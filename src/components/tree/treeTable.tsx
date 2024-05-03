@@ -11,6 +11,9 @@ import {
 import api from "@/lib/api"
 import { useEffect, useState } from "react"
 import { Skeleton } from "../ui/skeleton"
+import { useTree } from "@/hooks/useTree"
+import { Button } from "../ui/button"
+import { useModal } from "@/hooks/useModal"
 
 
 const tableCol = [{
@@ -41,9 +44,15 @@ const tableCol = [{
     label: 'M3',
     key: 'volumeM3',
     sortable: true
+}, {
+    label: 'Opções',
+    key: 'options',
+    sortable: false
 }]
 
 export const TreeTable = () => {
+    const { setTree } = useTree()
+    const { setForm } = useModal()
     const [data, setData] = useState([])
     const [loading, setLoading] = useState(true)
     useEffect(() => {
@@ -59,7 +68,19 @@ export const TreeTable = () => {
 
         }
     }
+    const onSelect = (tree: any) => {
+        setTree(tree)
+        setForm('treeForm')
+    }
+    const onDelete = async (id: string) => {
+        const { data } = await api.delete(`/tree?id=${id}`)
+        console.log(data)
+    }
+    const onView = async (id: string) => {
+        const { data } = await api.get(`/tree?id=${id}`)
+        console.log(data)
 
+    }
     return (
         <Table>
             <TableHeader>
@@ -89,6 +110,11 @@ export const TreeTable = () => {
                                 <TableCell>{tree.dap}</TableCell>
                                 <TableCell>{tree.meters}</TableCell>
                                 <TableCell>{tree.volumeM3}</TableCell>
+                                <TableCell>
+                                    <Button onClick={() => onSelect(tree)}>Editar</Button>
+                                    <Button onClick={() => onDelete(tree.id)}>Excluir</Button>
+                                    <Button onClick={() => onView(tree.id)}>Visualizar</Button>
+                                </TableCell>
                             </TableRow>
                         )
                     })

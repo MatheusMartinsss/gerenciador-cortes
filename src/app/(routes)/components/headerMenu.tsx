@@ -3,12 +3,12 @@ import { Button } from '@/components/ui/button';
 import { useModal } from '@/hooks/useModal';
 
 export const HeaderMenu = () => {
-    const { onOpen, setData } = useModal()
+    const { setForm } = useModal()
     return (
         <div className='flex w-full flex-row '>
             <Button onClick={() => {
-                setData('treeForm')
-                onOpen()
+                setForm('treeForm')
+
             }}>+ Arvore</Button>
         </div>
     )

@@ -5,7 +5,7 @@ interface ModalProps {
     onOpen: () => void
     onClose: () => void;
     form: string
-    setData(data: any): void
+    setForm(data: any): void
 }
 
 export const useModal = create<ModalProps>((set) => ({
@@ -13,5 +13,5 @@ export const useModal = create<ModalProps>((set) => ({
     onOpen: () => set({ isOpen: true }),
     onClose: () => set({ isOpen: false, form: '' }),
     form: '',
-    setData: (form) => set({ form: form })
+    setForm: (form) => set({ form: form, isOpen: true })
 }))

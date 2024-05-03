@@ -5,8 +5,10 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form"
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import api from '@/lib/api'
+import { useTree } from '@/hooks/useTree'
 
 const formSchema = z.object({
+    id: z.string().nullable(),
     commonName: z.string().min(2),
     scientificName: z.string().min(2),
     number: z.coerce.number(),
@@ -17,22 +19,30 @@ const formSchema = z.object({
 })
 
 export const TreeForm = () => {
+    const { tree } = useTree()
+    const editMode = tree !== null && typeof tree === 'object';
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            number: 0,
-            commonName: '',
-            scientificName: '',
-            dap: 0,
-            meters: 0,
-            range: 0,
-            volumeM3: 0
+            id: tree.id || '',
+            number: tree?.number || 0,
+            commonName: tree?.commonName || '',
+            scientificName: tree?.scientificName || '',
+            dap: tree.dap || 0,
+            meters: tree.meters || 0,
+            range: tree.range || 0,
+            volumeM3: tree.volumeM3 || 0
         }
     })
     async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
-            const { data } = await api.post('/tree', values)
-            console.log(data)
+            if (editMode) {
+                const { data } = await api.put('/tree', values)
+                console.log(data)
+            } else {
+                const { data } = await api.post('/tree', values)
+                console.log(data)
+            }
         } catch (error) {
             console.log(error)
         }
