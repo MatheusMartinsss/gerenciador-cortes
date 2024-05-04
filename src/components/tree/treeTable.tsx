@@ -2,7 +2,6 @@
 import {
     Table,
     TableBody,
-    TableCaption,
     TableCell,
     TableHead,
     TableHeader,
@@ -14,13 +13,10 @@ import { Skeleton } from "../ui/skeleton"
 import { useTree } from "@/hooks/useTree"
 import { Button } from "../ui/button"
 import { useModal } from "@/hooks/useModal"
+import { maskToM3, maskToMeters } from "@/lib/masks"
 
 
 const tableCol = [{
-    label: 'id',
-    key: 'id',
-    sortable: false,
-}, {
     label: 'N° Arvore',
     key: 'number',
     sortable: true
@@ -51,22 +47,22 @@ const tableCol = [{
 }]
 
 export const TreeTable = () => {
-    const { setTree } = useTree()
-    const { setForm } = useModal()
-    const [data, setData] = useState([])
+    const { setTree, trees, setTrees, removeTree } = useTree()
+    const { setForm, isOpen } = useModal()
     const [loading, setLoading] = useState(true)
+
     useEffect(() => {
         fetchData()
     }, [])
-
-    const fetchData = async () => {
-        try {
-            const { data } = await api.get('/tree')
-            setData(data)
-            setLoading(false)
-        } catch (error) {
-
+    useEffect(() => {
+        if (!isOpen) {
+            setTree(null)
         }
+    }, [isOpen])
+    const fetchData = async () => {
+        const { data } = await api.get('/tree')
+        setTrees(data)
+        setLoading(false)
     }
     const onSelect = (tree: any) => {
         setTree(tree)
@@ -74,11 +70,13 @@ export const TreeTable = () => {
     }
     const onDelete = async (id: string) => {
         const { data } = await api.delete(`/tree?id=${id}`)
-        console.log(data)
+        if (data) {
+            removeTree(id)
+        }
     }
     const onView = async (id: string) => {
         const { data } = await api.get(`/tree?id=${id}`)
-        console.log(data)
+        setTree(data)
 
     }
     return (
@@ -100,16 +98,15 @@ export const TreeTable = () => {
                         </TableCell>
                     </TableRow>
                 ) : (
-                    data.map((tree: any) => {
+                    trees.map((tree: any) => {
                         return (
                             <TableRow key={tree.id}>
-                                <TableCell >{tree.id}</TableCell>
                                 <TableCell>{tree.number}</TableCell>
                                 <TableCell>{tree.commonName}</TableCell>
                                 <TableCell>{tree.scientificName}</TableCell>
-                                <TableCell>{tree.dap}</TableCell>
-                                <TableCell>{tree.meters}</TableCell>
-                                <TableCell>{tree.volumeM3}</TableCell>
+                                <TableCell>{maskToMeters(tree.dap)}</TableCell>
+                                <TableCell>{maskToMeters(tree.meters)}</TableCell>
+                                <TableCell>{maskToM3(tree.volumeM3)}</TableCell>
                                 <TableCell>
                                     <Button onClick={() => onSelect(tree)}>Editar</Button>
                                     <Button onClick={() => onDelete(tree.id)}>Excluir</Button>

@@ -6,6 +6,10 @@ import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import api from '@/lib/api'
 import { useTree } from '@/hooks/useTree'
+import { useToast } from '../ui/use-toast'
+import { useModal } from '@/hooks/useModal'
+import { maskToM3, maskToMeters, unMask } from '@/lib/masks'
+import { useEffect } from 'react'
 
 const formSchema = z.object({
     id: z.string().nullable(),
@@ -19,29 +23,44 @@ const formSchema = z.object({
 })
 
 export const TreeForm = () => {
-    const { tree } = useTree()
-    const editMode = tree !== null && typeof tree === 'object';
+    const { tree, updateTrees, setTree, addTree } = useTree()
+    const { onClose, isOpen } = useModal()
+    const { toast } = useToast()
+    const editMode = !!tree;
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            id: tree.id || '',
+            id: tree?.id || null,
             number: tree?.number || 0,
             commonName: tree?.commonName || '',
             scientificName: tree?.scientificName || '',
-            dap: tree.dap || 0,
-            meters: tree.meters || 0,
-            range: tree.range || 0,
-            volumeM3: tree.volumeM3 || 0
+            dap: tree?.dap || 0,
+            meters: tree?.meters || 0,
+            range: tree?.range || 0,
+            volumeM3: tree?.volumeM3 || 0
         }
     })
     async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
             if (editMode) {
                 const { data } = await api.put('/tree', values)
-                console.log(data)
+                if (data) {
+                    updateTrees(data)
+                    toast({
+                        description: `Arvore n° ${data.number} atualizada com sucesso!`,
+                        variant: 'default'
+                    })
+                    setTree(null)
+                    onClose()
+                }
             } else {
                 const { data } = await api.post('/tree', values)
-                console.log(data)
+                toast({
+                    description: `Arvore n° ${data.number} criada com sucesso!`,
+                    variant: 'default'
+                })
+                addTree(data)
+                onClose()
             }
         } catch (error) {
             console.log(error)
@@ -95,9 +114,14 @@ export const TreeForm = () => {
                         name='dap'
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>DAP</FormLabel>
+                                <FormLabel>DAP (CM)</FormLabel>
                                 <FormControl>
-                                    <Input type='number' {...field} />
+                                    <Input
+                                        {...field}
+                                        value={maskToMeters(field.value)}
+                                        onChange={(e) => {
+                                            form.setValue('dap', unMask(e.target.value))
+                                        }} />
                                 </FormControl>
                             </FormItem>
                         )}
@@ -108,9 +132,14 @@ export const TreeForm = () => {
                         name='meters'
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Altura</FormLabel>
+                                <FormLabel>Altura (M)</FormLabel>
                                 <FormControl>
-                                    <Input type='number' {...field} />
+                                    <Input {...field}
+                                        value={maskToMeters(field.value)}
+                                        onChange={(e) => {
+                                            form.setValue('meters', unMask(e.target.value))
+                                        }}
+                                    />
                                 </FormControl>
                             </FormItem>
                         )}
@@ -123,7 +152,13 @@ export const TreeForm = () => {
                             <FormItem>
                                 <FormLabel>M3</FormLabel>
                                 <FormControl>
-                                    <Input type='number' {...field} />
+                                    <Input
+                                        {...field}
+                                        value={maskToM3(field.value)}
+                                        onChange={(e) => {
+                                            form.setValue('volumeM3', unMask(e.target.value))
+                                        }}
+                                    />
                                 </FormControl>
                             </FormItem>
                         )}

@@ -1,16 +1,14 @@
 generator client {
     provider = "prisma-client-js"
-
 }
 
 datasource db {
     provider = "postgresql"
     url      = env("POSTGRES_PRISMA_URL")
-    
 }
 
 model tree {
-    id             String @id @default(cuid())
+    id             String @id @default(uuid())
     number         Int
     scientificName String
     commonName     String
