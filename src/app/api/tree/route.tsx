@@ -2,20 +2,11 @@ import db from "@/lib/prisma"
 import { NextResponse, NextRequest } from "next/server"
 
 export async function POST(request: Request) {
-    let { commonName, scientificName, number, range, dap, meters, volumeM3 } = await request.json()
+    const body = await request.json()
     try {
-        const response = await db.tree.create({
-            data: {
-                commonName,
-                scientificName,
-                number,
-                range,
-                dap,
-                meters,
-                volumeM3
-            }
-        })
-        return NextResponse.json(response)
+        await db.tree.createMany({ data: body })
+        const updatedList = await db.tree.findMany()
+        return NextResponse.json(updatedList, { status: 201 })
     } catch (error) {
         console.log(error)
         throw error

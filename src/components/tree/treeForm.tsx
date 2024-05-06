@@ -9,7 +9,6 @@ import { useTree } from '@/hooks/useTree'
 import { useToast } from '../ui/use-toast'
 import { useModal } from '@/hooks/useModal'
 import { maskToM3, maskToMeters, unMask } from '@/lib/masks'
-import { useEffect } from 'react'
 
 const formSchema = z.object({
     id: z.string().nullable(),
@@ -24,7 +23,7 @@ const formSchema = z.object({
 
 export const TreeForm = () => {
     const { tree, updateTrees, setTree, addTree } = useTree()
-    const { onClose, isOpen } = useModal()
+    const { onClose } = useModal()
     const { toast } = useToast()
     const editMode = !!tree;
     const form = useForm<z.infer<typeof formSchema>>({
@@ -68,8 +67,8 @@ export const TreeForm = () => {
     }
     return (
         <div>
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
+            <Form {...form} >
+                <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8 w-[600px]'>
                     <FormField
                         control={form.control}
                         name='number'

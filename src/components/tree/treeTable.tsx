@@ -14,7 +14,7 @@ import { useTree } from "@/hooks/useTree"
 import { Button } from "../ui/button"
 import { useModal } from "@/hooks/useModal"
 import { maskToM3, maskToMeters } from "@/lib/masks"
-
+import { Trash, Pencil, Eye } from 'lucide-react';
 
 const tableCol = [{
     label: 'N° Arvore',
@@ -107,10 +107,25 @@ export const TreeTable = () => {
                                 <TableCell>{maskToMeters(tree.dap)}</TableCell>
                                 <TableCell>{maskToMeters(tree.meters)}</TableCell>
                                 <TableCell>{maskToM3(tree.volumeM3)}</TableCell>
-                                <TableCell>
-                                    <Button onClick={() => onSelect(tree)}>Editar</Button>
-                                    <Button onClick={() => onDelete(tree.id)}>Excluir</Button>
-                                    <Button onClick={() => onView(tree.id)}>Visualizar</Button>
+                                <TableCell className="space-x-2">
+                                    <Button
+                                        variant='outline'
+                                        onClick={() => onSelect(tree)}>
+                                        <Pencil className="mr-2 h-4 w-4" />
+                                        Editar
+                                    </Button>
+                                    <Button
+                                        variant='outline'
+                                        onClick={() => onDelete(tree.id)}>
+                                        <Trash className="mr-2 h-4 w-4" />
+                                        Remover
+                                    </Button>
+                                    <Button
+                                        variant='outline'
+                                        onClick={() => onView(tree.id)}>
+                                        <Eye className="mr-2 h-4 w-4" />
+                                        Visualizar
+                                    </Button>
                                 </TableCell>
                             </TableRow>
                         )
