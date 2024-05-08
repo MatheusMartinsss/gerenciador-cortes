@@ -14,6 +14,13 @@ export async function POST(request: Request) {
 }
 export async function GET(request: NextRequest) {
     const id = request.nextUrl.searchParams.get('id')
+    const page = Number(request.nextUrl.searchParams.get('page')) || 1
+    const orderBy = request.nextUrl.searchParams.get('orderBy') || 'number'
+    const sortOrderParam = request.nextUrl.searchParams.get('sortOrder');
+    const searchParam = request.nextUrl.searchParams.get('searchParam') || ""
+    const sortOrder = (sortOrderParam === 'asc' || sortOrderParam === 'desc') ? sortOrderParam : 'asc';
+    const limit = 10
+    const offSet = (page - 1) * limit
     try {
         if (id) {
             const response = await db.tree.findUnique({
@@ -26,8 +33,33 @@ export async function GET(request: NextRequest) {
             }
             return NextResponse.json(response)
         }
-        const response = await db.tree.findMany()
-        return NextResponse.json(response)
+        console.log(searchParam)
+
+        let where = {}
+        if (searchParam) {
+            where = {
+                OR: [{
+                    commonName: {
+                        search: searchParam.toLowerCase()
+                    },
+                }, {
+                    scientificName: {
+                        search: searchParam.toLowerCase()
+                    },
+                }]
+            }
+        }
+        let query = {
+            take: limit,
+            skip: offSet,
+            orderBy: { [orderBy]: sortOrder },
+            where
+
+        }
+        const response = await db.tree.findMany(query)
+        const count = await db.tree.count({ where })
+        const maxPages = Math.ceil(count / limit)
+        return NextResponse.json({ data: response, pages: maxPages })
     } catch (error) {
         console.log(error)
         throw error
