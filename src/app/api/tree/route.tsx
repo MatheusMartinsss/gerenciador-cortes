@@ -14,6 +14,7 @@ export async function POST(request: Request) {
 }
 export async function GET(request: NextRequest) {
     const id = request.nextUrl.searchParams.get('id')
+    const number = Number(request.nextUrl.searchParams.get('number'))
     const page = Number(request.nextUrl.searchParams.get('page')) || 1
     const orderBy = request.nextUrl.searchParams.get('orderBy') || 'number'
     const sortOrderParam = request.nextUrl.searchParams.get('sortOrder');
@@ -33,7 +34,17 @@ export async function GET(request: NextRequest) {
             }
             return NextResponse.json(response)
         }
-        console.log(searchParam)
+        if (number) {
+            const response = await db.tree.findFirst({
+                where: {
+                    number
+                }
+            })
+            if (!response) {
+                return NextResponse.json({ message: `Arvore N° ${number} não encontrada!` }, { status: 404 })
+            }
+            return NextResponse.json(response)
+        }
 
         let where = {}
         if (searchParam) {

@@ -18,8 +18,13 @@ import { maskToM3, maskToMeters } from "@/lib/masks"
 import { Trash, Pencil, Eye, MoveDown, MoveUp } from 'lucide-react';
 import { useParams } from "@/hooks/useSearchParams"
 import { TablePagination } from "../pagination/pagination"
+import { Checkbox } from "../ui/checkbox"
 
 const tableCol = [{
+    label: '#',
+    key: '#',
+    sortable: false
+}, {
     label: 'N° Arvore',
     key: 'number',
     sortable: true
@@ -50,7 +55,7 @@ const tableCol = [{
 }]
 
 export const TreeTable = () => {
-    const { setTree, trees, setTrees, removeTree } = useTree()
+    const { setTree, trees, setTrees, removeTree, selectedTrees, removeSelectedTree, addSelectedTree } = useTree()
     const { setForm, isOpen } = useModal()
     const { handleSort, params, handleOrderBy } = useParams()
     const [loading, setLoading] = useState(true)
@@ -94,6 +99,7 @@ export const TreeTable = () => {
         setTree(data)
 
     }
+    console.log(selectedTrees)
     return (
         <div className="flex flex-col w-full">
             <Table>
@@ -102,6 +108,7 @@ export const TreeTable = () => {
                         {tableCol.map((col) => {
                             const isSortable = col.sortable
                             const selected = col.key === orderBy
+
                             if (selected) return (
                                 <TableHead
                                     key={col.key}
@@ -134,8 +141,23 @@ export const TreeTable = () => {
                         </TableRow>
                     ) : (
                         trees.map((tree: any) => {
+                            const isSelected = selectedTrees.map((x) => x.id).includes(tree.id)
                             return (
                                 <TableRow key={tree.id}>
+                                    <TableCell>
+                                        <Checkbox
+                                            checked={isSelected}
+                                            onCheckedChange={() => {
+                                                if (isSelected) {
+                                                    removeSelectedTree(tree.id)
+                                                } else {
+                                                    console.log(tree)
+                                                    addSelectedTree(tree)
+                                                }
+                                            }}
+                                        >
+                                        </Checkbox>
+                                    </TableCell>
                                     <TableCell>{tree.number}</TableCell>
                                     <TableCell>{tree.commonName}</TableCell>
                                     <TableCell>{tree.scientificName}</TableCell>

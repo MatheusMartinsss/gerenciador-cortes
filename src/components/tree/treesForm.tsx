@@ -14,6 +14,7 @@ import api from "@/lib/api";
 import { useTree } from "@/hooks/useTree";
 import { useToast } from "../ui/use-toast";
 import { useModal } from "@/hooks/useModal"
+
 const TreeSchema = z.object({
     commonName: z.string().min(2),
     scientificName: z.string().min(2),

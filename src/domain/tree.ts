@@ -10,7 +10,7 @@ export interface ICreateTree {
 }
 
 export interface ITree {
-    id: string | null
+    id: string 
     number: number;
     commonName: string;
     range: number

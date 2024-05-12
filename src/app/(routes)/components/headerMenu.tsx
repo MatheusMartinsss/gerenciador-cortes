@@ -23,6 +23,17 @@ export const HeaderMenu = () => {
                     Importar
                 </Button>
             </div>
+            <div>
+                <Button
+                    variant='secondary'
+                    onClick={() => {
+                        setForm('sectionsForm')
+                    }}
+                >
+                    <TreePine className="mr-2 h-4 w-4" />
+                    Abater
+                </Button>
+            </div>
             <div className='flex'>
                 <div className='flex w-max-sm items-center space-x-1'>
                     <Input value={searchText} onChange={(e) => setSearchText(e.target.value)} ></Input>

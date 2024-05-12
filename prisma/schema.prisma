@@ -1,6 +1,7 @@
 generator client {
-    provider = "prisma-client-js"
+    provider        = "prisma-client-js"
     previewFeatures = ["fullTextSearch"]
+
 }
 
 datasource db {
@@ -9,12 +10,28 @@ datasource db {
 }
 
 model tree {
-    id             String @id @default(uuid())
-    number         Int
-    scientificName String
-    commonName     String
-    range          Int
-    dap            Int
-    meters         Int
-    volumeM3       Int
+    id               String    @id @default(uuid())
+    number           Int
+    scientificName   String
+    commonName       String
+    range            Int       @default(0)
+    dap              Int       @default(0)
+    meters           Int       @default(0)
+    volumeM3         Int       @default(0)
+    sectionsVolumeM3 Int       @default(0)
+    sections         section[]
+}
+
+model section {
+    id       String @id @default(uuid())
+    number   Int    
+    section  String
+    d1       Int    @default(0)
+    d2       Int    @default(0)
+    d3       Int    @default(0)
+    d4       Int    @default(0)
+    meters   Int    @default(0)
+    volumeM3 Int    @default(0)
+    tree_id  String
+    tree     tree   @relation(fields: [tree_id], references: [id])
 }
