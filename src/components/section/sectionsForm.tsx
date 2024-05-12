@@ -3,10 +3,10 @@ import { Button } from "../ui/button";
 import api from "@/lib/api";
 import FieldArray from "./FieldArray";
 import { FormFieldValues } from "./FormFieldValues";
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
 import { useTree } from '@/hooks/useTree';
 import { useEffect } from 'react';
+import { useModal } from '@/hooks/useModal';
+import { useToast } from '../ui/use-toast';
 
 const defaultValues: FormFieldValues = {
     tree: [
@@ -26,7 +26,9 @@ const defaultValues: FormFieldValues = {
 };
 
 export const SectionsForm = () => {
-    const { selectedTrees } = useTree()
+    const { selectedTrees, clearSelectedTrees } = useTree()
+    const { onClose } = useModal()
+    const { toast } = useToast()
     const { control,
         register,
         handleSubmit,
@@ -52,9 +54,13 @@ export const SectionsForm = () => {
     }, [selectedTrees])
     const onSubmit = async (value: FormFieldValues) => {
         const response = await api.post('/tree/section', value)
-        console.log(response)
         if (response.status == 201) {
-
+            toast({
+                description: `Abates lançados com sucesso!.`,
+                variant: 'default'
+            })
+            clearSelectedTrees()
+            onClose()
         }
 
     }

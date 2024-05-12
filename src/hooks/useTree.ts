@@ -13,6 +13,7 @@ interface TreeProps {
     addTree: (data: ITree) => void
     addSelectedTree: (data: ITree) => void
     removeSelectedTree: (id: string) => void
+    clearSelectedTrees: () => void
 }
 export const useTree = create<TreeProps>((set) => ({
     tree: null,
@@ -37,5 +38,6 @@ export const useTree = create<TreeProps>((set) => ({
     })),
     removeSelectedTree: (id) => set((prevState) => ({
         selectedTrees: prevState.selectedTrees.filter((newState) => newState.id !== id)
-    }))
+    })),
+    clearSelectedTrees: () => set({ selectedTrees: [] })
 }))

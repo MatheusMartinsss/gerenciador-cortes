@@ -182,7 +182,7 @@ const SubTotal = ({ nestIndex, idx, control, setValue }: {
         control,
         name: `tree.${nestIndex}.section.${idx}`
     })
-    const { d1, d2, d3, d4, meters, volumeM3 } = watch
+    const { d1, d2, d3, d4, meters } = watch
 
     const watchTrees = useWatch({
         control,

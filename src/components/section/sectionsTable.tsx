@@ -11,7 +11,6 @@ import {
 import api from "@/lib/api"
 import { useEffect, useState } from "react"
 import { Skeleton } from "../ui/skeleton"
-import { useTree } from "@/hooks/useTree"
 import { Button } from "../ui/button"
 import { useModal } from "@/hooks/useModal"
 import { maskToM3, maskToMeters } from "@/lib/masks"
@@ -19,6 +18,7 @@ import { Trash, Pencil, Eye, MoveDown, MoveUp } from 'lucide-react';
 import { useParams } from "@/hooks/useSearchParams"
 import { TablePagination } from "../pagination/pagination"
 import { Checkbox } from "../ui/checkbox"
+import { useSection } from "@/hooks/useSection"
 
 const tableCol = [{
     label: '#',
@@ -26,22 +26,38 @@ const tableCol = [{
     sortable: false
 }, {
     label: 'N° Arvore',
+    key: 'tree.number',
+    sortable: true
+}, {
+    label: 'Plaqueta',
     key: 'number',
     sortable: true
 }, {
-    label: 'N. Popular',
-    key: 'commonName',
-    sortable: true
-}, {
     label: 'N. Cientifico',
-    key: 'scientificName',
+    key: 'tree.scientificName',
     sortable: true
 }, {
-    label: 'DAP',
-    key: 'dap',
+    label: 'N. Popular',
+    key: 'tree.commonName',
     sortable: true
 }, {
-    label: 'Altura',
+    label: 'D1',
+    key: 'd1',
+    sortable: true
+}, {
+    label: 'D2',
+    key: 'd2',
+    sortable: true
+}, {
+    label: 'D3',
+    key: 'd3',
+    sortable: true
+}, {
+    label: 'D4',
+    key: 'd4',
+    sortable: true
+}, {
+    label: 'Comprimento',
     key: 'meters',
     sortable: true
 }, {
@@ -49,17 +65,13 @@ const tableCol = [{
     key: 'volumeM3',
     sortable: true
 }, {
-    label: 'M3 Abatido',
-    key: 'sectionsVolumeM3',
-    sortable: true
-}, {
     label: 'Opções',
     key: 'options',
     sortable: false
 }]
 
-export const TreeTable = () => {
-    const { setTree, trees, setTrees, removeTree, selectedTrees, removeSelectedTree, addSelectedTree } = useTree()
+export const SectionsTable = () => {
+    const { setSection, sections, setSections, removeSection, selectedSections, removeSelectedSection, addSelectedSection, } = useSection()
     const { setForm, isOpen } = useModal()
     const { handleSort, params, handleOrderBy } = useParams()
     const [loading, setLoading] = useState(true)
@@ -70,11 +82,11 @@ export const TreeTable = () => {
     }, [searchParam, page, sortOrder, from, end, orderBy])
     useEffect(() => {
         if (!isOpen) {
-            setTree(null)
+            setSection(null)
         }
     }, [isOpen])
     const fetchData = async () => {
-        const { data: { data, pages } } = await api.get('/tree', {
+        const { data: { data, pages } } = await api.get('/section', {
             params: {
                 page,
                 orderBy,
@@ -84,23 +96,24 @@ export const TreeTable = () => {
                 searchParam
             }
         })
-        setTrees(data)
+        console.log(data)
+        setSections(data)
         setMaxPages(pages)
         setLoading(false)
     }
-    const onSelect = (tree: any) => {
-        setTree(tree)
-        setForm('treeForm')
+    const onSelect = (section: any) => {
+        setSection(section)
+
     }
     const onDelete = async (id: string) => {
-        const { data } = await api.delete(`/tree?id=${id}`)
+        const { data } = await api.delete(`/section?id=${id}`)
         if (data) {
-            removeTree(id)
+            removeSection(id)
         }
     }
     const onView = async (id: string) => {
-        const { data } = await api.get(`/tree?id=${id}`)
-        setTree(data)
+        const { data } = await api.get(`/section?id=${id}`)
+        setSection(data)
 
     }
     return (
@@ -143,47 +156,49 @@ export const TreeTable = () => {
                             </TableCell>
                         </TableRow>
                     ) : (
-                        trees.map((tree: any) => {
-                            const isSelected = selectedTrees.map((x) => x.id).includes(tree.id)
+                        sections.map((section: any) => {
+                            const isSelected = selectedSections.map((x) => x.id).includes(section.id)
                             return (
-                                <TableRow key={tree.id}>
+                                <TableRow key={section.id}>
                                     <TableCell>
                                         <Checkbox
                                             checked={isSelected}
                                             onCheckedChange={() => {
                                                 if (isSelected) {
-                                                    removeSelectedTree(tree.id)
+                                                    removeSelectedSection(section.id)
                                                 } else {
-                                                    console.log(tree)
-                                                    addSelectedTree(tree)
+                                                    addSelectedSection(section)
                                                 }
                                             }}
                                         >
                                         </Checkbox>
                                     </TableCell>
-                                    <TableCell>{tree.number}</TableCell>
-                                    <TableCell>{tree.commonName}</TableCell>
-                                    <TableCell>{tree.scientificName}</TableCell>
-                                    <TableCell>{maskToMeters(tree.dap)}</TableCell>
-                                    <TableCell>{maskToMeters(tree.meters)}</TableCell>
-                                    <TableCell>{maskToM3(tree.volumeM3)}</TableCell>
-                                    <TableCell>{maskToM3(tree.sectionsVolumeM3)}</TableCell>
+                                    <TableCell>{section.tree.number}</TableCell>
+                                    <TableCell>{section.number}</TableCell>
+                                    <TableCell>{section.tree.scientificName}</TableCell>
+                                    <TableCell>{section.tree.commonName}</TableCell>
+                                    <TableCell>{maskToMeters(section.d1)}</TableCell>
+                                    <TableCell>{maskToMeters(section.d2)}</TableCell>
+                                    <TableCell>{maskToMeters(section.d3)}</TableCell>
+                                    <TableCell>{maskToMeters(section.d4)}</TableCell>
+                                    <TableCell>{maskToMeters(section.meters)}</TableCell>
+                                    <TableCell>{maskToM3(section.volumeM3)}</TableCell>
                                     <TableCell className="space-x-2 w-[400px]">
                                         <Button
                                             variant='outline'
-                                            onClick={() => onSelect(tree)}>
+                                            onClick={() => onSelect(section)}>
                                             <Pencil className="mr-2 h-4 w-4" />
                                             Editar
                                         </Button>
                                         <Button
                                             variant='outline'
-                                            onClick={() => onDelete(tree.id)}>
+                                            onClick={() => onDelete(section.id)}>
                                             <Trash className="mr-2 h-4 w-4" />
                                             Remover
                                         </Button>
                                         <Button
                                             variant='outline'
-                                            onClick={() => onView(tree.id)}>
+                                            onClick={() => onView(section.id)}>
                                             <Eye className="mr-2 h-4 w-4" />
                                             Visualizar
                                         </Button>
