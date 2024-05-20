@@ -10,8 +10,13 @@ import {
 } from "@/components/ui/pagination"
 import { useParams } from "@/hooks/useSearchParams"
 
-export function TablePagination({ pages }: { pages: number }) {
-    const { params, handlePage } = useParams()
+interface PaginationProps {
+    handlePage: (page: number) => void
+    params: any
+    pages: number
+}
+
+export function TablePagination({ pages, handlePage, params }: PaginationProps) {
     const { page = 1, limit = 10 } = params
 
     let currentPage = Number(page)
@@ -31,11 +36,11 @@ export function TablePagination({ pages }: { pages: number }) {
     }
     const handlePreviousPage = () => {
         if (currentPage <= 1) return
-        handlePage(String(currentPage - 1))
+        handlePage((currentPage - 1))
     }
     const handleNextPage = () => {
         if (currentPage == pages) return
-        handlePage(String(currentPage + 1))
+        handlePage((currentPage + 1))
     }
     return (
         <Pagination >
@@ -46,7 +51,7 @@ export function TablePagination({ pages }: { pages: number }) {
                 {previousPages.map((page) => {
                     return (
                         <PaginationItem key={page}>
-                            <PaginationLink onClick={() => handlePage(String(page))}>{page}</PaginationLink>
+                            <PaginationLink onClick={() => handlePage(page)}>{page}</PaginationLink>
                         </PaginationItem>
                     )
                 })}
@@ -58,7 +63,7 @@ export function TablePagination({ pages }: { pages: number }) {
                 {nextPages.map((page) => {
                     return (
                         <PaginationItem key={page}>
-                            <PaginationLink onClick={() => handlePage(String(page))}>{page}</PaginationLink>
+                            <PaginationLink onClick={() => handlePage(page)}>{page}</PaginationLink>
                         </PaginationItem>
                     )
                 })}

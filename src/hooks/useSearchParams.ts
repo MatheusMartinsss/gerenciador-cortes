@@ -87,7 +87,7 @@ export const useParams = () => {
         router.push(`?${newSearchParams}`);
     };
     const clearParams = () => {
-
+        router.replace('')
     }
 
     return {

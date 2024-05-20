@@ -19,6 +19,7 @@ import { useParams } from "@/hooks/useSearchParams"
 import { TablePagination } from "../pagination/pagination"
 import { Checkbox } from "../ui/checkbox"
 import { useSection } from "@/hooks/useSection"
+import { SectionTableHeader } from "./sectionTableHeader"
 
 const tableCol = [{
     label: '#',
@@ -57,7 +58,7 @@ const tableCol = [{
     key: 'd4',
     sortable: true
 }, {
-    label: 'Comprimento',
+    label: 'Comp.',
     key: 'meters',
     sortable: true
 }, {
@@ -71,15 +72,26 @@ const tableCol = [{
 }]
 
 export const SectionsTable = () => {
-    const { setSection, sections, setSections, removeSection, selectedSections, removeSelectedSection, addSelectedSection, } = useSection()
+    const {
+        setSection,
+        sections,
+        setSections,
+        removeSection,
+        selectedSections,
+        removeSelectedSection,
+        addSelectedSection,
+        params,
+        handleSort,
+        handleOrderBy,
+        handlePage
+    } = useSection()
     const { setForm, isOpen } = useModal()
-    const { handleSort, params, handleOrderBy } = useParams()
     const [loading, setLoading] = useState(true)
-    const { searchParam, sortOrder, from, end, orderBy, page } = params
+    const { searchParam, sortOrder, orderBy, page } = params
     const [maxPages, setMaxPages] = useState(0)
     useEffect(() => {
         fetchData()
-    }, [searchParam, page, sortOrder, from, end, orderBy])
+    }, [searchParam, page, sortOrder, orderBy])
     useEffect(() => {
         if (!isOpen) {
             setSection(null)
@@ -91,12 +103,9 @@ export const SectionsTable = () => {
                 page,
                 orderBy,
                 sortOrder,
-                from,
-                end,
                 searchParam
             }
         })
-        console.log(data)
         setSections(data)
         setMaxPages(pages)
         setLoading(false)
@@ -118,31 +127,35 @@ export const SectionsTable = () => {
     }
     return (
         <div className="flex flex-col w-full">
+            <SectionTableHeader />
             <Table>
                 <TableHeader>
                     <TableRow>
                         {tableCol.map((col) => {
                             const isSortable = col.sortable
                             const selected = col.key === orderBy
-
-                            if (selected) return (
-                                <TableHead
-                                    key={col.key}
-                                    className="flex items-center "
-                                    onClick={() => {
-                                        handleSort()
-                                    }} >
-                                    {col.label}
-                                    {sortOrder === 'asc' ? <MoveUp className="ml-2 h-4 w-4" /> : <MoveDown className="ml-2 h-4 w-4" />}
-                                </TableHead>
-                            )
                             return (
-                                <TableHead key={col.key} onClick={() => {
-                                    if (isSortable) {
-                                        handleOrderBy(col.key)
-                                    }
-                                }} >
-                                    {col.label}
+                                <TableHead key={col.key}
+                                    onClick={() => {
+                                        if (isSortable) {
+                                            handleOrderBy(col.key)
+                                            if (selected) {
+                                                handleSort()
+
+                                            }
+                                        }
+                                    }}
+                                >
+                                    <div className="flex space-x-2">
+                                        {col.label}
+                                        <div className="h-4 w-4 flex items-center justify-center">
+                                            {selected && (
+                                                sortOrder === 'asc' ?
+                                                    <MoveUp className="h-4 w-4" /> :
+                                                    <MoveDown className="h-4 w-4" />
+                                            )}
+                                        </div>
+                                    </div>
                                 </TableHead>
                             )
                         })}
@@ -186,12 +199,6 @@ export const SectionsTable = () => {
                                     <TableCell className="space-x-2 w-[400px]">
                                         <Button
                                             variant='outline'
-                                            onClick={() => onSelect(section)}>
-                                            <Pencil className="mr-2 h-4 w-4" />
-                                            Editar
-                                        </Button>
-                                        <Button
-                                            variant='outline'
                                             onClick={() => onDelete(section.id)}>
                                             <Trash className="mr-2 h-4 w-4" />
                                             Remover
@@ -211,7 +218,7 @@ export const SectionsTable = () => {
             </Table >
             <div className="flex justify-end">
                 <div>
-                    <TablePagination pages={maxPages} />
+                    <TablePagination pages={maxPages} handlePage={handlePage} params={params} />
                 </div>
             </div>
         </div>

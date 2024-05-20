@@ -12,6 +12,7 @@ export async function GET(request: NextRequest) {
     const sortOrder = (sortOrderParam === 'asc' || sortOrderParam === 'desc') ? sortOrderParam : 'asc';
     const limit = 10
     const offSet = (page - 1) * limit
+    let query: Prisma.sectionFindManyArgs = {}
     try {
         if (id) {
             const response = await db.section.findUnique({
@@ -39,41 +40,76 @@ export async function GET(request: NextRequest) {
         let where: Prisma.sectionWhereInput = {}
         if (searchParam) {
             where = {
-                tree: {
-                    OR: [{
-                        commonName: {
-                            search: searchParam.toLowerCase()
-                        },
-                    }, {
-                        scientificName: {
-                            search: searchParam.toLowerCase()
-                        },
-                    },
-                    {
-                        number: {
-                            equals: parseInt(searchParam)
-                        },
-                    }]
-                }
+                OR: [{
+                    tree: {
+                        OR: [{
+                            commonName: {
+                                contains: searchParam.toLowerCase(),
+                                mode: 'insensitive'
+                            },
+                        }, {
+                            scientificName: {
+                                contains: searchParam.toLowerCase(),
+                                mode: 'insensitive'
+                            },
+                        }, {
+                            number: {
+                                equals: Number(searchParam)
+                            }
+                        }]
+                    }
+                }, {
+                    number: {
+                        equals: Number(searchParam)
+                    }
+                }]
             }
         }
-        let query: Prisma.sectionFindManyArgs = {
-            take: limit,
-            skip: offSet,
-            orderBy: { [orderBy]: sortOrder },
-            where,
-            include: {
-                tree: {
-                    select: {
-                        commonName: true,
-                        scientificName: true,
-                        number: true
+        if (limit && offSet) {
+            query.take = limit
+            query.skip = offSet
+        }
 
+        if (orderBy) {
+            if (orderBy === 'tree.number') {
+                query.orderBy = {
+                    tree: {
+                        number: sortOrder
                     }
                 }
-            }
+            } else if (orderBy === 'tree.commonName') {
+                query.orderBy = {
+                    tree: {
+                        commonName: sortOrder
+                    }
+                }
 
+            } else if (orderBy === 'tree.scientificName') {
+                query.orderBy = {
+                    tree: {
+                        scientificName: sortOrder
+                    }
+                }
+            } else {
+                query.orderBy = {
+                    [orderBy]: sortOrder
+                }
+            }
         }
+        query.include = {
+            tree: {
+                select: {
+                    commonName: true,
+                    scientificName: true,
+                    number: true
+
+                }
+            }
+        }
+        if (where) {
+            query.where = where
+        }
+
         const response = await db.section.findMany(query)
         const count = await db.section.count({ where })
         const maxPages = Math.ceil(count / limit)

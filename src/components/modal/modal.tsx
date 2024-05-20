@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
 import { TreeForm } from "../tree/treeForm"
 import { TreesForm } from "../tree/treesForm"
 import { SectionsForm } from "../section/sectionsForm"
+import { SpecieForm } from "../species/specieForm"
 
 export const Modal = () => {
     const { isOpen, onClose, form } = useModal()
@@ -21,6 +22,9 @@ export const Modal = () => {
                 )}
                 {form === 'sectionsForm' && (
                     <SectionsForm />
+                )}
+                {form === 'specieForm' && (
+                    <SpecieForm />
                 )}
             </DialogContent>
         </Dialog>

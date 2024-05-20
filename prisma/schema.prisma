@@ -1,12 +1,21 @@
 generator client {
     provider        = "prisma-client-js"
     previewFeatures = ["fullTextSearch"]
-
 }
 
 datasource db {
     provider = "postgresql"
     url      = env("POSTGRES_PRISMA_URL")
+}
+
+model species {
+    id               String    @id @default(uuid())
+    scientificName   String    @default("")
+    commonName       String    @default("")
+    volumeM3         Int       @default(0)
+    sectionsVolumeM3 Int       @default(0)
+    trees            tree[]
+    sections         section[]
 }
 
 model tree {
@@ -20,18 +29,22 @@ model tree {
     volumeM3         Int       @default(0)
     sectionsVolumeM3 Int       @default(0)
     sections         section[]
+    species          species?  @relation(fields: [species_id], references: [id])
+    species_id       String?
 }
 
 model section {
-    id       String @id @default(uuid())
-    number   Int    
-    section  String
-    d1       Int    @default(0)
-    d2       Int    @default(0)
-    d3       Int    @default(0)
-    d4       Int    @default(0)
-    meters   Int    @default(0)
-    volumeM3 Int    @default(0)
-    tree_id  String
-    tree     tree   @relation(fields: [tree_id], references: [id])
+    id         String   @id @default(uuid())
+    number     Int
+    section    String
+    d1         Int      @default(0)
+    d2         Int      @default(0)
+    d3         Int      @default(0)
+    d4         Int      @default(0)
+    meters     Int      @default(0)
+    volumeM3   Int      @default(0)
+    tree_id    String
+    tree       tree     @relation(fields: [tree_id], references: [id])
+    species    species? @relation(fields: [species_id], references: [id])
+    species_id String?
 }

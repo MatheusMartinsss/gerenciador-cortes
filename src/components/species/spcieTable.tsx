@@ -3,7 +3,6 @@ import {
     Table,
     TableBody,
     TableCell,
-    TableFooter,
     TableHead,
     TableHeader,
     TableRow,
@@ -11,38 +10,21 @@ import {
 import api from "@/lib/api"
 import { useEffect, useState } from "react"
 import { Skeleton } from "../ui/skeleton"
-import { useTree } from "@/hooks/useTree"
 import { Button } from "../ui/button"
 import { useModal } from "@/hooks/useModal"
 import { maskToM3, maskToMeters } from "@/lib/masks"
 import { Trash, Pencil, Eye, MoveDown, MoveUp } from 'lucide-react';
-import { useParams } from "@/hooks/useSearchParams"
 import { TablePagination } from "../pagination/pagination"
-import { Checkbox } from "../ui/checkbox"
+import { usespecie } from "@/hooks/useSpecie"
+import { SpecieHeaderMenu } from "./tableHeader"
 
 const tableCol = [{
-    label: '#',
-    key: '#',
-    sortable: false
-}, {
-    label: 'N° Arvore',
-    key: 'number',
-    sortable: true
-}, {
     label: 'N. Popular',
     key: 'commonName',
     sortable: true
 }, {
     label: 'N. Cientifico',
     key: 'scientificName',
-    sortable: true
-}, {
-    label: 'DAP',
-    key: 'dap',
-    sortable: true
-}, {
-    label: 'Altura',
-    key: 'meters',
     sortable: true
 }, {
     label: 'M3',
@@ -58,19 +40,16 @@ const tableCol = [{
     sortable: false
 }]
 
-export const TreeTable = () => {
+export const SpecieTable = () => {
     const {
-        setTree,
-        trees,
-        setTrees,
-        removeTree,
-        selectedTrees,
-        removeSelectedTree,
-        addSelectedTree,
+        setSpecie,
+        species,
+        setSpecies,
+        removeSpecie,
         handleSort,
         handleOrderBy,
         handlePage,
-        params } = useTree()
+        params } = usespecie()
     const { setForm, isOpen } = useModal()
     const [loading, setLoading] = useState(true)
     const { searchParam, sortOrder, orderBy, page } = params
@@ -80,11 +59,11 @@ export const TreeTable = () => {
     }, [searchParam, page, sortOrder, orderBy])
     useEffect(() => {
         if (!isOpen) {
-            setTree(null)
+            setSpecie(null)
         }
     }, [isOpen])
     const fetchData = async () => {
-        const { data: { data, pages } } = await api.get('/tree', {
+        const { data: { data, pages } } = await api.get('/specie', {
             params: {
                 page,
                 orderBy,
@@ -92,27 +71,28 @@ export const TreeTable = () => {
                 searchParam
             }
         })
-        setTrees(data)
+        setSpecies(data)
         setMaxPages(pages)
         setLoading(false)
     }
     const onSelect = (tree: any) => {
-        setTree(tree)
-        setForm('treeForm')
+        setSpecie(tree)
+        setForm('specieForm')
     }
     const onDelete = async (id: string) => {
-        const { data } = await api.delete(`/tree?id=${id}`)
+        const { data } = await api.delete(`/specie?id=${id}`)
         if (data) {
-            removeTree(id)
+            removeSpecie(id)
         }
     }
     const onView = async (id: string) => {
-        const { data } = await api.get(`/tree?id=${id}`)
-        setTree(data)
+        const { data } = await api.get(`/specie?id=${id}`)
+        setSpecie(data)
 
     }
     return (
         <div className="flex flex-col w-full">
+            <SpecieHeaderMenu />
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -154,47 +134,29 @@ export const TreeTable = () => {
                             </TableCell>
                         </TableRow>
                     ) : (
-                        trees.map((tree: any) => {
-                            const isSelected = selectedTrees.map((x) => x.id).includes(tree.id)
+                        species.map((spcie: any) => {
                             return (
-                                <TableRow key={tree.id}>
-                                    <TableCell>
-                                        <Checkbox
-                                            checked={isSelected}
-                                            onCheckedChange={() => {
-                                                if (isSelected) {
-                                                    removeSelectedTree(tree.id)
-                                                } else {
-                                                    console.log(tree)
-                                                    addSelectedTree(tree)
-                                                }
-                                            }}
-                                        >
-                                        </Checkbox>
-                                    </TableCell>
-                                    <TableCell>{tree.number}</TableCell>
-                                    <TableCell className="w-[150px]">{tree.commonName}</TableCell>
-                                    <TableCell className="w-[200px]">{tree.scientificName}</TableCell>
-                                    <TableCell>{maskToMeters(tree.dap)}</TableCell>
-                                    <TableCell>{maskToMeters(tree.meters)}</TableCell>
-                                    <TableCell>{maskToM3(tree.volumeM3)}</TableCell>
-                                    <TableCell>{maskToM3(tree.sectionsVolumeM3)}</TableCell>
+                                <TableRow key={spcie.id}>
+                                    <TableCell className="">{spcie.commonName}</TableCell>
+                                    <TableCell className="">{spcie.scientificName}</TableCell>
+                                    <TableCell>{maskToM3(spcie.volumeM3)}</TableCell>
+                                    <TableCell>{maskToM3(spcie.sectionsVolumeM3)}</TableCell>
                                     <TableCell className="space-x-2 w-[400px]">
                                         <Button
                                             variant='outline'
-                                            onClick={() => onSelect(tree)}>
+                                            onClick={() => onSelect(spcie)}>
                                             <Pencil className="mr-2 h-4 w-4" />
                                             Editar
                                         </Button>
                                         <Button
                                             variant='outline'
-                                            onClick={() => onDelete(tree.id)}>
+                                            onClick={() => onDelete(spcie.id)}>
                                             <Trash className="mr-2 h-4 w-4" />
                                             Remover
                                         </Button>
                                         <Button
                                             variant='outline'
-                                            onClick={() => onView(tree.id)}>
+                                            onClick={() => onView(spcie.id)}>
                                             <Eye className="mr-2 h-4 w-4" />
                                             Visualizar
                                         </Button>
