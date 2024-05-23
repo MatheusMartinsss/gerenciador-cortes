@@ -80,6 +80,7 @@ export const TreesForm = () => {
                         if (rowNumber > 1) {
                             const rowData: ICreateTree = {
                                 range: 0,
+                                specie_id: '',
                                 number: 0,
                                 scientificName: '',
                                 commonName: '',

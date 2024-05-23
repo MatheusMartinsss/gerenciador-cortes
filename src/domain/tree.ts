@@ -1,5 +1,6 @@
 
 export interface ICreateTree {
+    specie_id: string;
     number: number;
     commonName: string;
     scientificName: string;

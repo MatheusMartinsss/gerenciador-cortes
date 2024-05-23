@@ -1,12 +1,73 @@
+import { ISpecie } from "@/domain/specie"
+import { ICreateTree } from "@/domain/tree"
 import db from "@/lib/prisma"
+import { PrismaClient, Prisma } from "@prisma/client"
 import { NextResponse, NextRequest } from "next/server"
+
+
 
 export async function POST(request: Request) {
     const body = await request.json()
     try {
-        await db.tree.createMany({ data: body })
-        const updatedList = await db.tree.findMany()
-        return NextResponse.json(updatedList, { status: 201 })
+        await db.$transaction(async (prisma) => {
+            await Promise.all(
+                body.specie.map(async (specie: ISpecie) => {
+                    const result = await prisma.species.findFirst({
+                        where: {
+                            scientificName: {
+                                contains: specie.scientificName,
+                                mode: 'insensitive'
+                            },
+                        }
+                    })
+                    if (result) {
+                        specie.id = result.id
+                        specie.volumeM3 = result.volumeM3,
+                            specie.trees = specie.trees.map((tree) => {
+                                return {
+                                    ...tree,
+                                    specie_id: result.id,
+                                    sectionsVolumeM3: 0
+                                }
+                            })
+                    } else {
+                        const newSpecie = await prisma.species.create({
+                            data: {
+                                commonName: specie.commonName,
+                                scientificName: specie.scientificName
+                            }
+                        })
+                        specie.id = newSpecie.id
+                        specie.trees = specie.trees.map((tree) => {
+                            return {
+                                ...tree,
+                                specie_id: newSpecie.id,
+                                sectionsVolumeM3: 0
+                            }
+                        })
+                    }
+
+                    await prisma.tree.createMany({ data: specie.trees })
+
+                    specie.volumeM3 += specie.trees.reduce((acc, obj) => {
+                        return acc + obj.volumeM3
+                    }, 0)
+
+                    await prisma.species.update({
+                        data: {
+                            volumeM3: specie.volumeM3
+                        },
+                        where: {
+                            id: specie.id
+                        }
+                    })
+
+                })
+            )
+        })
+        /*  await db.tree.createMany({ data: body })
+          const updatedList = await db.tree.findMany() */
+        return NextResponse.json("", { status: 201 })
     } catch (error) {
         console.log(error)
         throw error

@@ -2,7 +2,7 @@
 import { useModal } from "@/hooks/useModal"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
 import { TreeForm } from "../tree/treeForm"
-import { TreesForm } from "../tree/treesForm"
+import { TreesForm } from "../tree/TreesForm/treesForm"
 import { SectionsForm } from "../section/sectionsForm"
 import { SpecieForm } from "../species/specieForm"
 

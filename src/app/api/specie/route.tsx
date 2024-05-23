@@ -20,7 +20,7 @@ export async function POST(request: Request) {
 
 export async function GET(request: NextRequest) {
     const id = request.nextUrl.searchParams.get('id')
-    const page = Number(request.nextUrl.searchParams.get('page')) || 0
+    const page = Number(request.nextUrl.searchParams.get('page')) || 1
     const orderBy = request.nextUrl.searchParams.get('orderBy') || null
     const sortOrderParam = request.nextUrl.searchParams.get('sortOrder');
     const searchParam = request.nextUrl.searchParams.get('searchParam') || null

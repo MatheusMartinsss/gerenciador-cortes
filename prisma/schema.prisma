@@ -27,10 +27,10 @@ model tree {
     dap              Int       @default(0)
     meters           Int       @default(0)
     volumeM3         Int       @default(0)
-    sectionsVolumeM3 Int       @default(0)
+    sectionsVolumeM3 Int       @default(0)  
     sections         section[]
-    species          species?  @relation(fields: [species_id], references: [id])
-    species_id       String?
+    species          species?  @relation(fields: [specie_id], references: [id])
+    specie_id       String?
 }
 
 model section {
@@ -45,6 +45,6 @@ model section {
     volumeM3   Int      @default(0)
     tree_id    String
     tree       tree     @relation(fields: [tree_id], references: [id])
-    species    species? @relation(fields: [species_id], references: [id])
-    species_id String?
+    species    species? @relation(fields: [specie_id], references: [id])
+    specie_id String?
 }
