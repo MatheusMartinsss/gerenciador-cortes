@@ -19,7 +19,8 @@ const defaultValues: FormFieldValues = {
             scientificName: '',
             volumeM3: 0,
             sectionsVolumeM3: 0,
-            section: [{ tree_id: '', section: "", d1: 0, d2: 0, d3: 0, d4: 0, meters: 0, number: 0, volumeM3: 0 }]
+            specie_id: '',
+            section: [{ tree_id: '', section: "", d1: 0, d2: 0, d3: 0, d4: 0, meters: 0, number: 0, volumeM3: 0, specie_id: '' }]
         },
 
     ]
@@ -46,7 +47,7 @@ export const SectionsForm = () => {
                 return {
                     ...tree,
                     sectionsVolumeM3: 0,
-                    section: [{ tree_id: tree.id, section: "", d1: 0, d2: 0, d3: 0, d4: 0, meters: 0, number: 0, volumeM3: 0 }]
+                    section: [{ tree_id: tree.id, section: "", d1: 0, d2: 0, d3: 0, d4: 0, meters: 0, number: 0, volumeM3: 0, specie_id: tree.specie_id }]
                 }
             })
             setValue('tree', newValues)

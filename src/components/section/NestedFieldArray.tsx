@@ -25,7 +25,7 @@ export default ({
         name: `tree.${nestIndex}.section`
 
     });
-    const tree_id = watch(`tree.${nestIndex}.id`)
+    const tree = watch(`tree.${nestIndex}`)
     return (
         <div className="flex justify-center  flex-col space-y-4">
             {fields.map((item, k) => {
@@ -148,7 +148,8 @@ export default ({
                                     variant='outline'
                                     onClick={() =>
                                         append({
-                                            tree_id,
+                                            tree_id: tree.id,
+                                            specie_id: tree.specie_id, 
                                             section: "",
                                             d1: 0,
                                             d2: 0,

@@ -9,6 +9,7 @@ export interface ICreateSection {
     d4: number;
     volumeM3: number;
     tree_id: number;
+    specie_id: string;
     meters: number;
 }
 

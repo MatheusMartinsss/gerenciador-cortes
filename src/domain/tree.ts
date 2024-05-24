@@ -14,6 +14,7 @@ export interface ITree {
     id: string 
     number: number;
     commonName: string;
+    specie_id: string;
     range: number
     scientificName: string;
     dap: number;

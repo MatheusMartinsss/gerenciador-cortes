@@ -5,6 +5,7 @@ export type FormFieldValues = {
         dap: number;
         range: number;
         scientificName: string;
+        specie_id: string;
         commonName: string;
         volumeM3: number
         sectionsVolumeM3: number;
@@ -12,6 +13,7 @@ export type FormFieldValues = {
             tree_id: string;
             section: string;
             number: number;
+            specie_id: string;
             d1: number;
             d2: number;
             d3: number;

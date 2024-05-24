@@ -1,27 +1,39 @@
 import db from "@/lib/prisma"
+import { Prisma } from "@prisma/client"
 import { NextResponse, NextRequest } from "next/server"
 
 export async function POST(request: Request) {
     const body = await request.json()
     try {
         let cuts: any = []
-        await db?.$transaction(async (prisma: any) => {
+        await db?.$transaction(async (prisma: Prisma.TransactionClient) => {
             await Promise.all(
                 body.tree.map(async (item: any) => {
                     const tree = await prisma.tree.findUnique({
                         where: {
                             id: item.id
-                        }
-                    })
-                    await prisma.tree.update({
-                        where: {
-                            id: item.id
                         },
-                        data: {
-                            sectionsVolumeM3: tree.sectionsVolumeM3 + item.sectionsVolumeM3
+                        include: {
+                            species: true
                         }
                     })
-                    await prisma.section.createMany({ data: item.section })
+                    if (tree) {
+                        await prisma.tree.update({
+                            where: {
+                                id: item.id
+                            },
+                            data: {
+                                sectionsVolumeM3: tree.sectionsVolumeM3 + item.sectionsVolumeM3,
+                                species: {
+                                    update: {
+                                        sectionsVolumeM3: tree.species?.sectionsVolumeM3 + item.sectionsVolumeM3
+                                    }
+                                }
+                            }
+                        })
+
+                        await prisma.section.createMany({ data: item.section })
+                    }
                 })
             )
         },)

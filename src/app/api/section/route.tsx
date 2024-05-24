@@ -147,15 +147,42 @@ export async function DELETE(request: NextRequest, res: Response) {
             const section = await db.section.findUnique({
                 where: {
                     id: id
-                }
+                },
+
             })
             if (!section)
                 return NextResponse.json({ message: `Arvore ${id} não encontrada` }, { status: 404 })
 
-            await db.section.delete({
-                where: {
-                    id
+            await db.$transaction(async (prisma: Prisma.TransactionClient) => {
+                const tree = await prisma.tree.findUnique({
+                    where: {
+                        id: section.tree_id
+                    },
+                    include: {
+                        species: true
+                    }
+                })
+                if (tree) {
+                    await prisma.tree.update({
+                        where: {
+                            id: tree.id
+                        },
+                        data: {
+                            sectionsVolumeM3: tree.sectionsVolumeM3 - section.volumeM3,
+                            species: {
+                                update: {
+                                    sectionsVolumeM3: tree.species?.sectionsVolumeM3 - section.volumeM3
+                                }
+                            }
+                        },
+                    })
                 }
+                await prisma.section.delete({
+                    where: {
+                        id
+                    }
+                })
+
             })
             return NextResponse.json(true)
         }
