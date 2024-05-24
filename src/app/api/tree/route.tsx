@@ -142,7 +142,12 @@ export async function PUT(request: Request, res: Response) {
 
     const body = await request.json()
     try {
-        const tree = await db.tree.findUnique({ where: { id: body.id } })
+        const tree = await db.tree.findUnique({
+            where: {
+                id: body.id
+
+            },
+        })
         if (!tree) {
             return NextResponse.json({ message: `Arvore ${body.id} não encontrada!` }, { status: 404 })
         }
@@ -165,10 +170,17 @@ export async function DELETE(request: NextRequest, res: Response) {
             const tree = await db.tree.findUnique({
                 where: {
                     id: id
+                },
+                include: {
+                    sections: true
                 }
             })
             if (!tree)
                 return NextResponse.json({ message: `Arvore ${id} não encontrada` }, { status: 404 })
+
+            if (tree.sections.length > 0) {
+                return NextResponse.json({ message: `Arvore ${id} não pode ser deletada pois tem secções!` })
+            }
 
             await db.tree.delete({
                 where: {
