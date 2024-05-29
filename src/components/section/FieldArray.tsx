@@ -35,7 +35,7 @@ export default function Fields({
         <div className="space-y-4">
             {fields.map((item, index) => {
                 return (
-                    <div className="flex flex-col space-y-1 justify-center items-center w-full">
+                    <div className="flex flex-col space-y-1 justify-center items-center w-full" key={index}>
                         <Label className="font-bold"> N° {item.number} {item.scientificName} {item.commonName}</Label>
                         <div key={item.id} className="flex space-x-2 border-t-2 items-center w-full border-black border-l-2 border-l-black h-4 border-r-2 border-r-black">
                             <div className="flex flex-col">

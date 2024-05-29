@@ -15,6 +15,7 @@ export const SectionTableHeader = () => {
         <div className='flex w-full flex-row space-x-2  '>
             <div className='flex'>
                 <div className='flex w-max-sm items-center space-x-1'>
+                    <Button size='sm'>Gerar Corte</Button>
                     <Input value={searchText} onChange={(e) => setSearchText(e.target.value)} ></Input>
                     <Button variant='outline' onClick={() => handleSearchParam(searchText)}> <Search className="mr-2 h-4 w-4" /></Button>
                 </div>

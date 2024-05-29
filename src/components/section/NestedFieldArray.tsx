@@ -7,7 +7,7 @@ import { Label } from "../ui/label";
 import { Trash, Copy, CirclePlus } from 'lucide-react';
 import { maskToM3, maskToMeters, unMask } from "@/lib/masks";
 
-export default ({
+export default function NestedFieldArray({
     nestIndex,
     control,
     register,
@@ -19,7 +19,7 @@ export default ({
     register: UseFormRegister<FormFieldValues>;
     watch: UseFormWatch<FormFieldValues>
     setValue: UseFormSetValue<FormFieldValues>
-}) => {
+})  {
     const { fields, remove, append, insert } = useFieldArray({
         control,
         name: `tree.${nestIndex}.section`

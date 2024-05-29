@@ -94,13 +94,13 @@ export const SpecieTable = () => {
         <div className="flex flex-col w-full">
             <SpecieHeaderMenu />
             <Table>
-                <TableHeader>
-                    <TableRow>
+                <TableHeader className="bg-green-950 font-bold rounded-2xl ">
+                    <TableRow >
                         {tableCol.map((col) => {
                             const isSortable = col.sortable
                             const selected = col.key === orderBy
                             return (
-                                <TableHead key={col.key}
+                                <TableHead className="text-white" key={col.key}
                                     onClick={() => {
                                         if (isSortable) {
                                             handleOrderBy(col.key)
@@ -129,7 +129,7 @@ export const SpecieTable = () => {
                 <TableBody>
                     {loading ? (
                         <TableRow>
-                            <TableCell className="disabled:pointer-events-none" colSpan={7}>
+                            <TableCell className="disabled:pointer-events-none" colSpan={5}>
                                 <Skeleton className="h-[500px] w-full rounded-xl" ></Skeleton>
                             </TableCell>
                         </TableRow>
@@ -154,12 +154,12 @@ export const SpecieTable = () => {
                                             <Trash className="mr-2 h-4 w-4" />
                                             Remover
                                         </Button>
-                                        <Button
+                                        {/*  <Button
                                             variant='outline'
                                             onClick={() => onView(spcie.id)}>
                                             <Eye className="mr-2 h-4 w-4" />
                                             Visualizar
-                                        </Button>
+                            </Button> */}
                                     </TableCell>
                                 </TableRow>
                             )

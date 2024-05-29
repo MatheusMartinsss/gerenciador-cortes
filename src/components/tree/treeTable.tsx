@@ -114,13 +114,13 @@ export const TreeTable = () => {
     return (
         <div className="flex flex-col w-full">
             <Table>
-                <TableHeader>
+                <TableHeader className="bg-green-950 font-bold rounded-2xl ">
                     <TableRow>
                         {tableCol.map((col) => {
                             const isSortable = col.sortable
                             const selected = col.key === orderBy
                             return (
-                                <TableHead key={col.key}
+                                <TableHead className="text-white" key={col.key}
                                     onClick={() => {
                                         if (isSortable) {
                                             handleOrderBy(col.key)
@@ -149,11 +149,12 @@ export const TreeTable = () => {
                 <TableBody>
                     {loading ? (
                         <TableRow>
-                            <TableCell className="disabled:pointer-events-none" colSpan={7}>
+                            <TableCell className="disabled:pointer-events-none" colSpan={9}>
                                 <Skeleton className="h-[500px] w-full rounded-xl" ></Skeleton>
                             </TableCell>
                         </TableRow>
                     ) : (
+
                         trees.map((tree: any) => {
                             const isSelected = selectedTrees.map((x) => x.id).includes(tree.id)
                             return (
@@ -180,24 +181,24 @@ export const TreeTable = () => {
                                     <TableCell>{maskToM3(tree.volumeM3)}</TableCell>
                                     <TableCell>{maskToM3(tree.sectionsVolumeM3)}</TableCell>
                                     <TableCell className="space-x-2 w-[400px]">
-                                        <Button
+                                        {/*  <Button
                                             variant='outline'
                                             onClick={() => onSelect(tree)}>
                                             <Pencil className="mr-2 h-4 w-4" />
                                             Editar
-                                        </Button>
+                                        </Button> */}
                                         <Button
                                             variant='outline'
                                             onClick={() => onDelete(tree.id)}>
                                             <Trash className="mr-2 h-4 w-4" />
                                             Remover
                                         </Button>
-                                        <Button
+                                        {/* <Button
                                             variant='outline'
                                             onClick={() => onView(tree.id)}>
                                             <Eye className="mr-2 h-4 w-4" />
                                             Visualizar
-                                        </Button>
+                                    </Button> */}
                                     </TableCell>
                                 </TableRow>
                             )

@@ -20,6 +20,9 @@ import { TablePagination } from "../pagination/pagination"
 import { Checkbox } from "../ui/checkbox"
 import { useSection } from "@/hooks/useSection"
 import { SectionTableHeader } from "./sectionTableHeader"
+import { Input } from '@/components/ui/input';
+import { TreePine, Search } from 'lucide-react';
+import * as exceljs from 'exceljs'
 
 const tableCol = [{
     label: '#',
@@ -32,6 +35,10 @@ const tableCol = [{
 }, {
     label: 'Plaqueta',
     key: 'number',
+    sortable: true
+}, {
+    label: 'Secção',
+    key: 'section',
     sortable: true
 }, {
     label: 'N. Cientifico',
@@ -72,6 +79,7 @@ const tableCol = [{
 }]
 
 export const SectionsTable = () => {
+    const [searchText, setSearchText] = useState<string>('')
     const {
         setSection,
         sections,
@@ -82,6 +90,7 @@ export const SectionsTable = () => {
         addSelectedSection,
         params,
         handleSort,
+        handleSearchParam,
         handleOrderBy,
         handlePage
     } = useSection()
@@ -125,17 +134,72 @@ export const SectionsTable = () => {
         setSection(data)
 
     }
+    const generateBatch = () => {
+        const workBook = new exceljs.Workbook()
+        const sheet = workBook.addWorksheet("tracar");
+        sheet.columns = [
+            {
+                header: "Nº Árvore",
+                key: 'id'
+            }, {
+                header: "Secção",
+                key: 'section'
+            }, {
+                header: "Diâmetro 1 (m)",
+                key: 'd1'
+            }, {
+                header: "Diâmetro 2 (m)",
+                key: 'd2'
+            }, {
+                header: "Comprimento (m)",
+                key: 'comp'
+            }
+        ]
+        if (selectedSections.length > 0) {
+            selectedSections.map((section: any) => {
+                sheet.addRow({
+                    id: section.tree?.number,
+                    section: section.section,
+                    d1: (section.d1 / 100),
+                    d2: (section.d2 / 100),
+                    comp: (section.meters / 100)
+                })
+            })
+
+            workBook.xlsx.writeBuffer().then((data) => {
+                const blob = new Blob([data], {
+                    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                })
+                const url = window.URL.createObjectURL(blob);
+                const anchor = document.createElement("a");
+                anchor.href = url;
+                anchor.download = "download.xlsx";
+                anchor.click();
+                window.URL.revokeObjectURL(url);
+            })
+        }
+    }
     return (
         <div className="flex flex-col w-full">
-            <SectionTableHeader />
+            <div className='flex w-full flex-row space-x-2  '>
+                <div className='flex'>
+                    <div className='flex w-max-sm items-center space-x-1'>
+                        <Button disabled={selectedSections.length === 0} size='sm' onClick={generateBatch}>Gerar Corte</Button>
+                        <Input value={searchText} onChange={(e) => setSearchText(e.target.value)} ></Input>
+                        <Button variant='outline' onClick={() => handleSearchParam(searchText)}> <Search className="mr-2 h-4 w-4" /></Button>
+                    </div>
+                </div>
+            </div>
             <Table>
-                <TableHeader>
-                    <TableRow>
+                <TableHeader className="bg-green-950 font-bold rounded-2xl ">
+                    <TableRow className="">
                         {tableCol.map((col) => {
                             const isSortable = col.sortable
                             const selected = col.key === orderBy
                             return (
-                                <TableHead key={col.key}
+                                <TableHead
+                                    className="text-white"
+                                    key={col.key}
                                     onClick={() => {
                                         if (isSortable) {
                                             handleOrderBy(col.key)
@@ -164,7 +228,7 @@ export const SectionsTable = () => {
                 <TableBody>
                     {loading ? (
                         <TableRow>
-                            <TableCell className="disabled:pointer-events-none" colSpan={7}>
+                            <TableCell className="disabled:pointer-events-none" colSpan={13}>
                                 <Skeleton className="h-[500px] w-full rounded-xl" ></Skeleton>
                             </TableCell>
                         </TableRow>
@@ -188,6 +252,7 @@ export const SectionsTable = () => {
                                     </TableCell>
                                     <TableCell>{section.tree.number}</TableCell>
                                     <TableCell>{section.number}</TableCell>
+                                    <TableCell>{section.section}</TableCell>
                                     <TableCell>{section.tree.scientificName}</TableCell>
                                     <TableCell>{section.tree.commonName}</TableCell>
                                     <TableCell>{maskToMeters(section.d1)}</TableCell>
@@ -203,12 +268,12 @@ export const SectionsTable = () => {
                                             <Trash className="mr-2 h-4 w-4" />
                                             Remover
                                         </Button>
-                                        <Button
+                                        {/*  <Button
                                             variant='outline'
                                             onClick={() => onView(section.id)}>
                                             <Eye className="mr-2 h-4 w-4" />
                                             Visualizar
-                                        </Button>
+                                        </Button> */}
                                     </TableCell>
                                 </TableRow>
                             )

@@ -1,5 +1,5 @@
 import db from "@/lib/prisma"
-import { Prisma } from "@prisma/client"
+import { Prisma, PrismaClient } from "@prisma/client"
 import { NextResponse, NextRequest } from "next/server"
 
 export async function POST(request: Request) {
@@ -60,6 +60,50 @@ export async function POST(request: Request) {
             )
         },)
         return NextResponse.json(cuts, { status: 201 })
+    } catch (error) {
+        console.log(error)
+        throw error
+    }
+}
+
+export async function GET(request: NextRequest) {
+    const id = request.nextUrl.searchParams.get('id')
+    const page = Number(request.nextUrl.searchParams.get('page')) || 1
+    const orderBy = request.nextUrl.searchParams.get('orderBy') || 'number'
+    const sortOrderParam = request.nextUrl.searchParams.get('sortOrder');
+    const searchParam = request.nextUrl.searchParams.get('searchParam') || ""
+    const sortOrder = (sortOrderParam === 'asc' || sortOrderParam === 'desc') ? sortOrderParam : 'asc';
+    const limit = 10
+    const offSet = (page - 1) * limit
+    try {
+        if (id) {
+            const response = await db.batch.findUnique({
+                where: {
+                    id: id
+                }
+            })
+            if (!response) {
+                return NextResponse.json({ message: `Abate ${id} não encontrada!` }, { status: 404 })
+            }
+            return NextResponse.json(response)
+        }
+        let where = {}
+        if (searchParam) {
+            where = {
+              
+            }
+        }
+        let query = {
+            take: limit,
+            skip: offSet,
+            orderBy: { [orderBy]: sortOrder },
+            where
+
+        }
+        const response = await db.batch.findMany(query)
+        const count = await db.batch.count({ where })
+        const maxPages = Math.ceil(count / limit)
+        return NextResponse.json({ data: response, pages: maxPages })
     } catch (error) {
         console.log(error)
         throw error

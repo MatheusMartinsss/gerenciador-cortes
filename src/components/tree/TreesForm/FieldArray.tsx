@@ -35,7 +35,7 @@ export default function Fields({
         <div className="space-y-4">
             {fields.map((item, index) => {
                 return (
-                    <div className="flex flex-col space-y-1 justify-center  w-full">
+                    <div key={index} className="flex flex-col space-y-1 justify-center  w-full">
                         <div className="flex flex-row justify-between">
                             <div className="flex flex-col">
                                 <Label className="font-bold">N. Cientifico</Label>
