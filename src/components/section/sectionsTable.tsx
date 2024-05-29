@@ -23,6 +23,7 @@ import { SectionTableHeader } from "./sectionTableHeader"
 import { Input } from '@/components/ui/input';
 import { TreePine, Search } from 'lucide-react';
 import * as exceljs from 'exceljs'
+import { Label } from "../ui/label"
 
 const tableCol = [{
     label: '#',
@@ -180,7 +181,7 @@ export const SectionsTable = () => {
         }
     }
     return (
-        <div className="flex flex-col w-full">
+        <div className="flex flex-col w-full space-y-2">
             <div className='flex w-full flex-row space-x-2  '>
                 <div className='flex'>
                     <div className='flex w-max-sm items-center space-x-1'>
@@ -233,51 +234,62 @@ export const SectionsTable = () => {
                             </TableCell>
                         </TableRow>
                     ) : (
-                        sections.map((section: any) => {
-                            const isSelected = selectedSections.map((x) => x.id).includes(section.id)
-                            return (
-                                <TableRow key={section.id}>
-                                    <TableCell>
-                                        <Checkbox
-                                            checked={isSelected}
-                                            onCheckedChange={() => {
-                                                if (isSelected) {
-                                                    removeSelectedSection(section.id)
-                                                } else {
-                                                    addSelectedSection(section)
-                                                }
-                                            }}
-                                        >
-                                        </Checkbox>
-                                    </TableCell>
-                                    <TableCell>{section.tree.number}</TableCell>
-                                    <TableCell>{section.number}</TableCell>
-                                    <TableCell>{section.section}</TableCell>
-                                    <TableCell>{section.tree.scientificName}</TableCell>
-                                    <TableCell>{section.tree.commonName}</TableCell>
-                                    <TableCell>{maskToMeters(section.d1)}</TableCell>
-                                    <TableCell>{maskToMeters(section.d2)}</TableCell>
-                                    <TableCell>{maskToMeters(section.d3)}</TableCell>
-                                    <TableCell>{maskToMeters(section.d4)}</TableCell>
-                                    <TableCell>{maskToMeters(section.meters)}</TableCell>
-                                    <TableCell>{maskToM3(section.volumeM3)}</TableCell>
-                                    <TableCell className="space-x-2 w-[400px]">
-                                        <Button
-                                            variant='outline'
-                                            onClick={() => onDelete(section.id)}>
-                                            <Trash className="mr-2 h-4 w-4" />
-                                            Remover
-                                        </Button>
-                                        {/*  <Button
-                                            variant='outline'
-                                            onClick={() => onView(section.id)}>
-                                            <Eye className="mr-2 h-4 w-4" />
-                                            Visualizar
-                                        </Button> */}
-                                    </TableCell>
-                                </TableRow>
-                            )
-                        })
+                        sections.length > 0 ? (
+                            sections.map((section: any) => {
+                                const isSelected = selectedSections.map((x) => x.id).includes(section.id)
+                                return (
+                                    <TableRow key={section.id}>
+                                        <TableCell>
+                                            <Checkbox
+                                                checked={isSelected}
+                                                onCheckedChange={() => {
+                                                    if (isSelected) {
+                                                        removeSelectedSection(section.id)
+                                                    } else {
+                                                        addSelectedSection(section)
+                                                    }
+                                                }}
+                                            >
+                                            </Checkbox>
+                                        </TableCell>
+                                        <TableCell>{section.tree.number}</TableCell>
+                                        <TableCell>{section.number}</TableCell>
+                                        <TableCell>{section.section}</TableCell>
+                                        <TableCell>{section.tree.scientificName}</TableCell>
+                                        <TableCell>{section.tree.commonName}</TableCell>
+                                        <TableCell>{maskToMeters(section.d1)}</TableCell>
+                                        <TableCell>{maskToMeters(section.d2)}</TableCell>
+                                        <TableCell>{maskToMeters(section.d3)}</TableCell>
+                                        <TableCell>{maskToMeters(section.d4)}</TableCell>
+                                        <TableCell>{maskToMeters(section.meters)}</TableCell>
+                                        <TableCell>{maskToM3(section.volumeM3)}</TableCell>
+                                        <TableCell className="space-x-2 w-[400px]">
+                                            <Button
+                                                variant='outline'
+                                                onClick={() => onDelete(section.id)}>
+                                                <Trash className="mr-2 h-4 w-4" />
+                                                Remover
+                                            </Button>
+                                            {/*  <Button
+                                                variant='outline'
+                                                onClick={() => onView(section.id)}>
+                                                <Eye className="mr-2 h-4 w-4" />
+                                                Visualizar
+                                            </Button> */}
+                                        </TableCell>
+                                    </TableRow>
+                                )
+                            })
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={13} className="disabled:pointer-events-none" >
+                                    <div className="w-full flex flex-col items-center text-center justify-center h-[500px] bg-slate-200 rounded-lg space-y-4 ">
+                                        <Label className="font-bold">Nenhuma secção encontrada!</Label>
+
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        )
                     )}
                 </TableBody >
             </Table >

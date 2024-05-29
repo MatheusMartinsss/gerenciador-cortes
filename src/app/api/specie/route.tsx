@@ -115,10 +115,17 @@ export async function DELETE(request: NextRequest, res: Response) {
             const species = await db.species.findUnique({
                 where: {
                     id: id
+                },
+                include: {
+                    trees: true
                 }
             })
             if (!species)
                 return NextResponse.json({ message: `Arvore ${id} não encontrada` }, { status: 404 })
+
+            if (species.trees.length > 0) {
+                return NextResponse.json({ message: `Arvore ${id} não pode ser deletada!` }, { status: 500 })
+            }
 
             await db.species.delete({
                 where: {

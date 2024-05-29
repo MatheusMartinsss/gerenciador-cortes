@@ -17,6 +17,7 @@ import { Trash, Pencil, Eye, MoveDown, MoveUp } from 'lucide-react';
 import { TablePagination } from "../pagination/pagination"
 import { usespecie } from "@/hooks/useSpecie"
 import { SpecieHeaderMenu } from "./tableHeader"
+import { Label } from "../ui/label"
 
 const tableCol = [{
     label: 'N. Popular',
@@ -91,7 +92,7 @@ export const SpecieTable = () => {
 
     }
     return (
-        <div className="flex flex-col w-full">
+        <div className="flex flex-col w-full space-y-2">
             <SpecieHeaderMenu />
             <Table>
                 <TableHeader className="bg-green-950 font-bold rounded-2xl ">
@@ -134,36 +135,46 @@ export const SpecieTable = () => {
                             </TableCell>
                         </TableRow>
                     ) : (
-                        species.map((spcie: any) => {
-                            return (
-                                <TableRow key={spcie.id}>
-                                    <TableCell className="">{spcie.commonName}</TableCell>
-                                    <TableCell className="">{spcie.scientificName}</TableCell>
-                                    <TableCell>{maskToM3(spcie.volumeM3)}</TableCell>
-                                    <TableCell>{maskToM3(spcie.sectionsVolumeM3)}</TableCell>
-                                    <TableCell className="space-x-2 w-[400px]">
-                                        <Button
-                                            variant='outline'
-                                            onClick={() => onSelect(spcie)}>
-                                            <Pencil className="mr-2 h-4 w-4" />
-                                            Editar
-                                        </Button>
-                                        <Button
-                                            variant='outline'
-                                            onClick={() => onDelete(spcie.id)}>
-                                            <Trash className="mr-2 h-4 w-4" />
-                                            Remover
-                                        </Button>
-                                        {/*  <Button
-                                            variant='outline'
-                                            onClick={() => onView(spcie.id)}>
-                                            <Eye className="mr-2 h-4 w-4" />
-                                            Visualizar
-                            </Button> */}
-                                    </TableCell>
-                                </TableRow>
-                            )
-                        })
+                        species.length > 0 ? (
+                            species.map((spcie: any) => {
+                                return (
+                                    <TableRow key={spcie.id}>
+                                        <TableCell className="">{spcie.commonName}</TableCell>
+                                        <TableCell className="">{spcie.scientificName}</TableCell>
+                                        <TableCell>{maskToM3(spcie.volumeM3)}</TableCell>
+                                        <TableCell>{maskToM3(spcie.sectionsVolumeM3)}</TableCell>
+                                        <TableCell className="space-x-2 w-[400px]">
+                                            <Button
+                                                variant='outline'
+                                                onClick={() => onSelect(spcie)}>
+                                                <Pencil className="mr-2 h-4 w-4" />
+                                                Editar
+                                            </Button>
+                                            <Button
+                                                variant='outline'
+                                                onClick={() => onDelete(spcie.id)}>
+                                                <Trash className="mr-2 h-4 w-4" />
+                                                Remover
+                                            </Button>
+                                            {/*  <Button
+                                                variant='outline'
+                                                onClick={() => onView(spcie.id)}>
+                                                <Eye className="mr-2 h-4 w-4" />
+                                                Visualizar
+                                </Button> */}
+                                        </TableCell>
+                                    </TableRow>
+                                )
+                            })
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={13} className="disabled:pointer-events-none" >
+                                    <div className="w-full flex flex-col items-center text-center justify-center h-[500px] bg-slate-200 rounded-lg space-y-4 ">
+                                        <Label className="font-bold">Nenhuma especie encontrada!</Label>
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        )
                     )}
                 </TableBody >
             </Table >

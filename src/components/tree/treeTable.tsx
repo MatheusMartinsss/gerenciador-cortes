@@ -13,12 +13,15 @@ import { useEffect, useState } from "react"
 import { Skeleton } from "../ui/skeleton"
 import { useTree } from "@/hooks/useTree"
 import { Button } from "../ui/button"
+import { TreePine, Search } from 'lucide-react';
 import { useModal } from "@/hooks/useModal"
 import { maskToM3, maskToMeters } from "@/lib/masks"
 import { Trash, Pencil, Eye, MoveDown, MoveUp } from 'lucide-react';
 import { useParams } from "@/hooks/useSearchParams"
+import { Input } from '@/components/ui/input';
 import { TablePagination } from "../pagination/pagination"
 import { Checkbox } from "../ui/checkbox"
+import { Label } from "../ui/label"
 
 const tableCol = [{
     label: '#',
@@ -68,10 +71,12 @@ export const TreeTable = () => {
         removeSelectedTree,
         addSelectedTree,
         handleSort,
+        handleSearchParam,
         handleOrderBy,
         handlePage,
         params } = useTree()
     const { setForm, isOpen } = useModal()
+    const [searchText, setSearchText] = useState<string>('')
     const [loading, setLoading] = useState(true)
     const { searchParam, sortOrder, orderBy, page } = params
     const [maxPages, setMaxPages] = useState(0)
@@ -112,7 +117,38 @@ export const TreeTable = () => {
 
     }
     return (
-        <div className="flex flex-col w-full">
+        <div className="flex flex-col w-full space-y-2 ">
+            <div className='flex w-full flex-row space-x-2  '>
+                <div>
+                    <Button
+                        variant='secondary'
+                        onClick={() => {
+                            setForm('treesForm')
+                        }}
+                    >
+                        <TreePine className="mr-2 h-4 w-4" />
+                        Importar
+                    </Button>
+                </div>
+                <div>
+                    <Button
+                        disabled={selectedTrees.length === 0}
+                        variant='secondary'
+                        onClick={() => {
+                            setForm('sectionsForm')
+                        }}
+                    >
+                        <TreePine className="mr-2 h-4 w-4" />
+                        Abater
+                    </Button>
+                </div>
+                <div className='flex'>
+                    <div className='flex w-max-sm items-center space-x-1'>
+                        <Input value={searchText} onChange={(e) => setSearchText(e.target.value)} ></Input>
+                        <Button variant='outline' onClick={() => handleSearchParam(searchText)}> <Search className="mr-2 h-4 w-4" /></Button>
+                    </div>
+                </div>
+            </div>
             <Table>
                 <TableHeader className="bg-green-950 font-bold rounded-2xl ">
                     <TableRow>
@@ -146,7 +182,7 @@ export const TreeTable = () => {
                         })}
                     </TableRow>
                 </TableHeader>
-                <TableBody>
+                <TableBody className=" overflow-y-scroll w-full rounded-xl">
                     {loading ? (
                         <TableRow>
                             <TableCell className="disabled:pointer-events-none" colSpan={9}>
@@ -154,55 +190,74 @@ export const TreeTable = () => {
                             </TableCell>
                         </TableRow>
                     ) : (
-
-                        trees.map((tree: any) => {
-                            const isSelected = selectedTrees.map((x) => x.id).includes(tree.id)
-                            return (
-                                <TableRow key={tree.id}>
-                                    <TableCell>
-                                        <Checkbox
-                                            checked={isSelected}
-                                            onCheckedChange={() => {
-                                                if (isSelected) {
-                                                    removeSelectedTree(tree.id)
-                                                } else {
-                                                    console.log(tree)
-                                                    addSelectedTree(tree)
-                                                }
+                        trees.length > 0 ? (
+                            trees.map((tree: any) => {
+                                const isSelected = selectedTrees.map((x) => x.id).includes(tree.id)
+                                return (
+                                    <TableRow key={tree.id}>
+                                        <TableCell>
+                                            <Checkbox
+                                                checked={isSelected}
+                                                onCheckedChange={() => {
+                                                    if (isSelected) {
+                                                        removeSelectedTree(tree.id)
+                                                    } else {
+                                                        console.log(tree)
+                                                        addSelectedTree(tree)
+                                                    }
+                                                }}
+                                            >
+                                            </Checkbox>
+                                        </TableCell>
+                                        <TableCell>{tree.number}</TableCell>
+                                        <TableCell className="w-[150px]">{tree.commonName}</TableCell>
+                                        <TableCell className="w-[200px]">{tree.scientificName}</TableCell>
+                                        <TableCell>{maskToMeters(tree.dap)}</TableCell>
+                                        <TableCell>{maskToMeters(tree.meters)}</TableCell>
+                                        <TableCell>{maskToM3(tree.volumeM3)}</TableCell>
+                                        <TableCell>{maskToM3(tree.sectionsVolumeM3)}</TableCell>
+                                        <TableCell className="space-x-2 w-[400px]">
+                                            {/*  <Button
+                                                variant='outline'
+                                                onClick={() => onSelect(tree)}>
+                                                <Pencil className="mr-2 h-4 w-4" />
+                                                Editar
+                                            </Button> */}
+                                            <Button
+                                                variant='outline'
+                                                onClick={() => onDelete(tree.id)}>
+                                                <Trash className="mr-2 h-4 w-4" />
+                                                Remover
+                                            </Button>
+                                            {/* <Button
+                                                variant='outline'
+                                                onClick={() => onView(tree.id)}>
+                                                <Eye className="mr-2 h-4 w-4" />
+                                                Visualizar
+                                        </Button> */}
+                                        </TableCell>
+                                    </TableRow>
+                                )
+                            })
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={9} className="disabled:pointer-events-none" >
+                                    <div className="w-full flex flex-col items-center text-center justify-center h-[500px] bg-slate-200 rounded-lg space-y-4 ">
+                                        <Label className="font-bold">Nenhuma arvore encontrada!</Label>
+                                        <Button
+                                            variant='secondary'
+                                            onClick={() => {
+                                                setForm('treesForm')
                                             }}
                                         >
-                                        </Checkbox>
-                                    </TableCell>
-                                    <TableCell>{tree.number}</TableCell>
-                                    <TableCell className="w-[150px]">{tree.commonName}</TableCell>
-                                    <TableCell className="w-[200px]">{tree.scientificName}</TableCell>
-                                    <TableCell>{maskToMeters(tree.dap)}</TableCell>
-                                    <TableCell>{maskToMeters(tree.meters)}</TableCell>
-                                    <TableCell>{maskToM3(tree.volumeM3)}</TableCell>
-                                    <TableCell>{maskToM3(tree.sectionsVolumeM3)}</TableCell>
-                                    <TableCell className="space-x-2 w-[400px]">
-                                        {/*  <Button
-                                            variant='outline'
-                                            onClick={() => onSelect(tree)}>
-                                            <Pencil className="mr-2 h-4 w-4" />
-                                            Editar
-                                        </Button> */}
-                                        <Button
-                                            variant='outline'
-                                            onClick={() => onDelete(tree.id)}>
-                                            <Trash className="mr-2 h-4 w-4" />
-                                            Remover
+                                            <TreePine className="mr-2 h-4 w-4" />
+                                            Importar
                                         </Button>
-                                        {/* <Button
-                                            variant='outline'
-                                            onClick={() => onView(tree.id)}>
-                                            <Eye className="mr-2 h-4 w-4" />
-                                            Visualizar
-                                    </Button> */}
-                                    </TableCell>
-                                </TableRow>
-                            )
-                        })
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+
+                        )
                     )}
                 </TableBody >
             </Table >

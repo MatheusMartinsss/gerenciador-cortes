@@ -181,7 +181,8 @@ export async function DELETE(request: NextRequest, res: Response) {
                     id: id
                 },
                 include: {
-                    sections: true
+                    sections: true,
+                    species: true
                 }
             })
             if (!tree)
@@ -190,6 +191,14 @@ export async function DELETE(request: NextRequest, res: Response) {
             if (tree.sections.length > 0) {
                 return NextResponse.json({ message: `Arvore ${id} não pode ser deletada pois tem secções!` })
             }
+            await db.species.update({
+                where: {
+                    id: tree.specie_id,
+                },
+                data: {
+                    volumeM3: tree.species.volumeM3 - tree.volumeM3
+                }
+            })
 
             await db.tree.delete({
                 where: {

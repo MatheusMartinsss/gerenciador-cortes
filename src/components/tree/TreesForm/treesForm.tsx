@@ -147,6 +147,7 @@ export const TreesForm = () => {
                 description: 'Arvores cadastradas com sucesso!',
                 variant: 'default'
             })
+            
             onClose()
         }
 

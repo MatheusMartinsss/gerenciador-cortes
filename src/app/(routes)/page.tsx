@@ -15,7 +15,6 @@ export default function Home() {
           <TabsTrigger value='species'>Especies</TabsTrigger>
         </TabsList>
         <TabsContent value='trees' className='w-full'>
-          <HeaderMenu />
           <TreeTable />
         </TabsContent>
         <TabsContent value='cuts' className='w-full'>
