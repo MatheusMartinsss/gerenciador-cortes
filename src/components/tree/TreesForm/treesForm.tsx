@@ -11,22 +11,9 @@ import { useModal } from '@/hooks/useModal';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
 import { normalizeString } from '@/lib/masks';
+import { Label } from '@/components/ui/label';
 const defaultValues: FormFieldValues = {
-    specie: [{
-        commonName: '',
-        id: '',
-        scientificName: '',
-        trees: [{
-            commonName: '',
-            dap: 0,
-            number: 0,
-            range: 0,
-            scientificName: '',
-            specie_id: '',
-            volumeM3: 0,
-            meters: 0,
-        }]
-    },]
+    specie: []
 };
 
 interface GroupedSpecies {
@@ -59,11 +46,11 @@ export const TreesForm = () => {
         }
     };
     useEffect(() => { handleImport() }, [file])
-    const { fields, insert, remove, append } = useFieldArray({
+    const { remove } = useFieldArray({
         control,
         name: 'specie'
     })
-
+    const formValue = watch('specie')
     const handleImport = async () => {
         if (file) {
             const reader = new FileReader()
@@ -97,13 +84,13 @@ export const TreesForm = () => {
                                 if (renamedHeader == 'dap' || renamedHeader == 'meters' || renamedHeader == 'volumeM3') {
                                     //@ts-ignore
                                     rowData[renamedHeader] = parseInt(renamedHeader == 'volumeM3' ? cell.value * 1000 : cell.value * 100);
-                                } else if(renamedHeader == "scientificName" || renamedHeader == 'commonName'){
+                                } else if (renamedHeader == "scientificName" || renamedHeader == 'commonName') {
                                     rowData[renamedHeader] = normalizeString(String(cell.value))
                                 } else {
                                     //@ts-ignore
                                     rowData[renamedHeader] = cell.value;
                                 }
-                                
+
                             })
                             rows.push(rowData);
                         }
@@ -154,10 +141,19 @@ export const TreesForm = () => {
     }
 
     const onSubmit = async (value: FormFieldValues) => {
-        await api.post('/tree', value)
+        const response = await api.post('/tree', value)
+        if (response.data) {
+            toast({
+                description: 'Arvores cadastradas com sucesso!',
+                variant: 'default'
+            })
+            onClose()
+        }
+
     }
+    console.log(formValue)
     return (
-        <div className="flex flex-col space-y-2 max-h-[800px]  ">
+        <div className="flex flex-col space-y-4 max-h-[800px] min-w-[500px]  ">
             <div className="flex space-x-2">
                 <div className="">
                     <Button
@@ -178,11 +174,19 @@ export const TreesForm = () => {
                         style={{ display: 'none' }} onChange={handleFileChange} />
                 </div>
             </div>
-            <form className="w-full flex space-y-4 flex-col overflow-y-scroll p-4" onSubmit={handleSubmit(onSubmit)}>
-                <FieldArray
-                    {...{ control, register, defaultValues, getValues, setValue, errors, watch }}
-                />
-                <Button type="submit">Salvar</Button>
+            <form className="w-full flex space-y-4 flex-col  p-4 overflow-y-auto" onSubmit={handleSubmit(onSubmit)}>
+                {formValue?.length === 0 || !formValue ? (
+                    <div className='w-[550px] h-[400px] flex justify-center items-center text-center '>
+                        <Label>Importe alguma planilha para carregar os dados...</Label>
+                    </div>
+                ) : (
+                    <div className='w-full flex flex-col'>
+                        <FieldArray
+                            {...{ control, register, defaultValues, getValues, setValue, errors, watch }}
+                        />
+                        <Button type="submit">Salvar</Button>
+                    </div>
+                )}
             </form>
         </div>
     );

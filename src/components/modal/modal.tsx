@@ -12,7 +12,7 @@ export const Modal = () => {
         <Dialog onOpenChange={onClose} open={isOpen} modal defaultOpen={isOpen} >
             <DialogContent className="sm:max-w-fit" >
                 <DialogHeader>
-                    <DialogTitle>Teste</DialogTitle>
+                   
                 </DialogHeader>
                 {form === 'treeForm' && (
                     <TreeForm />

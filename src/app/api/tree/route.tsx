@@ -1,5 +1,5 @@
 import { ISpecie } from "@/domain/specie"
-import { ICreateTree } from "@/domain/tree"
+import { ICreateTree, ITree } from "@/domain/tree"
 import db from "@/lib/prisma"
 import { PrismaClient, Prisma } from "@prisma/client"
 import { NextResponse, NextRequest } from "next/server"
@@ -9,6 +9,7 @@ import { NextResponse, NextRequest } from "next/server"
 export async function POST(request: Request) {
     const body = await request.json()
     try {
+        let treesCreated: ITree[] = []
         await db.$transaction(async (prisma) => {
             await Promise.all(
                 body.specie.map(async (specie: ISpecie) => {
@@ -34,10 +35,13 @@ export async function POST(request: Request) {
                         const newSpecie = await prisma.species.create({
                             data: {
                                 commonName: specie.commonName,
-                                scientificName: specie.scientificName
+                                scientificName: specie.scientificName,
+                                volumeM3: 0,
+                                sectionsVolumeM3: 0
                             }
                         })
                         specie.id = newSpecie.id
+                        specie.volumeM3 = 0
                         specie.trees = specie.trees.map((tree) => {
                             return {
                                 ...tree,
@@ -47,7 +51,12 @@ export async function POST(request: Request) {
                         })
                     }
 
-                    await prisma.tree.createMany({ data: specie.trees })
+                    specie.trees.map(async (tree) => {
+                        const result = await prisma.tree.create({ data: tree })
+                        treesCreated.push(result)
+                    })
+
+                    // await prisma.tree.createMany({ data: specie.trees })
 
                     specie.volumeM3 += specie.trees.reduce((acc, obj) => {
                         return acc + obj.volumeM3
@@ -67,7 +76,7 @@ export async function POST(request: Request) {
         })
         /*  await db.tree.createMany({ data: body })
           const updatedList = await db.tree.findMany() */
-        return NextResponse.json("", { status: 201 })
+        return NextResponse.json(treesCreated, { status: 201 })
     } catch (error) {
         console.log(error)
         throw error

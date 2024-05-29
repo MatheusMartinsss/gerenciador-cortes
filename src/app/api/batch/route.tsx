@@ -31,30 +31,8 @@ export async function POST(request: Request) {
                                 }
                             }
                         })
-
-                        // await prisma.section.createMany({ data: item.section })
-
-                        await prisma.batch.create({
-                            data: {
-                                volumeM3: item.section.reduce((acc: any, obj: any) => {
-                                    return acc + obj.volumeM3
-                                }, 0),
-                                sections: {
-                                    create: item.section.map((x: any) => ({
-                                        section: {
-                                            create: x
-                                        }
-                                    }))
-                                }
-                            },
-                            include: {
-                                sections: {
-                                    include: {
-                                        section: true
-                                    }
-                                }
-                            }
-                        })
+                
+                        await prisma.section.createMany({ data: item.section })
                     }
                 })
             )

@@ -34,17 +34,38 @@ model tree {
 }
 
 model section {
-    id        String   @id @default(uuid())
+    id        String         @id @default(uuid())
     number    Int
     section   String
-    d1        Int      @default(0)
-    d2        Int      @default(0)
-    d3        Int      @default(0)
-    d4        Int      @default(0)
-    meters    Int      @default(0)
-    volumeM3  Int      @default(0)
+    d1        Int            @default(0)
+    d2        Int            @default(0)
+    d3        Int            @default(0)
+    d4        Int            @default(0)
+    meters    Int            @default(0)
+    volumeM3  Int            @default(0)
+    tree      tree           @relation(fields: [tree_id], references: [id])
     tree_id   String
-    tree      tree     @relation(fields: [tree_id], references: [id])
-    species   species? @relation(fields: [specie_id], references: [id])
+    species   species?       @relation(fields: [specie_id], references: [id])
     specie_id String?
+    batches   batchSection[]
+}
+
+model batch {
+    id        String         @id @default(uuid())
+    volumeM3  Int            @default(0)
+    sections  batchSection[]
+    createdAt DateTime       @default(now())
+    updatedAt DateTime       @updatedAt
+}
+
+model batchSection {
+    id         String   @id @default(uuid())
+    section    section? @relation(fields: [section_id], references: [id])
+    section_id String?
+    batch      batch?   @relation(fields: [batch_id], references: [id])
+    batch_id   String?
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+
+    @@index([section_id, batch_id])
 }
