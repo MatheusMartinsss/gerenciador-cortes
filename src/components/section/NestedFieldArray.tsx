@@ -34,7 +34,7 @@ export default function NestedFieldArray({
                     <div className="flex space-x-2  items-center justify-center " key={item.id} >
                         <div className="w-[100px]">
                             {isFirstIndex && (<Label>Plaqueta</Label>)}
-                            <Input {...register(`tree.${nestIndex}.section.${k}.number`, { valueAsNumber: true })} />
+                            <Input {...register(`tree.${nestIndex}.section.${k}.number`)} />
                         </div>
                         <div className="w-[100px]">
                             {isFirstIndex && (<Label>Secção</Label>)}

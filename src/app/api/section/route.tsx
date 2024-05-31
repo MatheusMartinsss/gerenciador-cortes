@@ -29,7 +29,8 @@ export async function GET(request: NextRequest) {
             const response = await db.section.findFirst({
                 where: {
                     number: {
-                        equals: number
+                        contains: number,
+                        mode: 'insensitive'
                     }
                 }
             })
@@ -54,15 +55,12 @@ export async function GET(request: NextRequest) {
                                 contains: searchParam.toLowerCase(),
                                 mode: 'insensitive'
                             },
-                        }, {
-                            number: {
-                                equals: Number(searchParam)
-                            }
-                        }]
+                        }, ]
                     }
                 }, {
                     number: {
-                        equals: searchParam
+                        contains: searchParam,
+                        mode: 'insensitive'
                     }
                 }]
             }
