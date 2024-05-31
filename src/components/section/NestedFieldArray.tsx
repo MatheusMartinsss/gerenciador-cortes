@@ -156,7 +156,7 @@ export default function NestedFieldArray({
                                             d3: 0,
                                             d4: 0,
                                             meters: 0,
-                                            number: 0,
+                                            number: '',
                                             volumeM3: 0
                                         })
                                     }

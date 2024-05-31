@@ -4,7 +4,7 @@ import { Prisma } from "@prisma/client"
 
 export async function GET(request: NextRequest) {
     const id = request.nextUrl.searchParams.get('id')
-    const number = Number(request.nextUrl.searchParams.get('number'))
+    const number = request.nextUrl.searchParams.get('number')
     const page = Number(request.nextUrl.searchParams.get('page')) || 1
     const orderBy = request.nextUrl.searchParams.get('orderBy') || 'number'
     const sortOrderParam = request.nextUrl.searchParams.get('sortOrder');
@@ -28,7 +28,9 @@ export async function GET(request: NextRequest) {
         if (number) {
             const response = await db.section.findFirst({
                 where: {
-                    number
+                    number: {
+                        equals: number
+                    }
                 }
             })
             if (!response) {
@@ -60,7 +62,7 @@ export async function GET(request: NextRequest) {
                     }
                 }, {
                     number: {
-                        equals: Number(searchParam)
+                        equals: searchParam
                     }
                 }]
             }

@@ -12,7 +12,7 @@ export type FormFieldValues = {
         section?: {
             tree_id: string;
             section: string;
-            number: number;
+            number: string;
             specie_id: string;
             d1: number;
             d2: number;

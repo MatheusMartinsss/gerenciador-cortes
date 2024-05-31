@@ -28,7 +28,7 @@ const tableCol = [{
     key: '#',
     sortable: false
 }, {
-    label: 'N° Arvore',
+    label: 'N°',
     key: 'number',
     sortable: true
 }, {
@@ -52,7 +52,7 @@ const tableCol = [{
     key: 'volumeM3',
     sortable: true
 }, {
-    label: 'M3 Abatido',
+    label: 'M3 Abate',
     key: 'sectionsVolumeM3',
     sortable: true
 }, {
@@ -195,7 +195,7 @@ export const TreeTable = () => {
                                 const isSelected = selectedTrees.map((x) => x.id).includes(tree.id)
                                 return (
                                     <TableRow key={tree.id}>
-                                        <TableCell>
+                                        <TableCell aria-checked className="w-2">
                                             <Checkbox
                                                 checked={isSelected}
                                                 onCheckedChange={() => {
@@ -209,14 +209,14 @@ export const TreeTable = () => {
                                             >
                                             </Checkbox>
                                         </TableCell>
-                                        <TableCell>{tree.number}</TableCell>
-                                        <TableCell className="w-[150px]">{tree.commonName}</TableCell>
-                                        <TableCell className="w-[200px]">{tree.scientificName}</TableCell>
+                                        <TableCell className="w-2">{tree.number}</TableCell>
+                                        <TableCell >{tree.commonName}</TableCell>
+                                        <TableCell >{tree.scientificName}</TableCell>
                                         <TableCell>{maskToMeters(tree.dap)}</TableCell>
                                         <TableCell>{maskToMeters(tree.meters)}</TableCell>
                                         <TableCell>{maskToM3(tree.volumeM3)}</TableCell>
                                         <TableCell>{maskToM3(tree.sectionsVolumeM3)}</TableCell>
-                                        <TableCell className="space-x-2 w-[400px]">
+                                        <TableCell className="space-x-2 ">
                                             {/*  <Button
                                                 variant='outline'
                                                 onClick={() => onSelect(tree)}>
