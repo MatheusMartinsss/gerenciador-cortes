@@ -22,6 +22,7 @@ import { Input } from '@/components/ui/input';
 import { TablePagination } from "../pagination/pagination"
 import { Checkbox } from "../ui/checkbox"
 import { Label } from "../ui/label"
+import { formatSearchParam } from "@/lib/searchParam"
 
 const tableCol = [{
     label: '#',
@@ -84,6 +85,11 @@ export const TreeTable = () => {
         fetchData()
     }, [searchParam, page, sortOrder, orderBy])
     useEffect(() => {
+        if (searchText.trim() == '') {
+            handleSearchParam('')
+        }
+    }, [searchText])
+    useEffect(() => {
         if (!isOpen) {
             setTree(null)
         }
@@ -116,6 +122,9 @@ export const TreeTable = () => {
         setTree(data)
 
     }
+    const handleSearch = (value: string) => {
+        setSearchText(value)
+    }
     return (
         <div className="flex flex-col w-full space-y-2 ">
             <div className='flex w-full flex-row space-x-2  '>
@@ -144,7 +153,7 @@ export const TreeTable = () => {
                 </div>
                 <div className='flex'>
                     <div className='flex w-max-sm items-center space-x-1'>
-                        <Input value={searchText} onChange={(e) => setSearchText(e.target.value)} ></Input>
+                        <Input value={searchText} onChange={(e) => handleSearch(e.target.value)} ></Input>
                         <Button variant='outline' onClick={() => handleSearchParam(searchText)}> <Search className="mr-2 h-4 w-4" /></Button>
                     </div>
                 </div>

@@ -147,16 +147,16 @@ export const TreesForm = () => {
                 description: 'Arvores cadastradas com sucesso!',
                 variant: 'default'
             })
-            
+
             onClose()
         }
 
     }
     console.log(formValue)
     return (
-        <div className="flex flex-col space-y-4 max-h-[800px] min-w-[500px]  ">
+        <div className="flex flex-col space-y-1 w-full">
             <div className="flex space-x-2">
-                <div className="">
+                <div className="w-full">
                     <Button
                         onClick={() => {
                             if (inputFileRef.current) {
@@ -175,17 +175,23 @@ export const TreesForm = () => {
                         style={{ display: 'none' }} onChange={handleFileChange} />
                 </div>
             </div>
-            <form className="w-full flex space-y-4 flex-col  p-4 overflow-y-auto" onSubmit={handleSubmit(onSubmit)}>
+            <form className="w-full flex space-y-4 flex-col  p-4 " onSubmit={handleSubmit(onSubmit)}>
                 {formValue?.length === 0 || !formValue ? (
-                    <div className='w-[550px] h-[400px] flex justify-center items-center text-center '>
+                    <div className='flex justify-center items-center text-center '>
                         <Label>Importe alguma planilha para carregar os dados...</Label>
                     </div>
                 ) : (
-                    <div className='w-full flex flex-col'>
-                        <FieldArray
-                            {...{ control, register, defaultValues, getValues, setValue, errors, watch }}
-                        />
-                        <Button type="submit">Salvar</Button>
+                    <div className='w-full flex flex-col   '>
+                        <div >
+                            <FieldArray
+                                {...{ control, register, defaultValues, getValues, setValue, errors, watch }}
+                            />
+                        </div>
+                        <div >
+                            <div className='w-full flex justify-center items-center p-4'>
+                                <Button className='w-full' type="submit">Salvar</Button>
+                            </div>
+                        </div>
                     </div>
                 )}
             </form>

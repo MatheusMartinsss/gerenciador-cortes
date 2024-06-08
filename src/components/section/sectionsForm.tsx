@@ -66,7 +66,7 @@ export const SectionsForm = () => {
 
     }
     return (
-        <div className="flex space-y-2 max-h-[800px]  ">
+        <div className="flex space-y-2   ">
             <form className="w-full flex space-y-4 flex-col overflow-y-scroll p-4" onSubmit={handleSubmit(onSubmit)}>
                 <FieldArray
                     {...{ control, register, defaultValues, getValues, setValue, errors, watch }}

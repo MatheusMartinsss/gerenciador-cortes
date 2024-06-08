@@ -27,20 +27,20 @@ export default function NestedFieldArray({
     });
     const tree = watch(`tree.${nestIndex}`)
     return (
-        <div className="flex justify-center  flex-col space-y-4">
+        <div className="flex justify-center  flex-col space-y-2">
             {fields.map((item, k) => {
                 const isFirstIndex = k === 0
                 return (
-                    <div className="flex space-x-2  items-center justify-center " key={item.id} >
-                        <div className="w-[100px]">
+                    <div className="flex space-x-1 2xl:space-x-8  items-center justify-center " key={item.id} >
+                        <div >
                             {isFirstIndex && (<Label>Plaqueta</Label>)}
                             <Input {...register(`tree.${nestIndex}.section.${k}.number`)} />
                         </div>
-                        <div className="w-[100px]">
+                        <div >
                             {isFirstIndex && (<Label>Secção</Label>)}
                             <Input {...register(`tree.${nestIndex}.section.${k}.section`)} />
                         </div>
-                        <div className="w-[100px]">
+                        <div >
                             {isFirstIndex && <Label>D1</Label>}
                             <Controller
                                 name={`tree.${nestIndex}.section.${k}.d1`}
@@ -57,7 +57,7 @@ export default function NestedFieldArray({
                                 )}
                             />
                         </div>
-                        <div className="w-[100px]">
+                        <div >
                             {isFirstIndex && <Label>D2</Label>}
                             <Controller
                                 name={`tree.${nestIndex}.section.${k}.d2`}
@@ -74,7 +74,7 @@ export default function NestedFieldArray({
                                 )}
                             />
                         </div>
-                        <div className="w-[100px]">
+                        <div >
                             {isFirstIndex && <Label>D3</Label>}
                             <Controller
                                 name={`tree.${nestIndex}.section.${k}.d3`}
@@ -91,7 +91,7 @@ export default function NestedFieldArray({
                                 )}
                             />
                         </div>
-                        <div className="w-[100px]">
+                        <div >
                             {isFirstIndex && <Label>D4</Label>}
                             <Controller
                                 name={`tree.${nestIndex}.section.${k}.d4`}
@@ -108,7 +108,7 @@ export default function NestedFieldArray({
                                 )}
                             />
                         </div>
-                        <div className="w-[100px]">
+                        <div >
                             {isFirstIndex && <Label>Comp</Label>}
                             <Controller
                                 name={`tree.${nestIndex}.section.${k}.meters`}
@@ -125,7 +125,7 @@ export default function NestedFieldArray({
                                 )}
                             />
                         </div>
-                        <div className="w-[100px]">
+                        <div >
                             {isFirstIndex && <Label>M3</Label>}
                             <SubTotal key={k} control={control} setValue={setValue} idx={k} nestIndex={nestIndex} />
                         </div>

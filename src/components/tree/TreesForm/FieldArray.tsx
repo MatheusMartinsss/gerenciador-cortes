@@ -61,7 +61,7 @@ export default function Fields({
                             <div className="flex flex-col">
                             </div>
                         </div>
-                        <div className="flex flex-col p-2 max-h-[150px] overflow-y-auto">
+                        <div className="flex flex-col  max-h-[150px] overflow-y-auto">
                             <NestedArray nestIndex={index} {...{ control, register, watch, setValue }} />
                         </div>
                     </div>

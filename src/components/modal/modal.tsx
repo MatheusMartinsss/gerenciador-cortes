@@ -9,10 +9,9 @@ import { SpecieForm } from "../species/specieForm"
 export const Modal = () => {
     const { isOpen, onClose, form } = useModal()
     return (
-        <Dialog onOpenChange={onClose} open={isOpen} modal defaultOpen={isOpen} >
-            <DialogContent className="sm:max-w-fit" >
+        <Dialog onOpenChange={onClose} open={isOpen} modal defaultOpen={isOpen}   >
+            <DialogContent  className="max-w-[80%]  2xl:max-w-[70%] flex min-h-[450px] max-h-[90%]  overflow-y-auto  " >
                 <DialogHeader>
-                   
                 </DialogHeader>
                 {form === 'treeForm' && (
                     <TreeForm />

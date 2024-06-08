@@ -31,13 +31,13 @@ export default function NestedFieldArray({
             {fields.map((item, k) => {
                 const isFirstIndex = k === 0
                 return (
-                    <div className="flex space-x-2  items-center justify-center " key={item.id} >
-                        <div className="w-[100px]">
+                    <div className="flex 2xl:space-x-8 space-x-4  justify-between " key={item.id} >
+                        <div >
                             {isFirstIndex && (<Label>Plaqueta</Label>)}
                             <Input {...register(`specie.${nestIndex}.trees.${k}.number`, { valueAsNumber: true })} />
                         </div>
-                        <div className="w-[100px]">
-                            {isFirstIndex && <Label>D1</Label>}
+                        <div >
+                            {isFirstIndex && <Label>DAP</Label>}
                             <Controller
                                 name={`specie.${nestIndex}.trees.${k}.dap`}
                                 control={control}
@@ -53,7 +53,7 @@ export default function NestedFieldArray({
                                 )}
                             />
                         </div>
-                        <div className="w-[100px]">
+                        <div >
                             {isFirstIndex && <Label>Comp</Label>}
                             <Controller
                                 name={`specie.${nestIndex}.trees.${k}.meters`}
@@ -70,7 +70,7 @@ export default function NestedFieldArray({
                                 )}
                             />
                         </div>
-                        <div className="w-[100px]">
+                        <div>
                             {isFirstIndex && <Label>Volume M3</Label>}
                             <Controller
                                 name={`specie.${nestIndex}.trees.${k}.volumeM3`}
