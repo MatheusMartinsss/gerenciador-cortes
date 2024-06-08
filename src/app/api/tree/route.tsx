@@ -1,6 +1,7 @@
 import { ISpecie } from "@/domain/specie"
 import { ICreateTree, ITree } from "@/domain/tree"
 import db from "@/lib/prisma"
+import { formatSearchParam } from "@/lib/searchParam"
 import { PrismaClient, Prisma } from "@prisma/client"
 import { NextResponse, NextRequest } from "next/server"
 
@@ -118,17 +119,35 @@ export async function GET(request: NextRequest) {
 
         let where = {}
         if (searchParam) {
-            where = {
-                OR: [{
-                    commonName: {
-                        search: searchParam.toLowerCase()
-                    },
-                }, {
-                    scientificName: {
-                        search: searchParam.toLowerCase()
-                    },
-                }]
+            const formatedSearchParam = formatSearchParam(searchParam)
+            if (formatedSearchParam?.type == 'numeric') {
+                where = {
+                    number: {
+                        equals: formatedSearchParam.value
+                    }
+                }
+            } else if (formatedSearchParam?.type == 'string') {
+                where = {
+                    OR: [{
+                        commonName: {
+                            contains: searchParam,
+                            mode: 'insensitive'
+                        },
+                    }, {
+                        scientificName: {
+                            contains: searchParam,
+                            mode: 'insensitive'
+                        },
+                    },]
+                }
+            } else if (formatedSearchParam?.type == 'numberArray') {
+                where = {
+                    number: {
+                        in: formatedSearchParam.value
+                    }
+                }
             }
+
         }
         let query = {
             take: limit,
