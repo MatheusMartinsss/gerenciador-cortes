@@ -23,7 +23,7 @@ import { TablePagination } from "../pagination/pagination"
 import { Checkbox } from "../ui/checkbox"
 import { Label } from "../ui/label"
 import { formatSearchParam } from "@/lib/searchParam"
-
+import * as exceljs from 'exceljs'
 const tableCol = [{
     label: '#',
     key: '#',
@@ -125,6 +125,35 @@ export const TreeTable = () => {
     const handleSearch = (value: string) => {
         setSearchText(value)
     }
+    const generateBatch = () => {
+        const workBook = new exceljs.Workbook()
+        const sheet = workBook.addWorksheet("tracar");
+        sheet.columns = [
+            {
+                header: "Nº Árvore",
+                key: 'id'
+            }, 
+        ]
+        if (selectedTrees.length > 0) {
+            selectedTrees.map((tree: any) => {
+                sheet.addRow({
+                    id: tree?.number,
+                    
+                })
+            })
+            workBook.xlsx.writeBuffer().then((data) => {
+                const blob = new Blob([data], {
+                    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                })
+                const url = window.URL.createObjectURL(blob);
+                const anchor = document.createElement("a");
+                anchor.href = url;
+                anchor.download = "download.xlsx";
+                anchor.click();
+                window.URL.revokeObjectURL(url);
+            })
+        }
+    }
     return (
         <div className="flex flex-col w-full space-y-2 ">
             <div className='flex w-full flex-row space-x-2  '>
@@ -144,11 +173,23 @@ export const TreeTable = () => {
                         disabled={selectedTrees.length === 0}
                         variant='secondary'
                         onClick={() => {
+                            generateBatch()
+                        }}
+                    >
+                        <TreePine className="mr-2 h-4 w-4" />
+                        Cortar
+                    </Button>
+                </div>
+                <div>
+                    <Button
+                        disabled={selectedTrees.length === 0}
+                        variant='secondary'
+                        onClick={() => {
                             setForm('sectionsForm')
                         }}
                     >
                         <TreePine className="mr-2 h-4 w-4" />
-                        Abater
+                        Tracar
                     </Button>
                 </div>
                 <div className='flex'>
