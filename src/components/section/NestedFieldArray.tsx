@@ -101,6 +101,7 @@ export default function NestedFieldArray({
                                         {...field}
                                         value={maskToMeters(field.value)}
                                         onChange={(e) => {
+                                            setValue(`tree.${nestIndex}.section.${k}.d4`, unMask(e.target.value))
                                             field.onChange(unMask(e.target.value))
                                         }}
                                     >

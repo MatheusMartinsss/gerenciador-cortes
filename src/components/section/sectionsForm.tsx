@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form'
+import { useForm, useFormContext } from 'react-hook-form'
 import { Button } from "../ui/button";
 import api from "@/lib/api";
 import FieldArray from "./FieldArray";
@@ -37,20 +37,34 @@ export const SectionsForm = () => {
         formState: { errors },
         reset,
         watch,
-        setValue } = useForm<FormFieldValues>({
-            mode: 'onBlur'
-        })
+        setValue } = useFormContext<FormFieldValues>()
 
     useEffect(() => {
         if (selectedTrees) {
-            const newValues = selectedTrees.map((tree) => {
-                return {
-                    ...tree,
-                    sectionsVolumeM3: 0,
-                    section: [{ tree_id: tree.id, section: "", d1: 0, d2: 0, d3: 0, d4: 0, meters: 0, number: '', volumeM3: 0, specie_id: tree.specie_id }]
-                }
-            })
-            setValue('tree', newValues)
+            if (getValues('tree').length) {
+                const currentValue = getValues('tree')
+                const newValue = selectedTrees.map((tree) => {
+                    const alreadyExists = currentValue.find((x) => x.id == tree.id)
+                    if (alreadyExists) {
+                        return alreadyExists
+                    }
+                    return {
+                        ...tree,
+                        sectionsVolumeM3: 0,
+                        section: [{ tree_id: tree.id, section: "", d1: 0, d2: 0, d3: 0, d4: 0, meters: 0, number: '', volumeM3: 0, specie_id: tree.specie_id }]
+                    }
+                })
+                setValue('tree', newValue)
+            } else {
+                const newValues = selectedTrees.map((tree) => {
+                    return {
+                        ...tree,
+                        sectionsVolumeM3: 0,
+                        section: [{ tree_id: tree.id, section: "", d1: 0, d2: 0, d3: 0, d4: 0, meters: 0, number: '', volumeM3: 0, specie_id: tree.specie_id }]
+                    }
+                })
+                setValue('tree', newValues)
+            }
         }
     }, [selectedTrees])
     const onSubmit = async (value: FormFieldValues) => {
