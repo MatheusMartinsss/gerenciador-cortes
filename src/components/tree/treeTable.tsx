@@ -141,14 +141,14 @@ export const TreeTable = () => {
                     
                 })
             })
-            workBook.xlsx.writeBuffer().then((data) => {
+            workBook.csv.writeBuffer().then((data) => {
                 const blob = new Blob([data], {
                     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 })
                 const url = window.URL.createObjectURL(blob);
                 const anchor = document.createElement("a");
                 anchor.href = url;
-                anchor.download = "download.xlsx";
+                anchor.download = "download.csv";
                 anchor.click();
                 window.URL.revokeObjectURL(url);
             })

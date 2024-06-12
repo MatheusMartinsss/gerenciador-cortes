@@ -2,7 +2,7 @@ version: 'latest'
 
 services:
   next-app:
-    container_name: next-app
+    container_name: next-app-dev
     build:
       dockerfile: .dockerfile
       args:
@@ -14,7 +14,7 @@ services:
     networks:
       - db
   db:
-    container_name: postgres
+    container_name: postgres-dev
     image: postgres
     environment:
       POSTGRES_USER: postgres

@@ -74,6 +74,7 @@ export const SectionsForm = () => {
                 description: `Abates lançados com sucesso!.`,
                 variant: 'default'
             })
+            reset()
             clearSelectedTrees()
             onClose()
         }
