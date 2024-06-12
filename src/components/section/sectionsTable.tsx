@@ -9,7 +9,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import api from "@/lib/api"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Skeleton } from "../ui/skeleton"
 import { Button } from "../ui/button"
 import { useModal } from "@/hooks/useModal"
@@ -22,8 +22,8 @@ import { useSection } from "@/hooks/useSection"
 import { SectionTableHeader } from "./sectionTableHeader"
 import { Input } from '@/components/ui/input';
 import { TreePine, Search } from 'lucide-react';
-import * as exceljs from 'exceljs'
 import { Label } from "../ui/label"
+import { CSVLink } from 'react-csv'
 
 const tableCol = [{
     label: '#',
@@ -97,6 +97,9 @@ export const SectionsTable = () => {
     } = useSection()
     const { setForm, isOpen } = useModal()
     const [loading, setLoading] = useState(true)
+    const [sectionsToCut, setSectionsToCut] = useState<any>([])
+    const sectionsToCutRef = useRef(sectionsToCut)
+    const csvLink = useRef<any>()
     const { searchParam, sortOrder, orderBy, page } = params
     const [maxPages, setMaxPages] = useState(0)
     useEffect(() => {
@@ -107,6 +110,9 @@ export const SectionsTable = () => {
             setSection(null)
         }
     }, [isOpen])
+    useEffect(() => {
+        sectionsToCutRef.current = sectionsToCut
+    }, [sectionsToCut])
     const fetchData = async () => {
         const { data: { data, pages } } = await api.get('/section', {
             params: {
@@ -136,49 +142,26 @@ export const SectionsTable = () => {
 
     }
     const generateBatch = () => {
-        const workBook = new exceljs.Workbook()
-        const sheet = workBook.addWorksheet("tracar");
-        sheet.columns = [
-            {
-                header: "Nº Árvore",
-                key: 'id'
-            }, {
-                header: "Secção",
-                key: 'section'
-            }, {
-                header: "Diâmetro 1 (m)",
-                key: 'd1'
-            }, {
-                header: "Diâmetro 2 (m)",
-                key: 'd2'
-            }, {
-                header: "Comprimento (m)",
-                key: 'comp'
-            }
-        ]
-        if (selectedSections.length > 0) {
-            selectedSections.map((section: any) => {
-                sheet.addRow({
-                    id: section.tree?.number,
-                    section: section.section,
-                    d1: (section.d1 / 100),
-                    d2: (section.d2 / 100),
-                    comp: (section.meters / 100)
-                })
-            })
-
-            workBook.csv.writeBuffer().then((data) => {
-                const blob = new Blob([data], {
-                    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                })
-                const url = window.URL.createObjectURL(blob);
-                const anchor = document.createElement("a");
-                anchor.href = url;
-                anchor.download = "tracar.csv";
-                anchor.click();
-                window.URL.revokeObjectURL(url);
-            })
+        if (csvLink.current) {
+            csvLink.current.link.click()
         }
+    }
+    const headers = [
+        { label: "N° da avore", key: "tree.number" },
+        { label: "Secção", key: "section" },
+        { label: "Diametro 1", key: "d1" },
+        { label: "Diametro 2", key: "d4" },
+        { label: "Comprimento", key: "meters" },
+    ];
+    const getFormatedData = () => {
+        return selectedSections.map((section) => {
+            return {
+                ...section,
+                d1: (section.d1 / 100).toFixed(2).replace('.', ','),
+                d4: (section.d4 / 100).toFixed(2).replace('.', ','),
+                meters: (section.meters / 100).toFixed(2).replace('.', ','),
+            }
+        })
     }
     return (
         <div className="flex flex-col w-full space-y-2">
@@ -186,6 +169,7 @@ export const SectionsTable = () => {
                 <div className='flex'>
                     <div className='flex w-max-sm items-center space-x-1'>
                         <Button disabled={selectedSections.length === 0} size='sm' onClick={generateBatch}>Gerar Corte</Button>
+                        <CSVLink ref={csvLink} filename="tracar.csv" headers={headers} data={getFormatedData()} separator=";" className="hidden"></CSVLink>
                         <Input value={searchText} onChange={(e) => setSearchText(e.target.value)} ></Input>
                         <Button variant='outline' onClick={() => handleSearchParam(searchText)}> <Search className="mr-2 h-4 w-4" /></Button>
                     </div>

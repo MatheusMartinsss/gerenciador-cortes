@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
                 }]
             }
         }
-        if (limit && offSet) {
+        if (limit) {
             query.take = limit
             query.skip = offSet
         }
