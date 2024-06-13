@@ -2,11 +2,14 @@ import { useForm, useFormContext } from 'react-hook-form'
 import { Button } from "../ui/button";
 import api from "@/lib/api";
 import FieldArray from "./FieldArray";
+import { CSVLink } from 'react-csv'
 import { FormFieldValues } from "./FormFieldValues";
 import { useTree } from '@/hooks/useTree';
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useModal } from '@/hooks/useModal';
 import { useToast } from '../ui/use-toast';
+import {AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter } from '../ui/alert-dialog';
+
 
 const defaultValues: FormFieldValues = {
     tree: [
@@ -25,11 +28,20 @@ const defaultValues: FormFieldValues = {
 
     ]
 };
-
+const headers = [
+    { label: "N° da avore", key: "number" },
+    { label: "Secção", key: "section" },
+    { label: "Diametro 1", key: "d1" },
+    { label: "Diametro 2", key: "d4" },
+    { label: "Comprimento", key: "meters" },
+];
 export const SectionsForm = () => {
     const { selectedTrees, clearSelectedTrees } = useTree()
     const { onClose } = useModal()
     const { toast } = useToast()
+    const [createdSections, setCreatedSections] = useState<any>([])
+    const csvLink = useRef<any>()
+    const [openAlert, setAlertOpen] = useState(false)
     const { control,
         register,
         handleSubmit,
@@ -74,11 +86,46 @@ export const SectionsForm = () => {
                 description: `Abates lançados com sucesso!.`,
                 variant: 'default'
             })
-            reset()
-            clearSelectedTrees()
-            onClose()
         }
-
+        const sections = value.tree
+            .map(tree => {
+                if (tree.section) {
+                    return tree.section.map(section => ({
+                        ...section,
+                        number: tree.number
+                    }));
+                } else {
+                    return [];
+                }
+            })
+            .flat();
+        setCreatedSections(sections)
+        handleDialogAlert()
+    }
+    const handleDialogAlert = () => {
+        setAlertOpen((state) => !state)
+    }
+    const generateCsv = () => {
+        if (csvLink.current) {
+            csvLink.current.link.click()
+        }
+        handleCloseDialog()
+    }
+    const getFormatedData = () => {
+        return createdSections.map((section: any) => {
+            return {
+                ...section,
+                d1: (section.d1 / 100).toFixed(2).replace('.', ','),
+                d4: (section.d4 / 100).toFixed(2).replace('.', ','),
+                meters: (section.meters / 100).toFixed(2).replace('.', ','),
+            }
+        })
+    }
+    const handleCloseDialog = () => {
+        setAlertOpen(false)
+        clearSelectedTrees()
+        reset()
+        onClose()
     }
     return (
         <div className="flex space-y-2   ">
@@ -88,6 +135,21 @@ export const SectionsForm = () => {
                 />
                 <Button type="submit">Salvar</Button>
             </form>
+            <AlertDialog
+                open={openAlert}
+
+            >
+                <AlertDialogContent>
+                    <AlertDialogDescription>
+                        Gostaria de gerar a planilha de corte das seções?
+                    </AlertDialogDescription>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={handleCloseDialog}>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction onClick={generateCsv}>Gerar</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+            <CSVLink ref={csvLink} filename="tracar.csv" headers={headers} data={getFormatedData()} separator=";" className="hidden"></CSVLink>
         </div>
     );
 }
