@@ -8,7 +8,6 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination"
-import { useParams } from "@/hooks/useSearchParams"
 
 interface PaginationProps {
     handlePage: (page: number) => void
@@ -24,6 +23,7 @@ export function TablePagination({ pages, handlePage, params }: PaginationProps) 
     let endPreviousPage = currentPage - 1;
     let startNexPage = currentPage + 1;
     let endNextPage = currentPage + 2 > pages ? pages : currentPage + 2;
+    let lastPage = pages
 
     const previousPages: number[] = [];
     for (let i = prevPage; i <= endPreviousPage; i++) {
@@ -42,33 +42,55 @@ export function TablePagination({ pages, handlePage, params }: PaginationProps) 
         if (currentPage == pages) return
         handlePage((currentPage + 1))
     }
+    let skipLastPage = currentPage !== lastPage && !nextPages.includes(lastPage)
+    let skipFirstPage = currentPage !== 1 && !previousPages.includes(1)
     return (
         <Pagination >
             <PaginationContent>
                 <PaginationItem>
-                    <PaginationPrevious onClick={handlePreviousPage} />
+                    <PaginationPrevious size='sm' onClick={handlePreviousPage} />
                 </PaginationItem>
+                {skipFirstPage && (
+                    <div className="flex flex-row">
+                        <PaginationItem key={1}>
+                            <PaginationLink size='sm' onClick={() => handlePage(1)}>1</PaginationLink>
+                        </PaginationItem>
+                        <PaginationItem className="flex">
+                            <PaginationEllipsis ></PaginationEllipsis>
+                        </PaginationItem>
+                    </div>
+                )}
                 {previousPages.map((page) => {
                     return (
                         <PaginationItem key={page}>
-                            <PaginationLink onClick={() => handlePage(page)}>{page}</PaginationLink>
+                            <PaginationLink size='sm' onClick={() => handlePage(page)}>{page}</PaginationLink>
                         </PaginationItem>
                     )
                 })}
                 <PaginationItem>
-                    <PaginationLink isActive>
+                    <PaginationLink isActive size='sm'>
                         {currentPage}
                     </PaginationLink>
                 </PaginationItem>
                 {nextPages.map((page) => {
                     return (
                         <PaginationItem key={page}>
-                            <PaginationLink onClick={() => handlePage(page)}>{page}</PaginationLink>
+                            <PaginationLink size='sm' onClick={() => handlePage(page)}>{page}</PaginationLink>
                         </PaginationItem>
                     )
                 })}
+                {skipLastPage && (
+                    <div className="flex flex-row">
+                        <PaginationItem className="flex">
+                            <PaginationEllipsis ></PaginationEllipsis>
+                        </PaginationItem>
+                        <PaginationItem key={lastPage}>
+                            <PaginationLink size='sm' onClick={() => handlePage(lastPage)}>{lastPage}</PaginationLink>
+                        </PaginationItem>
+                    </div>
+                )}
                 <PaginationItem>
-                    <PaginationNext onClick={handleNextPage} />
+                    <PaginationNext size='sm' onClick={handleNextPage} />
                 </PaginationItem>
             </PaginationContent>
         </Pagination>

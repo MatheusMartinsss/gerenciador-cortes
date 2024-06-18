@@ -30,7 +30,7 @@ const tableCol = [{
     key: '#',
     sortable: false
 }, {
-    label: 'N° Arvore',
+    label: 'N°',
     key: 'tree.number',
     sortable: true
 }, {
@@ -183,7 +183,7 @@ export const SectionsTable = () => {
                             const selected = col.key === orderBy
                             return (
                                 <TableHead
-                                    className="text-white"
+                                    className="text-white text-center"
                                     key={col.key}
                                     onClick={() => {
                                         if (isSortable) {
@@ -195,7 +195,7 @@ export const SectionsTable = () => {
                                         }
                                     }}
                                 >
-                                    <div className="flex space-x-2">
+                                    <div className="flex space-x-2 text-center">
                                         {col.label}
                                         <div className="h-4 w-4 flex items-center justify-center">
                                             {selected && (
@@ -236,7 +236,7 @@ export const SectionsTable = () => {
                                             >
                                             </Checkbox>
                                         </TableCell>
-                                        <TableCell>{section.tree.number}</TableCell>
+                                        <TableCell >{section.tree.number}</TableCell>
                                         <TableCell>{section.number}</TableCell>
                                         <TableCell>{section.section}</TableCell>
                                         <TableCell>{section.tree.scientificName}</TableCell>

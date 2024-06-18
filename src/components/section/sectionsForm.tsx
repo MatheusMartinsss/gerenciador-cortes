@@ -137,7 +137,6 @@ export const SectionsForm = () => {
             </form>
             <AlertDialog
                 open={openAlert}
-
             >
                 <AlertDialogContent>
                     <AlertDialogDescription>

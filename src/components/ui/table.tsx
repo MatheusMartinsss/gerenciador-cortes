@@ -2,17 +2,21 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+interface ExtendedTableProps extends React.HTMLAttributes<HTMLTableElement> {
+  divClassname?: string;
+}
+
 const Table = React.forwardRef<
   HTMLTableElement,
-  React.HTMLAttributes<HTMLTableElement>
->(({ className, ...props }, ref) => (
-  <div className="relative w-full overflow-auto">
+  ExtendedTableProps
+>(({ className, divClassname, ...props }, ref) => (
+ // <div className={cn("relative w-full overflow-auto", divClassname)}>
     <table
       ref={ref}
       className={cn("w-full caption-bottom text-sm", className)}
       {...props}
     />
-  </div>
+//  </div>
 ))
 Table.displayName = "Table"
 
@@ -30,7 +34,7 @@ const TableBody = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <tbody
     ref={ref}
-    className={cn("[&_tr:last-child]:border-0", className)}
+    className={cn("[&_tr:last-child]:border-0  transition-colors [&_tr:hover]:hover:bg-muted/50  [&>*:nth-child(odd)]:bg-gray-100", className)}
     {...props}
   />
 ))
@@ -43,7 +47,7 @@ const TableFooter = React.forwardRef<
   <tfoot
     ref={ref}
     className={cn(
-      "border-t bg-muted/50 font-medium [&>tr]:last:border-b-0",
+      "border-t bg-muted/50 font-medium [&>tr]:last:border-b-0 ",
       className
     )}
     {...props}
@@ -58,7 +62,7 @@ const TableRow = React.forwardRef<
   <tr
     ref={ref}
     className={cn(
-      "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+      "border-b  data-[state=selected]:bg-muted ",
       className
     )}
     {...props}

@@ -7,7 +7,7 @@ import { SpecieTable } from '@/components/species/spcieTable';
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col  p-10">
+    <main className="flex min-h-screen max-h-screen  flex-col  p-8">
       <Tabs defaultValue='trees' className='w-full'>
         <TabsList className="grid w-[600px] grid-cols-3">
           <TabsTrigger value='trees'>Arvores</TabsTrigger>
