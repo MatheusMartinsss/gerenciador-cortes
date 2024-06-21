@@ -24,10 +24,9 @@ export const ViewTreeButton = ({ treeId }: { treeId: string }) => {
     return (
         <>
             <Button
-                variant='outline'
+                variant='ghost'
                 onClick={() => selectTree(treeId)}>
-                <Eye className="mr-2 h-4 w-4" />
-                Visualizar
+                <Eye className="h-5 w-5" />
             </Button>
             <TreeModal treeId={selectedTreeId} handleModalState={handleModal} open={open} />
         </>

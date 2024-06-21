@@ -11,19 +11,21 @@ import {
 } from "@/components/ui/table"
 import api from "@/lib/api"
 import { useEffect, useState } from "react"
+
 import { Skeleton } from "../ui/skeleton"
 import { useTree } from "@/hooks/useTree"
 import { Button } from "../ui/button"
 import { TreePine, Search } from 'lucide-react';
 import { useModal } from "@/hooks/useModal"
 import { maskToM3, maskToMeters } from "@/lib/masks"
-import { Trash, Pencil, Eye, MoveDown, MoveUp } from 'lucide-react';
+import { Trash, Pencil, Eye, MoveDown, MoveUp, Ellipsis } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { TablePagination } from "../pagination/pagination"
 import { Checkbox } from "../ui/checkbox"
 import { Label } from "../ui/label"
 import * as exceljs from 'exceljs'
 import { ViewTreeButton } from "./viewTreeButton"
+import { DropdownMenuOptions } from "./DropDownMenu"
 
 const tableCol = [{
     label: 'N°',
@@ -51,12 +53,12 @@ const tableCol = [{
     sortable: true,
     numeric: true
 }, {
-    label: 'Volume',
+    label: 'Vol. Exploravel',
     key: 'volumeM3',
     sortable: true,
     numeric: true
 }, {
-    label: 'M3 Explorado',
+    label: 'Vol. Explorado',
     key: 'sectionsVolumeM3',
     sortable: true,
     numeric: true
@@ -239,7 +241,7 @@ export const TreeTable = () => {
                                     const isOptions = col.key == 'options'
                                     return (
                                         <TableHead
-                                            className={`text-white font-medium ${isNumeric ? 'w-4' : 'w-28'}${isOptions && 'text-center'}`}
+                                            className={`text-white font-medium ${isNumeric ? 'w-4' : 'w-28'}${isOptions && 'w-48'}`}
                                             key={col.key}
                                             onClick={() => {
                                                 if (isSortable) {
@@ -298,22 +300,13 @@ export const TreeTable = () => {
                                             <TableCell className="text-sm font-medium" >{tree.scientificName}</TableCell>
                                             <TableCell className="text-sm font-medium">{maskToMeters(tree.dap)}</TableCell>
                                             <TableCell className="text-sm font-medium">{maskToMeters(tree.meters)}</TableCell>
-                                            <TableCell className="text-sm font-medium">{maskToM3(tree.volumeM3)}</TableCell>
+                                            <TableCell className="text-sm font-medium ">{maskToM3(tree.volumeM3)}</TableCell>
                                             <TableCell className="text-sm font-medium">{maskToM3(tree.sectionsVolumeM3)}</TableCell>
-                                            <TableCell >
-                                                {/*  <Button
-                                                variant='outline'
-                                                onClick={() => onSelect(tree)}>
-                                                <Pencil className="mr-2 h-4 w-4" />
-                                                Editar
-                                            </Button> */}
-                                                <Button
-                                                    variant='outline'
-                                                    onClick={() => onDelete(tree.id)}>
-                                                    <Trash className="mr-2 h-4 w-4" />
-                                                    Remover
-                                                </Button>
+                                            <TableCell className="flex">
                                                 <ViewTreeButton treeId={tree.id} />
+                                                <Button variant="ghost">
+                                                    <Trash className="w-5 h-5" />
+                                                </Button>
                                             </TableCell>
                                         </TableRow>
                                     )
