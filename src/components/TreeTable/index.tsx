@@ -241,7 +241,7 @@ export const TreeTable = () => {
                                     const isOptions = col.key == 'options'
                                     return (
                                         <TableHead
-                                            className={`text-white font-medium ${isNumeric ? 'w-4' : 'w-28'}${isOptions && 'w-48'}`}
+                                            className={`text-white font-medium ${isNumeric ? 'w-4' : 'w-28'}${isOptions && 'w-48 text-center'}`}
                                             key={col.key}
                                             onClick={() => {
                                                 if (isSortable) {
@@ -252,16 +252,22 @@ export const TreeTable = () => {
                                                 }
                                             }}
                                         >
-                                            <div className="flex space-x-2 text-center items-center ">
-                                                {col.label}
-                                                <div className="h-4 w-10 flex">
-                                                    {selected && (
-                                                        sortOrder === 'asc' ?
-                                                            <MoveUp className="h-4 w-4" /> :
-                                                            <MoveDown className="h-4 w-4" />
-                                                    )}
+                                            {!isSortable ? (
+                                                <>
+                                                    {col.label}
+                                                </>
+                                            ) : (
+                                                <div className="flex space-x-2 items-center  ">
+                                                    {col.label}
+                                                    <div className="h-4 w-10 flex">
+                                                        {selected && (
+                                                            sortOrder === 'asc' ?
+                                                                <MoveUp className="h-4 w-4" /> :
+                                                                <MoveDown className="h-4 w-4" />
+                                                        )}
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            )}
                                         </TableHead>
                                     )
                                 })
@@ -302,7 +308,7 @@ export const TreeTable = () => {
                                             <TableCell className="text-sm font-medium">{maskToMeters(tree.meters)}</TableCell>
                                             <TableCell className="text-sm font-medium ">{maskToM3(tree.volumeM3)}</TableCell>
                                             <TableCell className="text-sm font-medium">{maskToM3(tree.sectionsVolumeM3)}</TableCell>
-                                            <TableCell className="flex">
+                                            <TableCell className="text-center">
                                                 <ViewTreeButton treeId={tree.id} />
                                                 <Button variant="ghost">
                                                     <Trash className="w-5 h-5" />
