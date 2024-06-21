@@ -1,5 +1,5 @@
 "use client"
-import { TreeTable } from '@/components/tree/treeTable';
+import { TreeTable } from '@/components/TreeTable';
 import { HeaderMenu } from './components/headerMenu';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SectionsTable } from '@/components/section/sectionsTable';

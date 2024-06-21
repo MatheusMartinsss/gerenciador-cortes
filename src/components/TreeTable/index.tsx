@@ -23,6 +23,7 @@ import { TablePagination } from "../pagination/pagination"
 import { Checkbox } from "../ui/checkbox"
 import { Label } from "../ui/label"
 import * as exceljs from 'exceljs'
+import { ViewTreeButton } from "./viewTreeButton"
 
 const tableCol = [{
     label: 'N°',
@@ -312,12 +313,7 @@ export const TreeTable = () => {
                                                     <Trash className="mr-2 h-4 w-4" />
                                                     Remover
                                                 </Button>
-                                                <Button
-                                                    variant='outline'
-                                                    onClick={() => onView(tree.id)}>
-                                                    <Eye className="mr-2 h-4 w-4" />
-                                                    Visualizar
-                                                </Button>
+                                                <ViewTreeButton treeId={tree.id} />
                                             </TableCell>
                                         </TableRow>
                                     )

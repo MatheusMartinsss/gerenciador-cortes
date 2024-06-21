@@ -1,3 +1,4 @@
+import { ISection } from "./section";
 
 export interface ICreateTree {
     specie_id: string;
@@ -17,7 +18,10 @@ export interface ITree {
     specie_id: string;
     range: number
     scientificName: string;
+    sections?: ISection[]
     dap: number;
     meters: number;
     volumeM3: number
+    sectionsVolumeM3: number;
+ 
 }

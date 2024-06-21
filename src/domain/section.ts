@@ -25,4 +25,6 @@ export interface ISection {
     volumeM3: number;
     tree_id: number;
     meters: number;
+    createdAt: Date
+    updatedAt: Date
 }
