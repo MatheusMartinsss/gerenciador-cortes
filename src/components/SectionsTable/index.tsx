@@ -22,6 +22,7 @@ import { Input } from '@/components/ui/input';
 import { TreePine, Search } from 'lucide-react';
 import { Label } from "../ui/label"
 import { CSVLink } from 'react-csv'
+import { SectionsReports } from "./SectionsReport"
 
 const tableCol = [{
     label: '#',
@@ -168,6 +169,7 @@ export const SectionsTable = () => {
                     <div className='flex w-max-sm items-center space-x-1'>
                         <Button disabled={selectedSections.length === 0} size='sm' onClick={generateBatch}>Gerar Corte</Button>
                         <CSVLink ref={csvLink} filename="tracar.csv" headers={headers} data={getFormatedData()} separator=";" className="hidden"></CSVLink>
+                        <SectionsReports />
                         <Input value={searchText} onChange={(e) => setSearchText(e.target.value)} ></Input>
                         <Button variant='outline' onClick={() => handleSearchParam(searchText)}> <Search className="mr-2 h-4 w-4" /></Button>
                     </div>

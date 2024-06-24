@@ -9,9 +9,11 @@ export async function GET(request: NextRequest) {
     const orderBy = request.nextUrl.searchParams.get('orderBy') || 'number'
     const sortOrderParam = request.nextUrl.searchParams.get('sortOrder');
     const searchParam = request.nextUrl.searchParams.get('searchParam') || ""
+    const withoutPagination = request.nextUrl.searchParams.get('withoutPagination') === 'true'
     const sortOrder = (sortOrderParam === 'asc' || sortOrderParam === 'desc') ? sortOrderParam : 'asc';
     const limit = 10
     const offSet = (page - 1) * limit
+    console.log(withoutPagination)
     let query: Prisma.sectionFindManyArgs = {}
     try {
         if (id) {
@@ -55,7 +57,7 @@ export async function GET(request: NextRequest) {
                                 contains: searchParam.toLowerCase(),
                                 mode: 'insensitive'
                             },
-                        }, ]
+                        },]
                     }
                 }, {
                     number: {
@@ -65,7 +67,7 @@ export async function GET(request: NextRequest) {
                 }]
             }
         }
-        if (limit) {
+        if (limit && !withoutPagination) {
             query.take = limit
             query.skip = offSet
         }
@@ -113,7 +115,7 @@ export async function GET(request: NextRequest) {
         const response = await db.section.findMany(query)
         const count = await db.section.count({ where })
         const maxPages = Math.ceil(count / limit)
-        return NextResponse.json({ data: response, pages: maxPages })
+        return NextResponse.json({ data: response, pages: maxPages, count: count })
     } catch (error) {
         console.log(error)
         throw error
