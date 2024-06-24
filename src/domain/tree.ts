@@ -12,16 +12,21 @@ export interface ICreateTree {
 }
 
 export interface ITree {
-    id: string 
+    id: string
     number: number;
     commonName: string;
     specie_id: string;
     range: number
     scientificName: string;
-    sections?: ISection[]
     dap: number;
     meters: number;
     volumeM3: number
     sectionsVolumeM3: number;
- 
+
 }
+
+export interface ITreeWithSections extends ITree {
+    sections: ISection[]
+
+}
+

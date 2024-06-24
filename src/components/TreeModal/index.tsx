@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Dialog, DialogContent } from "../ui/dialog"
-import { ITree } from "@/domain/tree"
+import { ITree, ITreeWithSections } from "@/domain/tree"
 import api from "@/lib/api"
 import { dateMask, maskToM3, maskToMeters } from "@/lib/masks"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table"
@@ -13,7 +13,7 @@ interface treeModalProps {
 }
 
 export const TreeModal = ({ open, treeId, handleModalState }: treeModalProps) => {
-    const [tree, setTree] = useState<ITree | null>(null)
+    const [tree, setTree] = useState<ITreeWithSections | null>(null)
     const [loading, setLoading] = useState(true)
     useEffect(() => {
         if (treeId) {
