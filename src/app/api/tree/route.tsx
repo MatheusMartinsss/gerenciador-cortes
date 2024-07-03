@@ -93,6 +93,7 @@ export async function GET(request: NextRequest) {
     const sortOrder = (sortOrderParam === 'asc' || sortOrderParam === 'desc') ? sortOrderParam : 'asc';
     const limit = 10
     const offSet = (page - 1) * limit
+    console.log(number)
     try {
         if (id) {
             const response = await db.tree.findUnique({
@@ -108,7 +109,7 @@ export async function GET(request: NextRequest) {
         if (number) {
             const response = await db.tree.findFirst({
                 where: {
-                    number
+                    number: number
                 }
             })
             if (!response) {

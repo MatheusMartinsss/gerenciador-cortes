@@ -9,7 +9,6 @@ interface Params {
 
 export async function GET(req: Request, context: { params: Params }) {
   const { params: { tree } } = context
-  console.log(context)
   try {
     const response = await db.tree.findUnique({
       where: {

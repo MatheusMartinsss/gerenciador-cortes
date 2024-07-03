@@ -13,7 +13,6 @@ export async function GET(request: NextRequest) {
     const sortOrder = (sortOrderParam === 'asc' || sortOrderParam === 'desc') ? sortOrderParam : 'asc';
     const limit = 10
     const offSet = (page - 1) * limit
-    console.log(withoutPagination)
     let query: Prisma.sectionFindManyArgs = {}
     try {
         if (id) {

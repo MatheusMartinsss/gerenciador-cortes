@@ -26,6 +26,7 @@ import { Label } from "../ui/label"
 import * as exceljs from 'exceljs'
 import { ViewTreeButton } from "./viewTreeButton"
 import { DropdownMenuOptions } from "./DropDownMenu"
+import { CutTreeButton } from "./CutTreeButton"
 
 const tableCol = [{
     label: 'N°',
@@ -190,16 +191,7 @@ export const TreeTable = () => {
                     </Button>
                 </div>
                 <div>
-                    <Button
-                        disabled={selectedTrees.length === 0}
-                        variant='secondary'
-                        onClick={() => {
-                            setForm('sectionsForm')
-                        }}
-                    >
-                        <TreePine className="mr-2 h-4 w-4" />
-                        Tracar
-                    </Button>
+                    <CutTreeButton />
                 </div>
                 <div className='flex'>
                     <div className='flex w-max-sm items-center space-x-1'>

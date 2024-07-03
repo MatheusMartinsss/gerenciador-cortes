@@ -17,7 +17,6 @@ const formSchema = z.object({
 
 export const SpecieForm = () => {
     const { specie, updateSpecies, setSpecie, addSpecie } = usespecie()
-    console.log(specie)
     const { onClose } = useModal()
     const { toast } = useToast()
     const editMode = !!specie;
