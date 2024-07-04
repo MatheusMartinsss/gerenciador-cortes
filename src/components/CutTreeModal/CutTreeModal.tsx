@@ -61,7 +61,6 @@ export const CutTreeModal = ({ open, handleModal }: ICutTreeModal) => {
         watch,
         setValue,
     } = useForm<FormFieldValues>({
-        mode: 'onBlur',
         defaultValues: defaultValues
 
     })
