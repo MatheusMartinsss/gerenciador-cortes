@@ -1,4 +1,4 @@
-import { useForm, useFormContext } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { Button } from "../ui/button";
 import api from "@/lib/api";
 import FieldArray from "./FieldArray";
@@ -6,13 +6,10 @@ import { CSVLink } from 'react-csv'
 import { FormFieldValues } from "./FormFieldValues";
 import { useTree } from '@/hooks/useTree';
 import { useEffect, useRef, useState } from 'react';
-import { useModal } from '@/hooks/useModal';
 import { useToast } from '../ui/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter } from '../ui/alert-dialog';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
-import { Input } from '../ui/input';
-import { SearchTree } from '../SearchTree';
-import { ITree } from '@/domain/tree';
+import { Dialog, DialogContent } from "../ui/dialog"
+
 
 interface ICutTreeModal {
     open: boolean
@@ -133,7 +130,7 @@ export const CutTreeModal = ({ open, handleModal }: ICutTreeModal) => {
         <Dialog open={open} onOpenChange={handleModal}>
             <DialogContent className="max-w-[80%]  2xl:max-w-[70%] flex min-h-[450px] max-h-[90%]  overflow-y-auto  ">
                 <div className="flex w-full space-y-2">
-                    <form className="w-full flex space-y-4 flex-col overflow-y-scroll p-4" onSubmit={handleSubmit(onSubmit)}>
+                    <form className="w-full flex space-y-4 flex-col overflow-y-scroll p-4 justify-between" onSubmit={handleSubmit(onSubmit)}>
                         <FieldArray
                             {...{ control, register, defaultValues, getValues, setValue, errors, watch }}
                         />
