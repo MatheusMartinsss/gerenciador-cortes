@@ -8,6 +8,12 @@ datasource db {
     url      = env("ENV_PRISMA_URL")
 }
 
+enum TreeStatus {
+    NONE
+    PARTIAL
+    FULL
+}
+
 model species {
     id               String    @id @default(uuid())
     scientificName   String    @default("")
@@ -16,21 +22,26 @@ model species {
     sectionsVolumeM3 Int       @default(0)
     trees            tree[]
     sections         section[]
+    createdAt        DateTime  @default(now())
+    updatedAt        DateTime? @updatedAt
 }
 
 model tree {
-    id               String    @id @default(uuid())
+    id               String     @id @default(uuid())
     number           Int
     scientificName   String
     commonName       String
-    range            Int       @default(0)
-    dap              Int       @default(0)
-    meters           Int       @default(0)
-    volumeM3         Int       @default(0)
-    sectionsVolumeM3 Int       @default(0)
+    range            Int        @default(0)
+    dap              Int        @default(0)
+    meters           Int        @default(0)
+    status           TreeStatus @default(NONE)
+    volumeM3         Int        @default(0)
+    sectionsVolumeM3 Int        @default(0)
     sections         section[]
-    species          species   @relation(fields: [specie_id], references: [id])
+    species          species    @relation(fields: [specie_id], references: [id])
     specie_id        String
+    createdAt        DateTime   @default(now())
+    updatedAt        DateTime?  @updatedAt
 }
 
 model section {
@@ -49,7 +60,7 @@ model section {
     specie_id String?
     batches   batchSection[]
     createdAt DateTime       @default(now())
-    updatedAt DateTime?       @updatedAt 
+    updatedAt DateTime?      @updatedAt
 }
 
 model batch {

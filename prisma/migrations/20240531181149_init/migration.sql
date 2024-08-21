@@ -5,7 +5,8 @@ CREATE TABLE "species" (
     "commonName" TEXT NOT NULL DEFAULT '',
     "volumeM3" INTEGER NOT NULL DEFAULT 0,
     "sectionsVolumeM3" INTEGER NOT NULL DEFAULT 0,
-
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NULL,
     CONSTRAINT "species_pkey" PRIMARY KEY ("id")
 );
 
@@ -21,7 +22,8 @@ CREATE TABLE "tree" (
     "volumeM3" INTEGER NOT NULL DEFAULT 0,
     "sectionsVolumeM3" INTEGER NOT NULL DEFAULT 0,
     "specie_id" TEXT NOT NULL,
-
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NULL,
     CONSTRAINT "tree_pkey" PRIMARY KEY ("id")
 );
 
@@ -38,6 +40,8 @@ CREATE TABLE "section" (
     "volumeM3" INTEGER NOT NULL DEFAULT 0,
     "tree_id" TEXT NOT NULL,
     "specie_id" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NULL,
 
     CONSTRAINT "section_pkey" PRIMARY KEY ("id")
 );
@@ -80,3 +84,4 @@ ALTER TABLE "batchSection" ADD CONSTRAINT "batchSection_section_id_fkey" FOREIGN
 
 -- AddForeignKey
 ALTER TABLE "batchSection" ADD CONSTRAINT "batchSection_batch_id_fkey" FOREIGN KEY ("batch_id") REFERENCES "batch"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+

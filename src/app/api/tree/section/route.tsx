@@ -23,10 +23,10 @@ export async function POST(request: Request) {
                                 id: item.id
                             },
                             data: {
-                                sectionsVolumeM3: tree.sectionsVolumeM3 + item.sectionsVolumeM3,
+                                sectionsVolumeM3: tree.sectionsVolumeM3 + item.cutVolM3,
                                 species: {
                                     update: {
-                                        sectionsVolumeM3: tree.species?.sectionsVolumeM3 + item.sectionsVolumeM3
+                                        sectionsVolumeM3: tree.species?.sectionsVolumeM3 + item.cutVolM3
                                     }
                                 }
                             }

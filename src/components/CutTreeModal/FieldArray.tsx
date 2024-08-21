@@ -51,7 +51,6 @@ export default function Fields({
                 <SearchTree handleSelectedTree={handleSelectedTree} />
             </div>
             {fields.length > 0 ? (
-
                 fields.map((item, index) => {
                     return (
                         <div className="flex flex-col space-y-1 bg-slate-50  w-full rounded-md" key={index}>

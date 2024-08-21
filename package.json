@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start && prisma migrate",
-    "lint": "next lint"
+    "lint": "next lint",
+    "build:script": "tsc scripts/updateVolume.tsx --outDir dist/scripts",
+    "update-volume3": "node dist/scripts/updateVolume.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
@@ -52,6 +54,7 @@
     "postcss": "^8",
     "prisma": "^5.13.0",
     "tailwindcss": "^3.4.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }
