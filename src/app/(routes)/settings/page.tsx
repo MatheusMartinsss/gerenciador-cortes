@@ -7,8 +7,13 @@ import api from "@/lib/api";
 
 export default function Settings() {
     const handleVolume = async () => {
-        await api.get('/admin')
-    }
+        try {
+            const response = await api.get('/settings', {});
+            console.log('Dados recebidos:', response.data);
+        } catch (error) {
+            console.error('Erro ao buscar o volume:', error);
+        }
+    };
     return (
         <div className="flex h-screen bg-gray-200 justify-center p-8">
             <Card className="w-full">
@@ -17,7 +22,7 @@ export default function Settings() {
                 </CardHeader>
                 <CardContent className="pt-10">
                     <div className="flex items-center space-x-2">
-                        <Button onClick={() => handleVolume()} variant='default'>Volume M3</Button>
+                        <Button onClick={handleVolume} variant='default'>Volume M3</Button>
                         <Label> Soma novamente o saldo de todas arvores e especies.</Label>
                     </div>
                 </CardContent>
