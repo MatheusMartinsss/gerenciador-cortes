@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button";
 import { Settings } from 'lucide-react';
 import Link from "next/link";
+import ReactQueryProvider from "./ReactQueryProvider";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -25,21 +26,23 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={cn(
-        "min-h-screen  bg-background font-sans antialiased",
-        fontSans.variable
-      )}>
-        <nav className='w-full justify-end flex bg-green-900 rounded  items-center pt-1 pb-1 pr-1 pl-1'>
-          <Link href={`/settings`}>
-            <Button size='icon' variant='ghost' className="hover:border-black hover:bg-transparent">
-              <Settings className="h-6 w-6" />
-            </Button>
-          </Link>
-        </nav>
-        {children}
-        <Modal />
-        <Toaster />
-      </body>
+      <ReactQueryProvider>
+        <body className={cn(
+          "min-h-screen  bg-background font-sans antialiased",
+          fontSans.variable
+        )}>
+          <nav className='w-full justify-end flex bg-green-900 rounded  items-center pt-1 pb-1 pr-1 pl-1'>
+            <Link href={`/settings`}>
+              <Button size='icon' variant='ghost' className="hover:border-black hover:bg-transparent">
+                <Settings className="h-6 w-6" />
+              </Button>
+            </Link>
+          </nav>
+          {children}
+          <Modal />
+          <Toaster />
+        </body>
+      </ReactQueryProvider>
     </html>
   );
 }

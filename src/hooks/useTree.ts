@@ -3,7 +3,7 @@ import { ITree } from '@/domain/tree'
 import { create } from 'zustand'
 
 
-type sortOrder = "asc" | 'desc'
+type sortOrder = "ASC" | 'DESC'
 
 interface TreeParams {
     page: number;
@@ -34,10 +34,10 @@ interface TreeProps {
 }
 export const useTree = create<TreeProps>((set) => ({
     tree: null,
-    params: { orderBy: '', page: 1, searchParam: '', sortOrder: 'asc' },
+    params: { orderBy: '', page: 1, searchParam: '', sortOrder: 'ASC' },
     selectedTrees: [],
     trees: [],
-    handleSort: () => set((state) => ({ params: { ...state.params, sortOrder: state.params.sortOrder === 'asc' ? 'desc' : 'asc' } })),
+    handleSort: () => set((state) => ({ params: { ...state.params, sortOrder: state.params.sortOrder === 'ASC' ? 'DESC' : 'ASC' } })),
     handlePage: (page) => set((state) => ({ params: { ...state.params, page } })),
     handleSearchParam: (param) => set((state) => ({ params: { ...state.params, searchParam: param } })),
     handleOrderBy: (param: string) => set((state) => ({ params: { ...state.params, orderBy: param } })),

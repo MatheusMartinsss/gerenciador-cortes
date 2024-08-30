@@ -107,7 +107,6 @@ export const TreesForm = () => {
                     const obj = await Promise.all(
                         Object.entries(speciesGrouped).map(async ([key, value]) => {
                             return {
-                                id: null,
                                 commonName: value[0].commonName,
                                 scientificName: value[0].scientificName,
                                 trees: value
@@ -141,7 +140,7 @@ export const TreesForm = () => {
     }
 
     const onSubmit = async (value: FormFieldValues) => {
-        const response = await api.post('/tree', value)
+        const response = await api.post('/tree/bulk', value.specie)
         if (response.data) {
             toast({
                 description: 'Arvores cadastradas com sucesso!',
@@ -152,7 +151,6 @@ export const TreesForm = () => {
         }
 
     }
-    console.log(formValue)
     return (
         <div className="flex flex-col space-y-1 w-full">
             <div className="flex space-x-2">

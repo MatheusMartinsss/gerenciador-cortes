@@ -1,6 +1,6 @@
 export type FormFieldValues = {
     specie: {
-        id: string | null
+        id?: string | null
         commonName: string;
         scientificName: string
         trees: {

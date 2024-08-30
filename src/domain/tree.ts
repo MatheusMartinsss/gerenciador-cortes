@@ -21,7 +21,7 @@ export interface ITree {
     dap: number;
     meters: number;
     volumeM3: number
-    sectionsVolumeM3: number;
+    sVolumeM3: number;
 
 }
 

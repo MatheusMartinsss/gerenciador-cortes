@@ -31,13 +31,32 @@ export async function POST(request: Request) {
                                 }
                             }
                         })
-                
+
                         await prisma.section.createMany({ data: item.section })
                     }
                 })
             )
         },)
         return NextResponse.json(cuts, { status: 201 })
+    } catch (error) {
+        console.log(error)
+        throw error
+    }
+}
+
+export async function GET(request: Request) {
+    try {
+        const response = await db.batch.findMany({
+            include: {
+                sections: {
+                    include: {
+                        section: true
+                    }
+                },
+                _count: true
+            }
+        })
+        return NextResponse.json(response, { status: 201 })
     } catch (error) {
         console.log(error)
         throw error

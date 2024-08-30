@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/table"
 import api from "@/lib/api"
 import { useEffect, useState } from "react"
-
 import { Skeleton } from "../ui/skeleton"
 import { useTree } from "@/hooks/useTree"
 import { Button } from "../ui/button"
@@ -27,6 +26,9 @@ import * as exceljs from 'exceljs'
 import { ViewTreeButton } from "./viewTreeButton"
 import { DropdownMenuOptions } from "./DropDownMenu"
 import { CutTreeButton } from "./CutTreeButton"
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
+import { findAllTrees, FindAllTreesResponse } from "@/services/treeService"
+import { ITree } from "@/domain/tree"
 
 const tableCol = [{
     label: 'N°',
@@ -73,7 +75,6 @@ const tableCol = [{
 export const TreeTable = () => {
     const {
         setTree,
-        trees,
         setTrees,
         removeTree,
         selectedTrees,
@@ -91,9 +92,12 @@ export const TreeTable = () => {
     const [loading, setLoading] = useState(true)
     const { searchParam, sortOrder, orderBy, page } = params
     const [maxPages, setMaxPages] = useState(0)
-    useEffect(() => {
-        fetchData()
-    }, [searchParam, page, sortOrder, orderBy])
+    const { data: response, isLoading, isError } = useQuery<FindAllTreesResponse>({
+        queryKey: ['trees', page, orderBy, sortOrder],
+        queryFn: async () => await findAllTrees({ page, orderBy, order: sortOrder }),
+        placeholderData: keepPreviousData
+
+    })
     useEffect(() => {
         if (searchText.trim() == '') {
             handleSearchParam('')
@@ -104,34 +108,6 @@ export const TreeTable = () => {
             setTree(null)
         }
     }, [isOpen])
-    const fetchData = async () => {
-        const { data: { data, pages } } = await api.get('/tree', {
-            params: {
-                page,
-                orderBy,
-                sortOrder,
-                searchParam
-            }
-        })
-        setTrees(data)
-        setMaxPages(pages)
-        setLoading(false)
-    }
-    const onSelect = (tree: any) => {
-        setTree(tree)
-        setForm('treeForm')
-    }
-    const onDelete = async (id: string) => {
-        const { data } = await api.delete(`/tree?id=${id}`)
-        if (data) {
-            removeTree(id)
-        }
-    }
-    const onView = async (id: string) => {
-        const { data } = await api.get(`/tree?id=${id}`)
-        setTree(data)
-
-    }
     const handleSearch = (value: string) => {
         setSearchText(value)
     }
@@ -164,6 +140,9 @@ export const TreeTable = () => {
             })
         }
     }
+    if (isLoading) return null
+    if (isError) return null
+    if (!response) return null
     return (
         <div className="flex flex-col w-full space-y-2 ">
             <div className='flex w-full flex-row space-x-2  '>
@@ -211,10 +190,10 @@ export const TreeTable = () => {
                                         checked={selectedTrees.length > 0}
                                         onCheckedChange={() => {
                                             if (selectedTrees.length > 0) {
-                                                const treesIds = trees.map((tree) => tree.id)
+                                                const treesIds = response?.data.map((tree) => tree.id)
                                                 removeSelectedTrees(treesIds)
                                             } else {
-                                                addSelectedTrees(trees)
+                                                //     addSelectedTrees(trees)
                                             }
                                         }}
                                     >
@@ -253,7 +232,7 @@ export const TreeTable = () => {
                                                     {col.label}
                                                     <div className="h-4 w-10 flex">
                                                         {selected && (
-                                                            sortOrder === 'asc' ?
+                                                            sortOrder === 'ASC' ?
                                                                 <MoveUp className="h-4 w-4" /> :
                                                                 <MoveDown className="h-4 w-4" />
                                                         )}
@@ -267,15 +246,15 @@ export const TreeTable = () => {
                         </TableRow>
                     </TableHeader>
                     <TableBody   >
-                        {loading ? (
+                        {isLoading ? (
                             <TableRow className="h-full w-full flex">
                                 <TableCell className="disabled:pointer-events-none" colSpan={9}>
                                     <Skeleton className="h-full w-full rounded-xl" ></Skeleton>
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            trees.length > 0 ? (
-                                trees.map((tree: any) => {
+                            response?.data?.length > 0 ? (
+                                response?.data.map((tree) => {
                                     const isSelected = selectedTrees.map((x) => x.id).includes(tree.id)
                                     return (
                                         <TableRow key={tree.id} >
@@ -299,7 +278,7 @@ export const TreeTable = () => {
                                             <TableCell className="text-sm font-medium">{maskToMeters(tree.dap)}</TableCell>
                                             <TableCell className="text-sm font-medium">{maskToMeters(tree.meters)}</TableCell>
                                             <TableCell className="text-sm font-medium ">{maskToM3(tree.volumeM3)}</TableCell>
-                                            <TableCell className="text-sm font-medium">{maskToM3(tree.sectionsVolumeM3)}</TableCell>
+                                            <TableCell className="text-sm font-medium">{maskToM3(tree.sVolumeM3)}</TableCell>
                                             <TableCell className="text-center">
                                                 <ViewTreeButton treeId={tree.id} />
                                                 <Button variant="ghost">
@@ -332,7 +311,7 @@ export const TreeTable = () => {
                     <TableFooter className="bg-green-950 font-bold rounded-2xl sticky bottom-0 ">
                         <TableRow >
                             <TableCell colSpan={9}  >
-                                <TablePagination pages={maxPages} handlePage={handlePage} params={params} />
+                                <TablePagination pages={response?.totalPages} handlePage={handlePage} params={params} />
                             </TableCell>
                         </TableRow>
                     </TableFooter>
