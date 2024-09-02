@@ -9,6 +9,7 @@ import { Settings } from 'lucide-react';
 import Link from "next/link";
 import ReactQueryProvider from "./ReactQueryProvider";
 
+
 const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
