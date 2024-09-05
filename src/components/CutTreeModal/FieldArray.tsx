@@ -78,7 +78,7 @@ export default function Fields({
                                     <div className="flex flex-col  items-end">
                                         <div className="flex flex-col items-center">
                                             <Label className="font-bold">Explorado</Label>
-                                            <Label>{maskToM3(item.sectionsVolumeM3)}</Label>
+                                            <Label>{maskToM3(item.sVolumeM3)}</Label>
                                         </div>
                                     </div>
                                 </div>

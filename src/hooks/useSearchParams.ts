@@ -1,104 +1,124 @@
 import { useSearchParams, useRouter } from "next/navigation";
+import { useQueryParams } from "../hooks/queryParamsProvider";
+import { useCallback } from "react";
 
 export const useParams = () => {
-    const router = useRouter()
-    const searchParams = useSearchParams();
-    const queryParams = Object.fromEntries(searchParams);
-    let optionsSelected = 0;
-    let maxOptionsSelect = 3;
-    const handleSort = () => {
-        if (optionsSelected >= maxOptionsSelect) {
-            delete queryParams['sortOrder']
-            delete queryParams['orderBy']
-        } else {
-            const currentOrder = queryParams['sortOrder'] || 'asc'
-            queryParams['sortOrder'] = currentOrder === 'asc' ? 'desc' : 'asc'
-            optionsSelected++;
-        }
-        const newSearchParams = new URLSearchParams(queryParams);
-        router.push(`?${newSearchParams}`);
-    }
-    const handleFromDate = (value: string) => {
-        if (!value) {
-            delete queryParams['from']
-        } else {
-            queryParams['from'] = value
-        }
-        const newSearchParams = new URLSearchParams(queryParams);
-        router.push(`?${newSearchParams}`);
-    }
-    const handlePage = (value: string) => {
-        if (!value) {
-            delete queryParams['page']
-        } else {
-            queryParams['page'] = value
-        }
-        const newSearchParams = new URLSearchParams(queryParams);
-        router.push(`?${newSearchParams}`);
-    }
-    const handleLimit = (value: string) => {
-        const limits = [10, 20,]
-        queryParams['limit'] = '10'
-        const newSearchParams = new URLSearchParams(queryParams);
-        router.push(`?${newSearchParams}`);
-    }
-    const handleEndDate = (value: string) => {
-        if (!value) {
-            delete queryParams['end']
-        } else {
-            queryParams['end'] = value
-        }
-        const newSearchParams = new URLSearchParams(queryParams);
-        router.push(`?${newSearchParams}`);
-    }
-    const handleSearchParam = (value: string) => {
-        if (value == '') {
-            delete queryParams['searchParam']
-        } else {
-            queryParams['searchParam'] = value
-        }
-        const newSearchParams = new URLSearchParams(queryParams);
-        router.push(`?${newSearchParams}`);
-    }
-    const handleOrderBy = (value: string) => {
-        if (value == '') {
-            delete queryParams['orderBy']
-        } else {
-            queryParams['orderBy'] = value
-        }
-        const newSearchParams = new URLSearchParams(queryParams);
-        router.push(`?${newSearchParams}`);
-    }
-    const updateParams = (key: string, value: string) => {
-        if (!key) {
-            console.error("Chave e valor devem ser fornecidos.");
-            return;
-        }
-        if (key === 'orderBy') {
-            const currentOrder = queryParams['order'] || 'asc';
-            queryParams['order'] = currentOrder === 'asc' ? 'desc' : 'asc';
-        }
-        if (value === '') {
-            delete queryParams[key];
-        } else {
-            queryParams[key] = value;
-        }
-        const newSearchParams = new URLSearchParams(queryParams);
-        router.push(`?${newSearchParams}`);
-    };
-    const clearParams = () => {
-        router.replace('')
-    }
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const queryParams = new URLSearchParams(searchParams);
 
-    return {
-        updateParams,
-        handleSort,
-        handlePage,
-        handleFromDate,
-        clearParams,
-        handleOrderBy,
-        handleSearchParam,
-        handleEndDate,
-        params: Object.fromEntries(searchParams)
-    };
-}
+  let optionsSelected = 0;
+  const maxOptionsSelect = 3;
+
+  const updateSearchParams = (key: string, value: string) => {
+    if (value === "") {
+      queryParams.delete(key);
+    } else {
+      queryParams.set(key, value);
+    }
+    router.push(`?${queryParams.toString()}`);
+  };
+
+  const handleSort = () => {
+    if (optionsSelected >= maxOptionsSelect) {
+      queryParams.delete("sortOrder");
+      queryParams.delete("orderBy");
+    } else {
+      const currentOrder = queryParams.get("sortOrder") || "ASC";
+      queryParams.set("sortOrder", currentOrder === "DESC" ? "DESC" : "ASC");
+      optionsSelected++;
+    }
+    router.push(`?${queryParams.toString()}`);
+  };
+
+  const handleFromDate = (value: string) => {
+    updateSearchParams("from", value);
+  };
+
+  const handleEndDate = (value: string) => {
+    updateSearchParams("end", value);
+  };
+
+  const handleSearchParam = (value: string) => {
+    updateSearchParams("searchParam", value);
+  };
+
+  const handleOrderBy = (value: string) => {
+    updateSearchParams("orderBy", value);
+  };
+
+  const handlePage = (value: string) => {
+    updateSearchParams("page", value);
+  };
+
+  const handleLimit = (value: string) => {
+    updateSearchParams("limit", value);
+  };
+
+  const updateParams = (key: string, value: string) => {
+    if (!key) {
+      console.error("Chave e valor devem ser fornecidos.");
+      return;
+    }
+    if (key === "sortOrder") {
+      const currentOrder = queryParams.get("sortOrder") || "ASC";
+      queryParams.set("sortOrder", currentOrder === "ASC" ? "DESC" : "ASC");
+    }
+    updateSearchParams(key, value);
+  };
+
+  const clearParams = () => {
+    router.replace("");
+  };
+
+  return {
+    updateParams,
+    handleSort,
+    handlePage,
+    handleFromDate,
+    handleLimit,
+    clearParams,
+    handleOrderBy,
+    handleSearchParam,
+    handleEndDate,
+    params: Object.fromEntries(queryParams),
+  };
+};
+type ValidationOptions<T> =
+  | { type: 'enum'; enum: T[] }  // Validação por enum
+  | { type: 'number' }           // Validação para número
+  | { type: 'custom'; validate: (value: unknown) => value is T };
+
+export const useQueryState = <T>(key: string, defaultValue: T, options?: ValidationOptions<T>) => {
+  const { getParam, setParam } = useQueryParams();
+
+
+  const rawValue = getParam(key, defaultValue) as unknown;
+
+  const isValidValue = (value: unknown): value is T => {
+    if (!options) return true
+    switch (options.type) {
+      case 'enum': {
+        return options.enum.includes(value as T);
+      }
+      case 'number': {
+        return typeof value === 'number' && !isNaN(value);
+      }
+      default: {
+        return false
+      }
+    }
+  }
+
+  const value: T = isValidValue(rawValue) ? (rawValue as T) : defaultValue;
+
+  const setValue = useCallback(
+    (newValue: T) => {
+      setParam(key, newValue);
+    },
+    [key, setParam]
+  );
+
+
+  return [value, setValue] as const;
+};

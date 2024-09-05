@@ -1,22 +1,18 @@
 "use client"
-import {
-    Pagination,
-    PaginationContent,
-    PaginationEllipsis,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from "@/components/ui/pagination"
+
+
+import { useQueryState } from '@/hooks/useSearchParams'
+import { Button } from "../ui/button"
+import { ChevronsRight, ChevronsLeft, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Label } from '../ui/label';
 
 interface PaginationProps {
-    handlePage: (page: number) => void
-    params: any
     pages: number
 }
 
-export function TablePagination({ pages, handlePage, params }: PaginationProps) {
-    const { page = 1, limit = 10 } = params
+export function TablePagination({ pages, }: PaginationProps) {
+    const [page, setPage] = useQueryState('page', 1)
+    const [limit, setLimit] = useQueryState('limit', 10)
 
     let currentPage = Number(page)
     let prevPage = currentPage <= 2 ? 1 : currentPage - 1
@@ -34,65 +30,54 @@ export function TablePagination({ pages, handlePage, params }: PaginationProps) 
     for (let i = startNexPage; i <= endNextPage; i++) {
         nextPages.push(i);
     }
+    const handlePage = (page: string) => {
+        setPage(parseInt(page))
+    }
     const handlePreviousPage = () => {
         if (currentPage <= 1) return
-        handlePage((currentPage - 1))
+        handlePage(String(currentPage - 1))
+    }
+    const handleDoublePreviousPage = () => {
+        if (currentPage <= 1) return
+        if (currentPage == 2) {
+            handlePage(String(currentPage - 1))
+        } else {
+            handlePage(String(currentPage - 2))
+        }
     }
     const handleNextPage = () => {
         if (currentPage == pages) return
-        handlePage((currentPage + 1))
+        handlePage(String(currentPage + 1))
+    }
+    const handleDoublePage = () => {
+        if (currentPage == pages) return
+        if (currentPage == pages - 1) {
+            handlePage(String(currentPage + 1))
+        } else {
+            handlePage(String(currentPage + 2))
+        }
     }
     let skipLastPage = currentPage !== lastPage && !nextPages.includes(lastPage)
     let skipFirstPage = currentPage !== 1 && !previousPages.includes(1)
     return (
-        <Pagination >
-            <PaginationContent>
-                <PaginationItem>
-                    <PaginationPrevious size='sm' onClick={handlePreviousPage} />
-                </PaginationItem>
-                {skipFirstPage && (
-                    <div className="flex flex-row">
-                        <PaginationItem key={1}>
-                            <PaginationLink size='sm' onClick={() => handlePage(1)}>1</PaginationLink>
-                        </PaginationItem>
-                        <PaginationItem className="flex">
-                            <PaginationEllipsis ></PaginationEllipsis>
-                        </PaginationItem>
-                    </div>
-                )}
-                {previousPages.map((page) => {
-                    return (
-                        <PaginationItem key={page}>
-                            <PaginationLink size='sm' onClick={() => handlePage(page)}>{page}</PaginationLink>
-                        </PaginationItem>
-                    )
-                })}
-                <PaginationItem>
-                    <PaginationLink isActive size='sm'>
-                        {currentPage}
-                    </PaginationLink>
-                </PaginationItem>
-                {nextPages.map((page) => {
-                    return (
-                        <PaginationItem key={page}>
-                            <PaginationLink size='sm' onClick={() => handlePage(page)}>{page}</PaginationLink>
-                        </PaginationItem>
-                    )
-                })}
-                {skipLastPage && (
-                    <div className="flex flex-row">
-                        <PaginationItem className="flex">
-                            <PaginationEllipsis ></PaginationEllipsis>
-                        </PaginationItem>
-                        <PaginationItem key={lastPage}>
-                            <PaginationLink size='sm' onClick={() => handlePage(lastPage)}>{lastPage}</PaginationLink>
-                        </PaginationItem>
-                    </div>
-                )}
-                <PaginationItem>
-                    <PaginationNext size='sm' onClick={handleNextPage} />
-                </PaginationItem>
-            </PaginationContent>
-        </Pagination>
+        <div className='flex justify-end w-full items-center '>
+            <div className='flex space-x-2'>
+                <div className='items-center flex text-white'>
+                    <Label>Pagina {page} de {pages}</Label>
+                </div>
+                <Button className='p-2 hover:bg-black hover:bg-opacity-30' variant='ghost' onClick={handleDoublePreviousPage}>
+                    <ChevronsLeft className='h-4 w-4 text-white' />
+                </Button>
+                <Button className='p-2 hover:bg-black hover:bg-opacity-30' variant='ghost' onClick={handlePreviousPage}>
+                    <ChevronLeft className='h-4 w-4 text-white' />
+                </Button>
+                <Button className='p-2 hover:bg-black hover:bg-opacity-30' variant='ghost' onClick={handleNextPage}>
+                    <ChevronRight className='h-4 w-4 text-white' />
+                </Button>
+                <Button className='p-2 hover:bg-black hover:bg-opacity-30' variant='ghost' onClick={handleDoublePage}>
+                    <ChevronsRight className='h-4 w-4 text-white' />
+                </Button>
+            </div>
+        </div>
     )
 }

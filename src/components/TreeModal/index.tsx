@@ -1,20 +1,18 @@
 import { useEffect, useState } from "react"
 import { Dialog, DialogContent } from "../ui/dialog"
-import { ITree, ITreeWithSections } from "@/domain/tree"
+import { ITreeWithSections } from "@/domain/tree"
 import api from "@/lib/api"
 import { dateMask, maskToM3, maskToMeters } from "@/lib/masks"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table"
+import { useQueryState } from "@/hooks/useSearchParams"
 
 
-interface treeModalProps {
-    open: boolean
-    treeId: string | null
-    handleModalState: () => void
-}
 
-export const TreeModal = ({ open, treeId, handleModalState }: treeModalProps) => {
+export const TreeModal = () => {
+    const [treeId, setTreeId] = useQueryState('treeId', '')
     const [tree, setTree] = useState<ITreeWithSections | null>(null)
     const [loading, setLoading] = useState(true)
+    const open = treeId !== ''
     useEffect(() => {
         if (treeId) {
             const fetchData = async () => {
@@ -24,6 +22,10 @@ export const TreeModal = ({ open, treeId, handleModalState }: treeModalProps) =>
             fetchData()
         }
     }, [treeId])
+
+    const handleModalState = () => {
+        setTreeId('')
+    }
 
     return (
         <Dialog open={open} onOpenChange={handleModalState}>
@@ -53,7 +55,7 @@ export const TreeModal = ({ open, treeId, handleModalState }: treeModalProps) =>
                             </div>
                             <div className="flex flex-col">
                                 <a className="text-sm font-black text-gray-700">Volume Explorado</a>
-                                <span className="font-medium text-sm  ">{maskToM3(tree?.sectionsVolumeM3)}</span>
+                                <span className="font-medium text-sm  ">{maskToM3(tree?.sVolumeM3)}</span>
                             </div>
                         </div>
                         <div className="h-[50vh] relative overflow-auto shadow-md sm:rounded-lg">

@@ -8,7 +8,7 @@ export type FormFieldValues = {
         specie_id: string;
         commonName: string;
         volumeM3: number
-        sectionsVolumeM3: number;
+        sVolumeM3: number;
         cutVolM3: number;
         section?: {
             tree_id: string;

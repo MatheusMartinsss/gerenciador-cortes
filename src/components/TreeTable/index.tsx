@@ -2,14 +2,11 @@
 import {
     Table,
     TableBody,
-    TableCaption,
     TableCell,
-    TableFooter,
     TableHead,
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import api from "@/lib/api"
 import { useEffect, useState } from "react"
 import { Skeleton } from "../ui/skeleton"
 import { useTree } from "@/hooks/useTree"
@@ -17,18 +14,20 @@ import { Button } from "../ui/button"
 import { TreePine, Search } from 'lucide-react';
 import { useModal } from "@/hooks/useModal"
 import { maskToM3, maskToMeters } from "@/lib/masks"
-import { Trash, Pencil, Eye, MoveDown, MoveUp, Ellipsis } from 'lucide-react';
+import { Trash, Eye, MoveDown, MoveUp, Ellipsis } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { TablePagination } from "../pagination/pagination"
 import { Checkbox } from "../ui/checkbox"
 import { Label } from "../ui/label"
 import * as exceljs from 'exceljs'
-import { ViewTreeButton } from "./viewTreeButton"
-import { DropdownMenuOptions } from "./DropDownMenu"
 import { CutTreeButton } from "./CutTreeButton"
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import { findAllTrees, FindAllTreesResponse } from "@/services/treeService"
-import { ITree } from "@/domain/tree"
+import { useQueryState } from "@/hooks/useSearchParams"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "../ui/dropdown-menu"
+import { TreeModal } from "../TreeModal"
+import { DataTable } from "./data-table"
+import { columns } from "./columns"
 
 const tableCol = [{
     label: 'N°',
@@ -56,13 +55,13 @@ const tableCol = [{
     sortable: true,
     numeric: true
 }, {
-    label: 'Vol. Exploravel',
+    label: 'Exploravel',
     key: 'volumeM3',
     sortable: true,
     numeric: true
 }, {
     label: 'Vol. Explorado',
-    key: 'sectionsVolumeM3',
+    key: 'sVolumeM3',
     sortable: true,
     numeric: true
 }, {
@@ -71,38 +70,26 @@ const tableCol = [{
     sortable: false,
     numeric: false
 }]
+type SortOrder = 'ASC' | 'DESC' | '';
 
 export const TreeTable = () => {
     const {
         setTree,
-        setTrees,
-        removeTree,
         selectedTrees,
-        removeSelectedTree,
-        addSelectedTree,
-        addSelectedTrees,
-        removeSelectedTrees,
-        handleSort,
         handleSearchParam,
-        handleOrderBy,
-        handlePage,
-        params } = useTree()
+    } = useTree()
     const { setForm, isOpen } = useModal()
     const [searchText, setSearchText] = useState<string>('')
-    const [loading, setLoading] = useState(true)
-    const { searchParam, sortOrder, orderBy, page } = params
-    const [maxPages, setMaxPages] = useState(0)
+    const [page] = useQueryState<number>('page', 1)
+    const validFields = ['commonName', 'scientificName', 'createdAt'];
+    const [orderBy, setOrderBy] = useQueryState('orderBy', 'createdAt', { type: 'enum', enum: validFields })
+    const [order, setSortOrder] = useQueryState<SortOrder>('order', 'ASC')
     const { data: response, isLoading, isError } = useQuery<FindAllTreesResponse>({
-        queryKey: ['trees', page, orderBy, sortOrder],
-        queryFn: async () => await findAllTrees({ page, orderBy, order: sortOrder }),
+        queryKey: ['trees', page, orderBy, order],
+        queryFn: async () => await findAllTrees({ page: Number(page), orderBy, order }),
         placeholderData: keepPreviousData
 
     })
-    useEffect(() => {
-        if (searchText.trim() == '') {
-            handleSearchParam('')
-        }
-    }, [searchText])
     useEffect(() => {
         if (!isOpen) {
             setTree(null)
@@ -144,8 +131,8 @@ export const TreeTable = () => {
     if (isError) return null
     if (!response) return null
     return (
-        <div className="flex flex-col w-full space-y-2 ">
-            <div className='flex w-full flex-row space-x-2  '>
+        <div className="flex flex-col w-full">
+            <div className='flex w-full flex-row space-x-2'>
                 <div>
                     <Button
                         variant='secondary'
@@ -179,144 +166,28 @@ export const TreeTable = () => {
                     </div>
                 </div>
             </div>
-            <div className="h-[80vh] relative overflow-auto shadow-md sm:rounded-lg">
-                <Table className="table-fixed">
-                    <TableHeader className="bg-green-950 font-bold rounded-2xl sticky top-0 ">
-                        <TableRow>
-                            <TableHead className="font-medium w-10">
-                                <div className="flex">
-                                    <Checkbox
-                                        className=" border-slate-600 data-[state=checked]:bg-blue-400"
-                                        checked={selectedTrees.length > 0}
-                                        onCheckedChange={() => {
-                                            if (selectedTrees.length > 0) {
-                                                const treesIds = response?.data.map((tree) => tree.id)
-                                                removeSelectedTrees(treesIds)
-                                            } else {
-                                                //     addSelectedTrees(trees)
-                                            }
-                                        }}
-                                    >
-                                    </Checkbox>
-                                </div>
-                            </TableHead>
-                            {selectedTrees.length > 0 ? (
-                                <TableHead colSpan={8}>
-                                    {selectedTrees.length} Seleciondas
-                                </TableHead>
-                            ) : (
-                                tableCol.map((col) => {
-                                    const isSortable = col.sortable
-                                    const selected = col.key === orderBy
-                                    const isNumeric = col.numeric
-                                    const isOptions = col.key == 'options'
-                                    return (
-                                        <TableHead
-                                            className={`text-white font-medium ${isNumeric ? 'w-4' : 'w-28'}${isOptions && 'w-48 text-center'}`}
-                                            key={col.key}
-                                            onClick={() => {
-                                                if (isSortable) {
-                                                    handleOrderBy(col.key)
-                                                    if (selected) {
-                                                        handleSort()
-                                                    }
-                                                }
-                                            }}
-                                        >
-                                            {!isSortable ? (
-                                                <>
-                                                    {col.label}
-                                                </>
-                                            ) : (
-                                                <div className="flex space-x-2 items-center  ">
-                                                    {col.label}
-                                                    <div className="h-4 w-10 flex">
-                                                        {selected && (
-                                                            sortOrder === 'ASC' ?
-                                                                <MoveUp className="h-4 w-4" /> :
-                                                                <MoveDown className="h-4 w-4" />
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </TableHead>
-                                    )
-                                })
-                            )}
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody   >
-                        {isLoading ? (
-                            <TableRow className="h-full w-full flex">
-                                <TableCell className="disabled:pointer-events-none" colSpan={9}>
-                                    <Skeleton className="h-full w-full rounded-xl" ></Skeleton>
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            response?.data?.length > 0 ? (
-                                response?.data.map((tree) => {
-                                    const isSelected = selectedTrees.map((x) => x.id).includes(tree.id)
-                                    return (
-                                        <TableRow key={tree.id} >
-                                            <TableCell >
-                                                <Checkbox
-                                                    className="border-slate-600 data-[state=checked]:bg-blue-400"
-                                                    checked={isSelected}
-                                                    onCheckedChange={() => {
-                                                        if (isSelected) {
-                                                            removeSelectedTree(tree.id)
-                                                        } else {
-                                                            addSelectedTree(tree)
-                                                        }
-                                                    }}
-                                                >
-                                                </Checkbox>
-                                            </TableCell>
-                                            <TableCell className="text-sm font-medium">{tree.number}</TableCell>
-                                            <TableCell className="text-sm font-medium" >{tree.commonName}</TableCell>
-                                            <TableCell className="text-sm font-medium" >{tree.scientificName}</TableCell>
-                                            <TableCell className="text-sm font-medium">{maskToMeters(tree.dap)}</TableCell>
-                                            <TableCell className="text-sm font-medium">{maskToMeters(tree.meters)}</TableCell>
-                                            <TableCell className="text-sm font-medium ">{maskToM3(tree.volumeM3)}</TableCell>
-                                            <TableCell className="text-sm font-medium">{maskToM3(tree.sVolumeM3)}</TableCell>
-                                            <TableCell className="text-center">
-                                                <ViewTreeButton treeId={tree.id} />
-                                                <Button variant="ghost">
-                                                    <Trash className="w-5 h-5" />
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    )
-                                })
-                            ) : (
-                                <TableRow>
-                                    <TableCell colSpan={9} className="disabled:pointer-events-none" >
-                                        <div className="w-full flex flex-col items-center text-center justify-center h-[500px] bg-slate-200 rounded-lg space-y-4 ">
-                                            <Label className="font-bold">Nenhuma arvore encontrada!</Label>
-                                            <Button
-                                                variant='secondary'
-                                                onClick={() => {
-                                                    setForm('treesForm')
-                                                }}
-                                            >
-                                                <TreePine className="mr-2 h-4 w-4" />
-                                                Importar
-                                            </Button>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            )
-                        )}
-                    </TableBody >
-                    <TableFooter className="bg-green-950 font-bold rounded-2xl sticky bottom-0 ">
-                        <TableRow >
-                            <TableCell colSpan={9}  >
-                                <TablePagination pages={response?.totalPages} handlePage={handlePage} params={params} />
-                            </TableCell>
-                        </TableRow>
-                    </TableFooter>
-                </Table >
+            <div className="h-[68vh] relative overflow-auto shadow-md sm:rounded-lg">
+                <DataTable columns={columns} data={response.data} />
             </div>
+            <div className="bg-green-950 font-bold rounded-b-2xl p-2 flex w-full">
+                <TablePagination pages={response?.totalPages} />
+            </div>
+            <TreeModal />
         </div>
+    )
+}
+
+export const ViewTreeButton = ({ treeId }: { treeId: string }) => {
+    const [, setSelectedTreeId] = useQueryState('treeId', '')
+    const selectTree = (id: string) => {
+        setSelectedTreeId(id)
+    }
+    return (
+        <Button
+            variant='ghost'
+            onClick={() => selectTree(treeId)}>
+            <Eye className="h-3 w-3 mr-2" />
+            Detalhes
+        </Button>
     )
 }

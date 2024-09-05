@@ -10,7 +10,6 @@ import { useToast } from '../ui/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter } from '../ui/alert-dialog';
 import { Dialog, DialogContent } from "../ui/dialog"
 
-
 interface ICutTreeModal {
     open: boolean
     handleModal: () => void
@@ -27,7 +26,7 @@ const defaultValues: FormFieldValues = {
             number: 0,
             scientificName: '',
             volumeM3: 0,
-            sectionsVolumeM3: 0,
+            sVolumeM3: 0,
             specie_id: '',
             section: [{ tree_id: '', section: "", d1: 0, d2: 0, d3: 0, d4: 0, meters: 0, number: '', volumeM3: 0, specie_id: '' }]
         },
@@ -62,44 +61,30 @@ export const CutTreeModal = ({ open, handleModal }: ICutTreeModal) => {
 
     })
     useEffect(() => {
-        if (selectedTrees) {
-            const currentValue = getValues('tree')
-            const newValue = selectedTrees.map((tree) => {
-                const alreadyExists = currentValue.find((x) => x.id == tree.id)
-                if (alreadyExists) {
-                    return alreadyExists
-                }
-                return {
-                    ...tree,
-                    cutVolM3: 0,
-                    section: [{ tree_id: tree.id, section: "", d1: 0, d2: 0, d3: 0, d4: 0, meters: 0, number: '', volumeM3: 0, specie_id: tree.specie_id }]
-                }
-            })
-            setValue('tree', newValue)
-        }
     }, [selectedTrees])
     const onSubmit = async (value: FormFieldValues) => {
-        const response = await api.post('/tree/section', value)
-        if (response.status == 201) {
-            toast({
-                description: `Abates lançados com sucesso!.`,
-                variant: 'default'
-            })
-        }
-        const sections = value.tree
-            .map(tree => {
-                if (tree.section) {
-                    return tree.section.map(section => ({
-                        ...section,
-                        number: tree.number
-                    }));
-                } else {
-                    return [];
-                }
-            })
-            .flat();
-        setCreatedSections(sections)
-        handleDialogAlert()
+        console.log(value)
+        /*  const response = await api.post('/tree/section', value)
+          if (response.status == 201) {
+              toast({
+                  description: `Abates lançados com sucesso!.`,
+                  variant: 'default'
+              })
+          }
+          const sections = value.tree
+              .map(tree => {
+                  if (tree.section) {
+                      return tree.section.map(section => ({
+                          ...section,
+                          number: tree.number
+                      }));
+                  } else {
+                      return [];
+                  }
+              })
+              .flat();
+          setCreatedSections(sections)
+          handleDialogAlert()*/
     }
     const handleDialogAlert = () => {
         setAlertOpen((state) => !state)
