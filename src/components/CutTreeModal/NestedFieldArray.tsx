@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Control, Controller, useFieldArray, UseFormRegister, UseFormSetValue, UseFormWatch, useWatch } from "react-hook-form";
+import { Control, Controller, FieldErrors, useFieldArray, UseFormRegister, UseFormSetValue, UseFormWatch, useWatch } from "react-hook-form";
 import { FormFieldValues } from "./FormFieldValues";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -12,20 +12,26 @@ export default function NestedFieldArray({
     control,
     register,
     setValue,
-    watch
+    watch,
+    errors
 }: {
     nestIndex: number;
     control: Control<FormFieldValues>;
     register: UseFormRegister<FormFieldValues>;
     watch: UseFormWatch<FormFieldValues>
-    setValue: UseFormSetValue<FormFieldValues>
-})  {
+    setValue: UseFormSetValue<FormFieldValues>,
+    errors?: FieldErrors<FormFieldValues>
+}) {
     const { fields, remove, append, insert } = useFieldArray({
         control,
-        name: `tree.${nestIndex}.section`
+        name: `tree.${nestIndex}.section`,
+        rules: {
+            required: true
+        }
 
     });
     const tree = watch(`tree.${nestIndex}`)
+
     return (
         <div className="flex justify-center  flex-col space-y-2">
             {fields.map((item, k) => {
@@ -34,11 +40,12 @@ export default function NestedFieldArray({
                     <div className="flex space-x-1 2xl:space-x-8  items-center justify-center " key={item.id} >
                         <div >
                             {isFirstIndex && (<Label>Plaqueta</Label>)}
-                            <Input {...register(`tree.${nestIndex}.section.${k}.number`)} />
+                            <Input {...register(`tree.${nestIndex}.section.${k}.plate`)} />
+
                         </div>
                         <div >
                             {isFirstIndex && (<Label>Secção</Label>)}
-                            <Input {...register(`tree.${nestIndex}.section.${k}.section`)} />
+                            <Input  {...register(`tree.${nestIndex}.section.${k}.section`)} />
                         </div>
                         <div >
                             {isFirstIndex && <Label>D1</Label>}
@@ -150,14 +157,14 @@ export default function NestedFieldArray({
                                     onClick={() =>
                                         append({
                                             tree_id: tree.id,
-                                            specie_id: tree.specie_id, 
+                                            specie_id: tree.specie_id,
                                             section: "",
                                             d1: 0,
                                             d2: 0,
                                             d3: 0,
                                             d4: 0,
                                             meters: 0,
-                                            number: '',
+                                            plate: '',
                                             volumeM3: 0
                                         })
                                     }

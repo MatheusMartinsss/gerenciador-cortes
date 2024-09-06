@@ -11,8 +11,8 @@ interface FindAllTreesFilter {
     commonName?: string;
     specie_id?: string;
     createdAt?: Date;
-    filterBy?: string | number
-    searchText?: string | number
+    filterBy?: string 
+    searchTerm?: string | number
 }
 
 export interface FindAllTreesResponse {

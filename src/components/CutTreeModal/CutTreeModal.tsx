@@ -4,34 +4,56 @@ import api from "@/lib/api";
 import FieldArray from "./FieldArray";
 import { CSVLink } from 'react-csv'
 import { FormFieldValues } from "./FormFieldValues";
-import { useTree } from '@/hooks/useTree';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useToast } from '../ui/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter } from '../ui/alert-dialog';
 import { Dialog, DialogContent } from "../ui/dialog"
+import { useMutation } from '@tanstack/react-query';
+import { z } from 'zod'
+import { zodResolver } from "@hookform/resolvers/zod";
 
 interface ICutTreeModal {
     open: boolean
     handleModal: () => void
 }
+const sectionSchema = z.object({
+    tree_id: z.string(),
+    section: z
+        .string()
+        .min(1, "A seção não pode ser uma string vazia")
+        .regex(/^[a-zA-Z]+$/, "A seção deve conter apenas letras"),
+    plate: z.string(),
+    specie_id: z.string(),
+    d1: z.number().min(10),
+    d2: z.number().min(10),
+    d3: z.number().min(10),
+    d4: z.number().min(10),
+    meters: z.number().min(10),
+    volumeM3: z.number(),
+});
+
+const treeSchema = z.object({
+    id: z.string(),
+    number: z.number(),
+    dap: z.number(),
+    range: z.number(),
+    scientificName: z.string(),
+    specie_id: z.string(),
+    commonName: z.string(),
+    volumeM3: z.number(),
+    sVolumeM3: z.number(),
+    cutVolM3: z.number(),
+    section: z.array(sectionSchema).min(1),
+});
+
+const formFieldValuesSchema = z.object({
+    description: z.string(),
+    tree: z.array(treeSchema).min(1),
+});
 
 const defaultValues: FormFieldValues = {
-    tree: [
-        {
-            commonName: '',
-            id: '',
-            range: 0,
-            cutVolM3: 0,
-            dap: 0,
-            number: 0,
-            scientificName: '',
-            volumeM3: 0,
-            sVolumeM3: 0,
-            specie_id: '',
-            section: [{ tree_id: '', section: "", d1: 0, d2: 0, d3: 0, d4: 0, meters: 0, number: '', volumeM3: 0, specie_id: '' }]
-        },
-
-    ]
+    description: 'teste',
+    tree: []
 };
 const headers = [
     { label: "N° da avore", key: "number" },
@@ -41,54 +63,36 @@ const headers = [
     { label: "Comprimento", key: "meters" },
 ];
 
+const createBatch = async (data: FormFieldValues) => {
+    const reponse = await api.post('/batch', [data])
+    return reponse.data
+}
 
 export const CutTreeModal = ({ open, handleModal }: ICutTreeModal) => {
-    const { selectedTrees, clearSelectedTrees } = useTree()
     const { toast } = useToast()
     const [createdSections, setCreatedSections] = useState<any>([])
     const csvLink = useRef<any>()
     const [openAlert, setAlertOpen] = useState(false)
-    const { control,
-        register,
-        handleSubmit,
-        getValues,
-        formState: { errors },
-        reset,
-        watch,
-        setValue,
-    } = useForm<FormFieldValues>({
-        defaultValues: defaultValues
-
+    const { control, register, handleSubmit, getValues, formState: { errors }, reset, watch, setValue, } = useForm<FormFieldValues>({
+        defaultValues: defaultValues,
+        resolver: zodResolver(formFieldValuesSchema),
+        mode: 'onSubmit'
     })
-    useEffect(() => {
-    }, [selectedTrees])
     const onSubmit = async (value: FormFieldValues) => {
-        console.log(value)
-        /*  const response = await api.post('/tree/section', value)
-          if (response.status == 201) {
-              toast({
-                  description: `Abates lançados com sucesso!.`,
-                  variant: 'default'
-              })
-          }
-          const sections = value.tree
-              .map(tree => {
-                  if (tree.section) {
-                      return tree.section.map(section => ({
-                          ...section,
-                          number: tree.number
-                      }));
-                  } else {
-                      return [];
-                  }
-              })
-              .flat();
-          setCreatedSections(sections)
-          handleDialogAlert()*/
+        mutate(value)
+
     }
     const handleDialogAlert = () => {
         setAlertOpen((state) => !state)
     }
+    const onCreate = (data: any) => {
+        setCreatedSections(data)
+        handleDialogAlert()
+    }
+    const { mutate, isPending } = useMutation({
+        mutationFn: createBatch,
+        onSuccess: onCreate,
+    })
     const generateCsv = () => {
         if (csvLink.current) {
             csvLink.current.link.click()
@@ -98,7 +102,8 @@ export const CutTreeModal = ({ open, handleModal }: ICutTreeModal) => {
     const getFormatedData = () => {
         return createdSections.map((section: any) => {
             return {
-                ...section,
+                number: section.number,
+                section: section.section,
                 d1: (section.d1 / 100).toFixed(2).replace('.', ','),
                 d4: (section.d4 / 100).toFixed(2).replace('.', ','),
                 meters: (section.meters / 100).toFixed(2).replace('.', ','),
@@ -107,20 +112,19 @@ export const CutTreeModal = ({ open, handleModal }: ICutTreeModal) => {
     }
     const handleCloseDialog = () => {
         setAlertOpen(false)
-        clearSelectedTrees()
         reset()
         handleModal()
     }
     return (
         <Dialog open={open} onOpenChange={handleModal}>
-            <DialogContent className="max-w-[80%]  2xl:max-w-[70%] flex min-h-[450px] max-h-[90%]  overflow-y-auto  ">
+            <DialogContent className="max-w-[90%]  2xl:max-w-[70%] flex min-h-[450px] max-h-[90%]  overflow-y-auto  ">
                 <div className="flex w-full space-y-2">
                     <form className="w-full flex space-y-4 flex-col overflow-y-scroll p-4 justify-between" onSubmit={handleSubmit(onSubmit)}>
                         <FieldArray
                             {...{ control, register, defaultValues, getValues, setValue, errors, watch }}
                         />
                         <div className='w-full flex'>
-                            <Button disabled={!getValues('tree').length} className='w-full' type="submit">Salvar</Button>
+                            <Button disabled={!getValues('tree').length || isPending} className='w-full' type="submit">Salvar</Button>
                         </div>
                     </form>
                     <AlertDialog

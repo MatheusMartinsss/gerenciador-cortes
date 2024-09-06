@@ -1,4 +1,5 @@
 export type FormFieldValues = {
+    description: string,
     tree: {
         id: string;
         number: number;
@@ -13,7 +14,7 @@ export type FormFieldValues = {
         section?: {
             tree_id: string;
             section: string;
-            number: string;
+            plate: string;
             specie_id: string;
             d1: number;
             d2: number;

@@ -11,7 +11,6 @@ import { useQueryState } from "@/hooks/useSearchParams"
 export const TreeModal = () => {
     const [treeId, setTreeId] = useQueryState('treeId', '')
     const [tree, setTree] = useState<ITreeWithSections | null>(null)
-    const [loading, setLoading] = useState(true)
     const open = treeId !== ''
     useEffect(() => {
         if (treeId) {

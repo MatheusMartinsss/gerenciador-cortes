@@ -7,6 +7,8 @@ import {
     UseFormRegister,
     UseFormSetValue,
     UseFormWatch,
+    FieldError,
+    FieldErrors
 } from "react-hook-form";
 import { FormFieldValues } from "./FormFieldValues";
 import NestedArray from "./NestedFieldArray";
@@ -16,24 +18,25 @@ import { SearchTree } from '../SearchTree';
 import { ITree } from "@/domain/tree";
 import { Button } from "../ui/button";
 import { X } from 'lucide-react';
+
 export default function Fields({
     control,
     register,
     setValue,
-    getValues,
     watch,
+    errors
 }: {
     control: Control<FormFieldValues>;
     register: UseFormRegister<FormFieldValues>;
     setValue: UseFormSetValue<FormFieldValues>;
     getValues: UseFormGetValues<FormFieldValues>;
-    watch: UseFormWatch<FormFieldValues>
+    watch: UseFormWatch<FormFieldValues>,
+    errors?: FieldErrors<FormFieldValues>
 }) {
     const { fields, append, remove } = useFieldArray({
         control,
-        name: "tree"
+        name: "tree",
     });
-
     const handleSelectedTree = (tree: ITree) => {
         if (fields.find((item) => item.number == tree.number)) {
             return
@@ -41,7 +44,7 @@ export default function Fields({
         append({
             ...tree,
             cutVolM3: 0,
-            section: [{ tree_id: tree.id, section: "", d1: 0, d2: 0, d3: 0, d4: 0, meters: 0, number: '', volumeM3: 0, specie_id: tree.specie_id }]
+            section: [{ tree_id: tree.id, section: "", d1: 0, d2: 0, d3: 0, d4: 0, meters: 0, plate: '', volumeM3: 0, specie_id: tree.specie_id }]
         })
     }
 
@@ -87,7 +90,7 @@ export default function Fields({
                                     </div>
                                 </div>
                                 <div className="flex flex-col p-2">
-                                    <NestedArray nestIndex={index} {...{ control, register, watch, setValue }} />
+                                    <NestedArray nestIndex={index} {...{ control, register, watch, setValue, errors }} />
                                 </div>
                                 <div className="flex w-full bg-slate-100 justify-end p-4">
                                     <Controller
@@ -103,8 +106,8 @@ export default function Fields({
                     );
                 })
             ) : (
-                <div className=""> 
-                    Adicione uma arvore
+                <div className="w-full h-full items-center text-center">
+                    Nenhuma selecionada!
                 </div>
             )}
         </div>
