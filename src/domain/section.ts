@@ -19,6 +19,8 @@ export interface ISection {
     section: string;
     number: string;
     plate: string;
+    commonName: string
+    scientificName: string
     d1: number;
     d2: number;
     tree?: ITree

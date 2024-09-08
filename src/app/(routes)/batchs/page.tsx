@@ -3,8 +3,7 @@ import { BatchsTable } from "@/components/BatchsTable"
 
 export default function Batchs() {
     return (
-        <div className="">
-
+        <div >
             <BatchsTable />
         </div>
     )
