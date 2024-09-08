@@ -25,10 +25,10 @@ export const SearchTree = ({ handleSelectedTree }: ISearchTreeProps) => {
     const [filterBy, setFilterBy] = useState<string>('number')
     const filterDebounce = useDebounce(filterBy, 500)
     const [text, setText] = useState<string>('')
-    const textDebounce = useDebounce(text, 200)
+    const searchTerm = useDebounce(text, 200)
     const { data: response } = useQuery<FindAllTreesResponse>({
-        queryKey: ['trees', page, filterBy, textDebounce, filterDebounce],
-        queryFn: async () => await findAllTrees({ page: Number(page), filterBy, searchTerm: textDebounce }),
+        queryKey: ['trees', page, filterBy, searchTerm, filterDebounce],
+        queryFn: async () => await findAllTrees({ page: Number(page), filterBy, searchTerm }),
         placeholderData: keepPreviousData
 
     })
@@ -36,7 +36,7 @@ export const SearchTree = ({ handleSelectedTree }: ISearchTreeProps) => {
     let totalPages = response?.totalPages || 0
     useEffect(() => {
         setPage(1)
-    }, [filterBy, textDebounce])
+    }, [filterBy, searchTerm])
 
     const dropdownRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);

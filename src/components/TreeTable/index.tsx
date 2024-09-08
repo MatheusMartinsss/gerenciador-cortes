@@ -1,75 +1,23 @@
 "use client"
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
+
 import { useEffect, useState } from "react"
-import { Skeleton } from "../ui/skeleton"
 import { useTree } from "@/hooks/useTree"
 import { Button } from "../ui/button"
 import { TreePine, Search } from 'lucide-react';
 import { useModal } from "@/hooks/useModal"
-import { maskToM3, maskToMeters } from "@/lib/masks"
-import { Trash, Eye, MoveDown, MoveUp, Ellipsis } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { TablePagination } from "../pagination/pagination"
-import { Checkbox } from "../ui/checkbox"
-import { Label } from "../ui/label"
 import * as exceljs from 'exceljs'
 import { CutTreeButton } from "./CutTreeButton"
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import { findAllTrees, FindAllTreesResponse } from "@/services/treeService"
 import { useQueryState } from "@/hooks/useSearchParams"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "../ui/dropdown-menu"
 import { TreeModal } from "../TreeModal"
 import { DataTable } from "./data-table"
 import { columns } from "./columns"
+import { useDebounce } from "@uidotdev/usehooks"
 
-const tableCol = [{
-    label: 'N°',
-    key: 'number',
-    sortable: true,
-    numeric: true
-}, {
-    label: 'N. Popular',
-    key: 'commonName',
-    sortable: true,
-    numeric: false
-}, {
-    label: 'N. Cientifico',
-    key: 'scientificName',
-    sortable: true,
-    numeric: false
-}, {
-    label: 'DAP',
-    key: 'dap',
-    sortable: true,
-    numeric: true
-}, {
-    label: 'Altura',
-    key: 'meters',
-    sortable: true,
-    numeric: true
-}, {
-    label: 'Exploravel',
-    key: 'volumeM3',
-    sortable: true,
-    numeric: true
-}, {
-    label: 'Vol. Explorado',
-    key: 'sVolumeM3',
-    sortable: true,
-    numeric: true
-}, {
-    label: 'Opções',
-    key: 'options',
-    sortable: false,
-    numeric: false
-}]
 type SortOrder = 'ASC' | 'DESC' | '';
 
 export const TreeTable = () => {
@@ -80,13 +28,14 @@ export const TreeTable = () => {
     } = useTree()
     const { setForm, isOpen } = useModal()
     const [searchText, setSearchText] = useState<string>('')
+    const textDebounce = useDebounce(searchText, 200)
     const [page] = useQueryState<number>('page', 1)
-    const validFields = ['commonName', 'scientificName', 'createdAt'];
-    const [orderBy, setOrderBy] = useQueryState('orderBy', 'createdAt', { type: 'enum', enum: validFields })
-    const [order, setSortOrder] = useQueryState<SortOrder>('order', 'ASC')
+    const validFields = ['commonName', 'scientificName', 'createdAt', 'meters', 'sVolumeM3', 'volumeM3'];
+    const [orderBy] = useQueryState('orderBy', 'number', { type: 'enum', enum: validFields })
+    const [order] = useQueryState<SortOrder>('order', 'ASC')
     const { data: response, isLoading, isError } = useQuery<FindAllTreesResponse>({
-        queryKey: ['trees', page, orderBy, order],
-        queryFn: async () => await findAllTrees({ page: Number(page), orderBy, order }),
+        queryKey: ['trees', page, orderBy, order, textDebounce],
+        queryFn: async () => await findAllTrees({ page: Number(page), orderBy, order, searchTerm: textDebounce }),
         placeholderData: keepPreviousData
 
     })

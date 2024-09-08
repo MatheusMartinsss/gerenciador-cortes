@@ -1,5 +1,6 @@
 import { ITree } from "@/domain/tree";
 import api from "@/lib/api";
+import { removeNulls } from "@/lib/removeEmptyParams";
 
 interface FindAllTreesFilter {
     page?: number;
@@ -11,8 +12,8 @@ interface FindAllTreesFilter {
     commonName?: string;
     specie_id?: string;
     createdAt?: Date;
-    filterBy?: string 
-    searchTerm?: string | number
+    filterBy?: string
+    searchTerm?: string | number | null
 }
 
 export interface FindAllTreesResponse {
@@ -26,7 +27,7 @@ export interface FindAllTreesResponse {
 export const findAllTrees = async (filters: FindAllTreesFilter): Promise<FindAllTreesResponse> => {
     try {
         const response = await api.get('/tree', {
-            params: filters
+            params: removeNulls(filters)
         });
         return response.data
     } catch (error) {

@@ -5,7 +5,6 @@ import {
   SortingState,
   flexRender,
   getCoreRowModel,
-  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
 
@@ -18,6 +17,8 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import React from "react"
+import { useQueryState } from "@/hooks/useSearchParams"
+import { SortOrder } from "@/domain"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -29,13 +30,13 @@ export function DataTable<TData, TValue>({
   data,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
-  
+  const [, setOrderBy] = useQueryState('orderBy', 'number')
+  const [, setSortOrder] = useQueryState<SortOrder>('order', 'ASC')
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
     state: {
       sorting
     }
@@ -47,8 +48,19 @@ export function DataTable<TData, TValue>({
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
+                const isSortable = header.column.getCanSort()
+                const isSorted = header.column.getIsSorted()
                 return (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id}
+                    onClick={() => {
+                      if (isSortable) {
+                        setOrderBy(header.column.id)
+                      }
+                      if (isSorted) {
+                        setSortOrder(isSorted.toLocaleUpperCase() as SortOrder)
+                      }
+                    }}
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(

@@ -1,5 +1,6 @@
 import { IBatch } from "@/domain/batch";
 import api from "@/lib/api";
+import { removeNulls } from "@/lib/removeEmptyParams";
 
 interface FindAllBatchFilter {
     page?: number;
@@ -9,7 +10,7 @@ interface FindAllBatchFilter {
     order?: 'ASC' | 'DESC' | '';
     number?: number;
     createdAt?: Date;
-    filterBy?: string 
+    filterBy?: string
     searchTerm?: string | number
 }
 
@@ -24,7 +25,7 @@ export interface FindAllBatchResponse {
 export const findAllBatch = async (filters: FindAllBatchFilter): Promise<FindAllBatchResponse> => {
     try {
         const response = await api.get('/batch', {
-            params: filters
+            params: removeNulls(filters)
         });
         return response.data
     } catch (error) {
