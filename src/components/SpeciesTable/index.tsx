@@ -204,7 +204,7 @@ export const SpecieTable = () => {
                     <TableFooter className="bg-green-950 font-bold rounded-2xl sticky bottom-0 ">
                         <TableRow >
                             <TableCell colSpan={5}  >
-                                <TablePagination pages={maxPages} handlePage={handlePage} params={params} />
+                               
                             </TableCell>
                         </TableRow>
                     </TableFooter>

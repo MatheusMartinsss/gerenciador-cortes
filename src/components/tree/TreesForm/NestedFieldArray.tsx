@@ -107,7 +107,7 @@ export default function NestedFieldArray({
                                     variant='outline'
                                     onClick={() =>
                                         append({
-                                            specie_id,
+                                            specie_id: specie_id || '',
                                             dap: 0,
                                             commonName: '',
                                             range: 0,

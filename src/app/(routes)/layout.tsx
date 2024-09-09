@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 import ReactQueryProvider from "./ReactQueryProvider";
 import Provider from "@/hooks/sessionProvider";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/authOptions";
 import { NavBar } from "@/components/navBar/NavBar";
 
 const fontSans = FontSans({
