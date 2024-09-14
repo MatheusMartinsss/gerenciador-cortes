@@ -76,9 +76,7 @@ export const TreeTable = () => {
             })
         }
     }
-    if (isLoading) return null
-    if (isError) return null
-    if (!response) return null
+
     return (
         <div className="flex flex-col w-full">
             <div className='flex w-full flex-row space-x-2'>
@@ -116,10 +114,10 @@ export const TreeTable = () => {
                 </div>
             </div>
             <div className="h-[68vh] relative overflow-auto shadow-md sm:rounded-lg">
-                <DataTable columns={columns} data={response.data} />
+                <DataTable columns={columns} data={response?.data || []} />
             </div>
             <div className="bg-green-950 font-bold rounded-b-2xl p-2 flex w-full">
-                <TablePagination pages={response?.totalPages} />
+                <TablePagination pages={response?.totalPages || 0} />
             </div>
             <TreeModal />
         </div>

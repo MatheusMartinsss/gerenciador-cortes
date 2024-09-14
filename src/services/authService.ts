@@ -5,7 +5,6 @@ import api from "@/lib/api"
 export const authService = async (email: string, password: string) => {
     try {
         const response = await api.post('/auth/login', { email, password });
-        console.log(response)
         return response.data;
     } catch (error: any) {
         console.log(error)

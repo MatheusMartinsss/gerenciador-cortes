@@ -4,7 +4,7 @@ import { getSession } from 'next-auth/react';
 
 const api = () => {
   const defaultOptions = {
-    baseURL: process.env.NEXT_PUBLIC_ENV_API,
+    baseURL: process.env.ENV_API_URL || process.env.NEXT_PUBLIC_ENV_API,
   };
 
   const instance = axios.create(defaultOptions);
