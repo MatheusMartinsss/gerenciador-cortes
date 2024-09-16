@@ -20,12 +20,14 @@ export const NavBar = () => {
                     <Button variant='ghost' className="hover:bg-opacity-100  text-white hover:text-black">Secções</Button>
                 </Link>
             </div>
-            <Button onClick={() => signOut()}>Signout</Button>
-            <Link href={`/settings`}>
-                <Button size='icon' variant='ghost' className="hover:bg-black  hover:bg-opacity-30 hover:rounded-2xl text-white hover:text-white">
-                    <Settings className="h-6 w-6" />
-                </Button>
-            </Link>
+            <div className="flex">
+                <Button variant='ghost' className="hover:bg-opacity-100  text-white hover:text-black" onClick={() => signOut()}>Sair</Button>
+                <Link href={`/settings`}>
+                    <Button size='icon' variant='ghost' className="hover:bg-black  hover:bg-opacity-30 hover:rounded-2xl text-white hover:text-white">
+                        <Settings className="h-6 w-6" />
+                    </Button>
+                </Link>
+            </div>
         </nav>
     )
 }
