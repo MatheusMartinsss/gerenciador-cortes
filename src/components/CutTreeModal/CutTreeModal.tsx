@@ -52,7 +52,7 @@ const formFieldValuesSchema = z.object({
 });
 
 const defaultValues: FormFieldValues = {
-    description: 'teste',
+    description: '',
     tree: []
 };
 const headers = [
@@ -117,7 +117,7 @@ export const CutTreeModal = ({ open, handleModal }: ICutTreeModal) => {
     }
     return (
         <Dialog open={open} onOpenChange={handleModal}>
-            <DialogContent className="max-w-[90%]  2xl:max-w-[70%] flex min-h-[450px] max-h-[90%]  overflow-y-auto  ">
+            <DialogContent className="max-w-[90%] 2xl:max-w-[70%] flex min-h-[450px] max-h-[90%]  overflow-y-auto  ">
                 <div className="flex w-full space-y-2">
                     <form className="w-full flex space-y-4 flex-col overflow-y-scroll p-4 justify-between" onSubmit={handleSubmit(onSubmit)}>
                         <FieldArray
@@ -140,7 +140,7 @@ export const CutTreeModal = ({ open, handleModal }: ICutTreeModal) => {
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
-                    <CSVLink ref={csvLink} filename="tracar.csv" headers={headers} data={getFormatedData()} separator=";" className="hidden"></CSVLink>
+                    <CSVLink ref={csvLink} filename="abate" headers={headers} data={getFormatedData()} separator=";" className="hidden"></CSVLink>
                 </div>
             </DialogContent>
         </Dialog>

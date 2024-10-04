@@ -4,8 +4,8 @@ import { SectionsTable } from "@/components/SectionsTable"
 
 export default function Sections() {
     return (
-        <div >
-            <SectionsTable />
-        </div>
+
+        <SectionsTable />
+
     )
 }

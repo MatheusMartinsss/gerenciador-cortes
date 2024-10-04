@@ -31,11 +31,15 @@ export default async function RootLayout({
       <Provider session={session}>
         <ReactQueryProvider>
           <body className={cn(
-            "min-h-screen  bg-background font-sans antialiased",
+            " bg-gray-200 font-sans antialiased",
             fontSans.variable
           )}>
             <NavBar />
-            {children}
+            <div className="flex-grow">
+              <main className="flex w-full flex-col items-center p-10 mx-auto">
+                {children}
+              </main>
+            </div>
             <Modal />
             <Toaster />
           </body>
