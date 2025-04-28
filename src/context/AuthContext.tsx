@@ -6,6 +6,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 type User = {
     id: string;
     email: string;
+    role: string
     [key: string]: any;
 };
 
@@ -25,28 +26,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     useEffect(() => {
         const token = localStorage.getItem('token');
-
+        console.log(user)
         if (token) {
             try {
                 const decoded = jwtDecode<User & { exp: number }>(token);
-
-                // Verificar expiração
-                if (decoded.exp * 1000 < Date.now()) {
-                    localStorage.removeItem('token');
-                    setUser(null);
-                    if (pathname !== '/login') router.push('/login');
-                } else {
-                    setUser(decoded);
-                }
+                console.log(decoded)
+                setUser(decoded.user);
             } catch (err) {
                 console.error('Token inválido:', err);
                 localStorage.removeItem('token');
                 setUser(null);
-                if (pathname !== '/login') router.push('/login');
+                if (pathname !== '/auth') router.push('/auth');
             }
         } else {
             setUser(null);
-            if (pathname !== '/login') router.push('/login');
+            if (pathname !== '/auth') router.push('/auth');
         }
 
         setLoading(false);
@@ -55,7 +49,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const logout = () => {
         localStorage.removeItem('token');
         setUser(null);
-        router.push('/login');
+        router.push('/auth');
     };
 
     if (loading) return null; // ou um <Loading />

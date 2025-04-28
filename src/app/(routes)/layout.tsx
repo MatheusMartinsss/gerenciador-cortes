@@ -1,16 +1,12 @@
 import type { Metadata } from "next";
-import { Inter as FontSans } from "next/font/google"
 import "./globals.css";
 import { Modal } from "@/components/modal/modal";
 import { Toaster } from "@/components/ui/toaster"
-import { cn } from "@/lib/utils"
 import ReactQueryProvider from "./ReactQueryProvider";
-import { NavBar } from "@/components/navBar/NavBar";
+import { NavBar } from "@/components/nagivation/navBar/NavBar";
+import { RequireAuth } from "@/components/Layout/RequireAuth";
 
-const fontSans = FontSans({
-  subsets: ["latin"],
-  variable: "--font-sans",
-})
+
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -24,22 +20,20 @@ export default async function RootLayout({
 }>) {
 
   return (
-    <html lang="en">
+    <RequireAuth>
       <ReactQueryProvider>
-        <body className={cn(
-          " bg-gray-200 font-sans antialiased",
-          fontSans.variable
-        )}>
+        <div>
           <NavBar />
           <div className="flex-grow">
-            <main className="flex w-full flex-col items-center p-10 mx-auto">
+            <div className="flex w-full flex-col items-center p-10 mx-auto">
               {children}
-            </main>
+            </div>
           </div>
           <Modal />
           <Toaster />
-        </body>
+        </div>
       </ReactQueryProvider>
-    </html>
+    </RequireAuth>
+
   );
 }

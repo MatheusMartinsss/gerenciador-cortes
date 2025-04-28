@@ -1,6 +1,6 @@
 "use client"
 import { useModal } from "@/hooks/useModal"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
+import { Dialog, DialogContent, DialogHeader } from "../ui/dialog"
 import { TreeForm } from "../tree/treeForm"
 import { TreesForm } from "../tree/TreesForm/treesForm"
 import { SectionsForm } from "../section/sectionsForm"

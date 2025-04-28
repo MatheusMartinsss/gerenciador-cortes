@@ -57,7 +57,7 @@ export const TreesForm = () => {
             remove(0)
             reader.onload = async (e: ProgressEvent<FileReader>) => {
                 if (e.target) {
-                    const data = e.target.result as Buffer;
+                    const data = e.target.result as any;
                     const workbook = new exceljs.Workbook();
                     await workbook.xlsx.load(data);
                     const worksheet = workbook.worksheets[0];
