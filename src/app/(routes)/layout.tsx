@@ -5,9 +5,6 @@ import { Modal } from "@/components/modal/modal";
 import { Toaster } from "@/components/ui/toaster"
 import { cn } from "@/lib/utils"
 import ReactQueryProvider from "./ReactQueryProvider";
-import Provider from "@/hooks/sessionProvider";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
 import { NavBar } from "@/components/navBar/NavBar";
 
 const fontSans = FontSans({
@@ -25,26 +22,24 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getServerSession(authOptions)
+
   return (
     <html lang="en">
-      <Provider session={session}>
-        <ReactQueryProvider>
-          <body className={cn(
-            " bg-gray-200 font-sans antialiased",
-            fontSans.variable
-          )}>
-            <NavBar />
-            <div className="flex-grow">
-              <main className="flex w-full flex-col items-center p-10 mx-auto">
-                {children}
-              </main>
-            </div>
-            <Modal />
-            <Toaster />
-          </body>
-        </ReactQueryProvider>
-      </Provider>
+      <ReactQueryProvider>
+        <body className={cn(
+          " bg-gray-200 font-sans antialiased",
+          fontSans.variable
+        )}>
+          <NavBar />
+          <div className="flex-grow">
+            <main className="flex w-full flex-col items-center p-10 mx-auto">
+              {children}
+            </main>
+          </div>
+          <Modal />
+          <Toaster />
+        </body>
+      </ReactQueryProvider>
     </html>
   );
 }

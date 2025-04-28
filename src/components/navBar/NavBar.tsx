@@ -2,11 +2,11 @@
 import Link from "next/link"
 import { Button } from "../ui/button"
 import { Settings } from 'lucide-react';
-import { useSession } from "next-auth/react";
+
 import { signOut } from 'next-auth/react'
 
 export const NavBar = () => {
-    const { data, status } = useSession()
+
     return (
         <nav className='w-full justify-between flex bg-green-900 rounded  items-center pt-1 pb-1 pr-1 pl-1'>
             <div>

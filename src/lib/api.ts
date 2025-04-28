@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getSession } from 'next-auth/react';
+
 
 
 const api = () => {
@@ -10,9 +10,9 @@ const api = () => {
   const instance = axios.create(defaultOptions);
 
   instance.interceptors.request.use(async (request) => {
-    const session = await getSession();
-    if (session) {
-      request.headers.Authorization = `Bearer ${session.user.token}`;
+    const token = localStorage.getItem('token');
+    if (token) {
+      request.headers.Authorization = `Bearer ${token}`;
     }
     return request;
   });

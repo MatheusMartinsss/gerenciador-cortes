@@ -1,6 +1,6 @@
-import Provider from '@/hooks/sessionProvider';
+
 import '../../(routes)/globals.css'
-import { getServerSession } from "next-auth";
+
 
 export const metadata = {
   title: 'Next.js',
@@ -12,13 +12,9 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const session = await getServerSession()
   return (
     <html lang="en">
-      <Provider session={session}>
-        <body>{children}</body>
-      </Provider>
-
+      <body>{children}</body>
     </html>
   )
 }

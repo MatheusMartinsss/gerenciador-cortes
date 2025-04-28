@@ -7,8 +7,7 @@ import { useForm } from "react-hook-form";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from 'next/navigation'
-
-import { useSession } from "next-auth/react";
+import { authService } from "@/services/authService";
 const Schema = z.object({
     email: z.string().email(),
     password: z.string()
@@ -19,22 +18,19 @@ type FormData = z.infer<typeof Schema>;
 const Auth = () => {
     const [loginError, setLoginError] = useState<string | null>(null);
     const router = useRouter();
-    const { data, status } = useSession()
     const { register, handleSubmit, formState: { errors }, } = useForm<FormData>({
         resolver: zodResolver(Schema),
         mode: 'onBlur'
     })
-    if(status === 'authenticated'){
-        router.push('/')
-    }
+
     const onSubmit = async (value: FormData) => {
         setLoginError(null);
-        const res = await signIn('credentials', { email: value.email, password: value.password, redirect: false })
-        if (!res || !res.ok) {
-            setLoginError("Credenciais inválidas. Por favor, tente novamente.");
-            return
+        try {
+            const user = await authService(value.email, value.password)
+            router.push('/');
+        } catch (ex) {
+            console.error(ex)
         }
-        router.push('/');
 
     }
     return (
