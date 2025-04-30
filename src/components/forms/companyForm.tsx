@@ -19,10 +19,11 @@ import { useCepLookup } from "@/hooks/useCepLookup"
 import { toast } from "../ui/use-toast"
 import { useCnpjLookup } from "@/hooks/useCnpjLookup"
 import { LoaderOverlay } from "../ui/loader-overlay"
+import { createCompany } from "@/services/companyService"
 
 const formSchema = z.object({
     razaoSocial: z.string().min(1),
-    nomePouplar: z.string().min(1),
+    nomePopular: z.string().min(1),
     cnpj: z.string().min(14),
     inscricaoEstadual: z.string(),
     email: z.string().email().optional().or(z.literal("")),
@@ -43,8 +44,8 @@ const formSchema = z.object({
         config: z.string().optional(),
     }),
     user: z.object({
-        firstname: z.string(),
-        lastname: z.string(),
+        firstName: z.string(),
+        lastName: z.string(),
         email: z.string().email(),
         password: z.string().min(6),
     })
@@ -57,11 +58,12 @@ const CompanyForm = () => {
     const [cnpjToSearch, setCnpjToSearch] = useState("")
     const { data: cepData, isError: isErrorCepLookUp, isSuccess: isSuccessCepLookUp, isLoading: isCepLoading } = useCepLookup(cepToSearch, cepToSearch.length === 8)
     const { data: cnpjData, isError: isErrorCnpjLookUp, isSuccess: isSuccessCnpjLookUp, isLoading: isCnpjLoading } = useCnpjLookup(cnpjToSearch, cnpjToSearch.length === 14)
+
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             razaoSocial: "",
-            nomePouplar: "",
+            nomePopular: "",
             cnpj: "",
             inscricaoEstadual: "",
             email: "",
@@ -82,8 +84,8 @@ const CompanyForm = () => {
                 config: "",
             },
             user: {
-                firstname: "",
-                lastname: "",
+                firstName: "",
+                lastName: "",
                 email: "",
                 password: "",
             }
@@ -110,7 +112,7 @@ const CompanyForm = () => {
     useEffect(() => {
         if (isSuccessCnpjLookUp && cnpjData) {
             form.setValue('razaoSocial', cnpjData.razao_social || '')
-            form.setValue('nomePouplar', cnpjData.nome_fantasia || '')
+            form.setValue('nomePopular', cnpjData.nome_fantasia || '')
             form.setValue('email', cnpjData.email || '')
             form.setValue('fone', cnpjData.ddd_telefone_1 || '')
             form.setValue('address.cep', cnpjData.cep || '')
@@ -134,7 +136,14 @@ const CompanyForm = () => {
     useEffect(() => {
         console.log(form.formState.errors)
     }, [form.formState.errors])
-    const onSubmit = (data: FormValues) => {
+    const onSubmit = async (data: FormValues) => {
+
+        try {
+            const company = await createCompany(data)
+            console.log(company)
+        } catch (ex) {
+            console.log(ex)
+        }
         console.log("Form data:", data)
     }
 
@@ -171,7 +180,7 @@ const CompanyForm = () => {
                                 <FormMessage />
                             </FormItem>
                         )} />
-                        <FormField name="nomePouplar" control={form.control} render={({ field }) => (
+                        <FormField name="nomePopular" control={form.control} render={({ field }) => (
                             <FormItem className="col-span-2">
                                 <FormLabel>Nome Popular</FormLabel>
                                 <FormControl><Input {...field} /></FormControl>
@@ -284,14 +293,14 @@ const CompanyForm = () => {
                 <section>
                     <h2 className="text-xl font-semibold mb-4">Usuário Responsável</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <FormField name="user.firstname" control={form.control} render={({ field }) => (
+                        <FormField name="user.firstName" control={form.control} render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Nome</FormLabel>
                                 <FormControl><Input {...field} /></FormControl>
                                 <FormMessage />
                             </FormItem>
                         )} />
-                        <FormField name="user.lastname" control={form.control} render={({ field }) => (
+                        <FormField name="user.lastName" control={form.control} render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Sobrenome</FormLabel>
                                 <FormControl><Input {...field} /></FormControl>

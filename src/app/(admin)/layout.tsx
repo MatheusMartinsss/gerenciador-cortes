@@ -3,7 +3,8 @@ import { Toaster } from "@/components/ui/toaster"
 import ReactQueryProvider from "../(routes)/ReactQueryProvider";
 import { NavBar } from "@/components/nagivation/navBar/NavBar";
 import { RequireAuthAdmin } from "@/components/Layout/RequireAuth";
-
+import { Sidebar } from "lucide-react";
+import Layout from "@/components/Layout/Layout";
 export default async function RootLayout({
     children,
 }: Readonly<{
@@ -13,18 +14,14 @@ export default async function RootLayout({
     return (
         <RequireAuthAdmin>
             <ReactQueryProvider>
-                <div>
-                    <NavBar />
-                    <div className="flex-grow">
-                        <div className="flex w-full flex-col items-center p-10 mx-auto">
-                            {children}
-                        </div>
-                    </div>
-                    <Modal />
-                    <Toaster />
-                </div>
+                <Layout>
+                    {children}
+                </Layout>
+                <Modal />
+                <Modal />
+                <Toaster />
             </ReactQueryProvider>
-        </RequireAuthAdmin>
+        </RequireAuthAdmin >
 
     );
 }

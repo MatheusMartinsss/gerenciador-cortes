@@ -5,7 +5,7 @@ export const authService = async (email: string, password: string) => {
         const response = await api.post('/auth/login', { email, password });
         const token = response.data.token
         localStorage.setItem('token', token)
-        return response.data;
+        return token;
     } catch (error: any) {
         console.log(error)
         const errorMessage = error.response?.data?.message || 'Erro desconhecido ao tentar fazer login';

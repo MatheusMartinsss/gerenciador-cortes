@@ -6,6 +6,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 type User = {
     id: string;
     email: string;
+    tenant_id: number | null;
     role: string
     [key: string]: any;
 };
@@ -13,6 +14,7 @@ type User = {
 type AuthContextType = {
     user: User | null;
     isAuthenticated: boolean;
+    login: (token: string) => void;
     logout: () => void;
 };
 
@@ -26,21 +28,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     useEffect(() => {
         const token = localStorage.getItem('token');
-        console.log(user)
         if (token) {
             try {
-                const decoded = jwtDecode<User & { exp: number }>(token);
-                console.log(decoded)
-                setUser(decoded.user);
+                login(token)
             } catch (err) {
-                console.error('Token inválido:', err);
-                localStorage.removeItem('token');
-                setUser(null);
-                if (pathname !== '/auth') router.push('/auth');
+                logout()
             }
         } else {
-            setUser(null);
-            if (pathname !== '/auth') router.push('/auth');
+            logout()
         }
 
         setLoading(false);
@@ -51,11 +46,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(null);
         router.push('/auth');
     };
+    const login = (token: string) => {
+        try {
+            const decoded = jwtDecode<User & { exp: number }>(token);
+            setUser(decoded.user);
+        } catch (ex) {
+            console.error('Token inválido:', ex);
+            localStorage.removeItem('token');
+            setUser(null);
+            if (pathname !== '/auth') router.push('/auth');
+        }
+    }
 
     if (loading) return null; // ou um <Loading />
 
     return (
-        <AuthContext.Provider value={{ user, isAuthenticated: !!user, logout }}>
+        <AuthContext.Provider value={{ user, isAuthenticated: !!user, logout, login }}>
             {children}
         </AuthContext.Provider>
     );

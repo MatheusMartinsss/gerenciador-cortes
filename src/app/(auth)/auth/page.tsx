@@ -4,10 +4,10 @@ import { Input } from "@/components/ui/input"
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from 'next/navigation'
 import { authService } from "@/services/authService";
+import { useAuth } from "@/context/AuthContext";
 const Schema = z.object({
     email: z.string().email(),
     password: z.string()
@@ -17,6 +17,7 @@ type FormData = z.infer<typeof Schema>;
 
 const Auth = () => {
     const [loginError, setLoginError] = useState<string | null>(null);
+    const { login } = useAuth()
     const router = useRouter();
     const { register, handleSubmit, formState: { errors }, } = useForm<FormData>({
         resolver: zodResolver(Schema),
@@ -26,7 +27,8 @@ const Auth = () => {
     const onSubmit = async (value: FormData) => {
         setLoginError(null);
         try {
-            const user = await authService(value.email, value.password)
+            const token = await authService(value.email, value.password)
+            login(token)
             router.push('/');
         } catch (ex) {
             console.error(ex)

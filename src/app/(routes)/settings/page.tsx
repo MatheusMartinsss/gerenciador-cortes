@@ -1,5 +1,5 @@
 "use client"
-import { ImportBatchsModal } from "@/components/ImportBatchsModal/ImportBatchsModal";
+import { ImportBatchsModal } from "@/components/modal/ImportBatchsModal/ImportBatchsModal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";

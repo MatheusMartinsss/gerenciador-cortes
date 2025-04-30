@@ -35,3 +35,13 @@ export const findAllCompanys = async (filters: FindAllCompanyFilter): Promise<Fi
         throw new Error('Failed to fetch trees');
     }
 };
+
+export const createCompany = async (body: any) => {
+    try {
+        const response = await api.post('/company', body)
+        return response.data
+    } catch (ex) {
+        console.error('Failed to fetch trees:',ex);
+        throw new Error('Failed to fetch trees');
+    }
+}
