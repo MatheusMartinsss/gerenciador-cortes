@@ -22,18 +22,18 @@ const menuOptions = [
         icon: Trees,
         roles: ['user'],
         childrens: [
-            { name: 'tree', label: 'Árvores', path: '/tree', roles: ['user', 'admin'] },
+            { name: 'sections', label: 'Árvores', path: '/sections', roles: ['user'] },
             { name: 'batchs', label: 'Cortes', path: '/batchs', roles: ['user', 'admin'] },
         ]
     },
     {
-        name: 'admin',
-        label: 'Admin',
+        name: 'empresas',
+        label: 'Empresas',
         icon: Building2,
         roles: ['admin'],
         childrens: [
-            { name: 'companies', label: 'Empresas', path: '/companys', roles: ['admin'] },
-            { name: 'company', label: 'Cadastrar Empresa', path: '/company', roles: ['admin'] },
+            { name: 'companys', label: 'Listar', path: '/companys', roles: ['admin'] },
+            { name: 'company', label: 'Cadastrar', path: '/company', roles: ['admin'] },
         ]
     },
     {
@@ -69,9 +69,9 @@ const Sidebar = () => {
         `hover:bg-green-800 p-2 rounded text-sm ${pathname === path ? 'bg-green-800 font-semibold' : ''}`
 
     return (
-        <aside className={`h-screen bg-green-900 text-white p-4 flex flex-col transition-all duration-300 ${collapsed ? 'w-16' : 'w-64'}`}>
+        <aside className={`h-auto  bg-green-900 text-white p-4 flex flex-col transition-all duration-300 ${collapsed ? 'w-16' : 'min-w-[240px] max-w-[280px]'}`}>
             <div className="flex items-center justify-between mb-6">
-                <h1 className={`text-lg font-bold ${collapsed && 'hidden'}`}>Sistema Florestal</h1>
+
                 <Button variant="ghost" size="icon" onClick={toggleSidebar}>
                     <Menu className="w-5 h-5 text-white" />
                 </Button>
