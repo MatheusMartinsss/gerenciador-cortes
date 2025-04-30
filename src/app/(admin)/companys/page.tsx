@@ -1,12 +1,10 @@
 "use client"
-
-import CompanyForm from "@/components/forms/companyForm"
-
+import { CompanyTable } from "@/components/tables/CompanysTable"
 
 export default function Company() {
     return (
         <div>
-            <CompanyForm />
+            <CompanyTable />
         </div>
     )
 }
