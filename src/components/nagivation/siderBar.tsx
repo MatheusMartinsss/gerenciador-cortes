@@ -4,7 +4,6 @@ import { useState } from "react"
 import { usePathname } from "next/navigation"
 import { Settings, Trees, Building2, LogOut, BarChart2, Menu, ChevronDown } from "lucide-react"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
 import { useAuth } from "@/context/AuthContext"
 
 const menuOptions = [
@@ -22,8 +21,10 @@ const menuOptions = [
         icon: Trees,
         roles: ['user'],
         childrens: [
+            { name: 'autex-list', label: 'Listar Autex', path: '/autex', roles: ['user'] },
+            { name: 'autex-create', label: 'Cadastrar Autex', path: '/autex/cadastrar', roles: ['user'] },
             { name: 'sections', label: 'Árvores', path: '/sections', roles: ['user'] },
-            { name: 'batchs', label: 'Cortes', path: '/batchs', roles: ['user', 'admin'] },
+            { name: 'batchs', label: 'Cortes', path: '/batchs', roles: ['user'] },
         ]
     },
     {

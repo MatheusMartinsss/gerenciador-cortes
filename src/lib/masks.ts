@@ -1,7 +1,21 @@
 import { format } from 'date-fns';
 
 export const maskToM3 = (value: number) => {
-    return `${(value / 1000).toFixed(3)}`
+    if (!value) return ""
+    return `${(value / 1000).toFixed(3)} m³`
+}
+
+export const formatVolumeM3 = (value: number | undefined): string => {
+    if (typeof value !== "number" || isNaN(value)) return ""
+    return value.toLocaleString("pt-BR", {
+        minimumFractionDigits: 3,
+        maximumFractionDigits: 3
+    }) + " m³"
+}
+export const formatM3WithSuffix = (value: number | string) => {
+    const float = typeof value === "number" ? value : parseFloat(value || "0")
+    if (isNaN(float)) return ""
+    return float.toFixed(2).replace(".", ",") + " m³"
 }
 
 export const maskToMeters = (value: number) => {
