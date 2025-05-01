@@ -78,7 +78,7 @@ export const TreeTable = () => {
     }
 
     return (
-        <div className="flex flex-col w-full">
+        <div >
             <div className='flex w-full flex-row space-x-2'>
                 <div>
                     <Button
@@ -113,9 +113,9 @@ export const TreeTable = () => {
                     </div>
                 </div>
             </div>
-            <div className="h-[68vh] relative overflow-auto shadow-md sm:rounded-lg">
-                <DataTable columns={columns} data={response?.data || []} />
-            </div>
+
+            <DataTable columns={columns} data={response?.data || []} />
+
             <div className="bg-green-950 font-bold rounded-b-2xl p-2 flex w-full">
                 <TablePagination pages={response?.totalPages || 0} />
             </div>

@@ -23,15 +23,18 @@ import { SortOrder } from "@/domain"
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  isLoading?: boolean
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  isLoading = false,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [, setOrderBy] = useQueryState('orderBy', 'number')
   const [, setSortOrder] = useQueryState<SortOrder>('order', 'ASC')
+
   const table = useReactTable({
     data,
     columns,
@@ -41,9 +44,10 @@ export function DataTable<TData, TValue>({
       sorting
     }
   })
+
   return (
-    <div className="rounded-md border">
-      <Table className="table-auto">
+    <div className="rounded-md border bg-white overflow-x-auto min-h-[50vh]">
+      <Table className="min-w-full table-auto">
         <TableHeader className="bg-green-900">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
@@ -51,15 +55,20 @@ export function DataTable<TData, TValue>({
                 const isSortable = header.column.getCanSort()
                 const isSorted = header.column.getIsSorted()
                 return (
-                  <TableHead key={header.id}
+                  <TableHead
+                    key={header.id}
+                    role="columnheader"
+                    aria-sort={
+                      isSorted === 'asc' ? 'ascending'
+                        : isSorted === 'desc' ? 'descending' : 'none'
+                    }
                     onClick={() => {
                       if (isSortable) {
                         setOrderBy(header.column.id)
-                      }
-                      if (isSorted) {
-                        setSortOrder(isSorted.toLocaleUpperCase() as SortOrder)
+                        setSortOrder(isSorted === 'asc' ? 'DESC' : 'ASC')
                       }
                     }}
+                    className="text-white font-medium cursor-pointer hover:bg-green-800 transition-colors"
                   >
                     {header.isPlaceholder
                       ? null
@@ -67,14 +76,25 @@ export function DataTable<TData, TValue>({
                         header.column.columnDef.header,
                         header.getContext()
                       )}
+                    {isSorted && (
+                      <span className="ml-1 text-xs">
+                        {isSorted === "asc" ? "▲" : "▼"}
+                      </span>
+                    )}
                   </TableHead>
                 )
               })}
             </TableRow>
           ))}
         </TableHeader>
-        <TableBody >
-          {table.getRowModel().rows?.length ? (
+        <TableBody>
+          {isLoading ? (
+            <TableRow>
+              <TableCell colSpan={columns.length} className="py-10 text-center text-gray-400">
+                Carregando...
+              </TableCell>
+            </TableRow>
+          ) : table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
               <TableRow
                 key={row.id}
@@ -89,8 +109,8 @@ export function DataTable<TData, TValue>({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+              <TableCell colSpan={columns.length} className="py-20 text-center text-gray-500 text-sm">
+                Nenhum resultado encontrado.
               </TableCell>
             </TableRow>
           )}

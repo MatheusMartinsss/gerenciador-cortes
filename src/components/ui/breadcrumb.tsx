@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { ChevronRight } from "lucide-react"
+import { ChevronRight, HomeIcon } from "lucide-react"
 
 const breadcrumbLabels: Record<string, string> = {
     "tree": "Árvores",
@@ -26,8 +26,10 @@ const Breadcrumb = () => {
     })
 
     return (
-        <nav className="text-sm text-gray-600 mb-4 flex items-center space-x-1">
-            <Link href="/" className="hover:underline">Início</Link>
+        <nav className="text-sm text-gray-600  flex items-center space-x-1 py-2 px-2">
+            <Link href="/" className="hover:underline">
+                Inicio
+            </Link>
             {pathMap.map((segment, idx) => (
                 <span key={idx} className="flex items-center space-x-1">
                     <ChevronRight className="w-4 h-4 text-gray-400" />

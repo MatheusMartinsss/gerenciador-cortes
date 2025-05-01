@@ -46,12 +46,12 @@ const menuOptions = [
     }
 ]
 
-const Sidebar = () => {
+const Sidebar = ({ collapsed }: { collapsed: boolean }) => {
     const pathname = usePathname()
-    const [collapsed, setCollapsed] = useState(false)
+
     const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({})
     const { user, logout } = useAuth()
-    const toggleSidebar = () => setCollapsed(!collapsed)
+
 
     const toggleMenu = (name: string) => {
         setOpenMenus(prev => {
@@ -69,13 +69,7 @@ const Sidebar = () => {
         `hover:bg-green-800 p-2 rounded text-sm ${pathname === path ? 'bg-green-800 font-semibold' : ''}`
 
     return (
-        <aside className={`h-auto  bg-green-900 text-white p-4 flex flex-col transition-all duration-300 ${collapsed ? 'w-16' : 'min-w-[240px] max-w-[280px]'}`}>
-            <div className="flex items-center justify-between mb-6">
-
-                <Button variant="ghost" size="icon" onClick={toggleSidebar}>
-                    <Menu className="w-5 h-5 text-white" />
-                </Button>
-            </div>
+        <aside className={`h-auto bg-green-900 text-white p-4 flex flex-col transition-all duration-300 ease-in-out ${collapsed ? 'w-16' : 'w-64'}`}>
             <nav className="flex flex-col gap-2">
                 {menuOptions.map(menu => {
                     const Icon = menu.icon
@@ -99,7 +93,9 @@ const Sidebar = () => {
                                     )}
                                 </button>
                                 {isOpen && !collapsed && (
-                                    <div className="ml-6 flex flex-col gap-1 mt-1">
+                                    <div
+                                        className={`ml-6 overflow-hidden flex flex-col transition-all duration-300 ease-in-out ${isOpen && !collapsed ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}
+                                    >
                                         {menu.childrens.map(child => (
                                             <Link key={child.name} href={child.path} className={subLinkClass(child.path)}>{child.label}</Link>
                                         ))}
