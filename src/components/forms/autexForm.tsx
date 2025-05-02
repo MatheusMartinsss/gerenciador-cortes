@@ -6,25 +6,28 @@ import { z } from "zod"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import { maskToM3, formatM3WithSuffix, formatVolumeM3 } from "@/lib/masks"
 import { DecimalInput } from "../ui/decimalinput"
+import { CpfCnpjInput } from "../ui/cpfCnpjInput"
+import { createAutex } from "@/services/autexService"
+import { useToast } from "../ui/use-toast"
 
 const schema = z.object({
-    numero: z.string().min(1, "Obrigatório"),
-    detentor: z.string().min(1, "Obrigatório"),
-    cpfCnpj: z.string().min(11, "Obrigatório"),
-    volumeExplorado: z.number().nonnegative(),
-    volumeTotal: z.number().positive()
+    numero_autorizacao: z.string().min(1, "Obrigatório"),
+    detentor_autorizacao: z.string().min(1, "Obrigatório"),
+    cpf_cnpj: z.string().min(11, "Obrigatório"),
+    validade_inicial: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Data inválida"),
+    validade_final: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Data inválida"),
+    volumeM3_total: z.number().positive()
 })
 
 type AutexFormValues = z.infer<typeof schema>
 
 const AutexForm = () => {
+    const { toast } = useToast()
     const {
         register,
         handleSubmit,
         watch,
-        setValue,
         control,
         formState: { errors },
         reset
@@ -32,44 +35,68 @@ const AutexForm = () => {
         resolver: zodResolver(schema)
     })
 
-    const volumeTotal = watch("volumeTotal")
-    console.log(volumeTotal)
-    const onSubmit = (data: AutexFormValues) => {
-        console.log("Autex cadastrada:", data)
-        reset()
-    }
+    const onSubmit = async (data: AutexFormValues) => {
+        try {
+            const response = await createAutex(data)
+            if (response) {
+                toast({
+                    title: 'Autex cadastrada!',
+                    variant: 'default',
+                })
+            }
+            reset()
+        } catch (error) {
+            toast({
+                title: 'Autex não cadastrada!',
+                description: 'Ocorreu um erro durante o salvamento, tente novamente.',
+                variant: 'destructive'
+            })
+        }
 
+    }
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-md shadow w-full">
             <div className="space-y-2">
                 <Label htmlFor="numero">Número da Autorização</Label>
-                <Input id="numero" {...register("numero")} placeholder="12345" />
-                {errors.numero && <span className="text-sm text-red-500">{errors.numero.message}</span>}
+                <Input id="numero" {...register("numero_autorizacao")} placeholder="12345" />
+                {errors.numero_autorizacao && <span className="text-sm text-red-500">{errors.numero_autorizacao.message}</span>}
             </div>
 
             <div className="space-y-2">
                 <Label htmlFor="detentor">Detentor da Autorização</Label>
-                <Input id="detentor" {...register("detentor")} placeholder="Nome do detentor" />
-                {errors.detentor && <span className="text-sm text-red-500">{errors.detentor.message}</span>}
+                <Input id="detentor" {...register("detentor_autorizacao")} placeholder="Nome do detentor" />
+                {errors.detentor_autorizacao && <span className="text-sm text-red-500">{errors.detentor_autorizacao.message}</span>}
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 col-span-2">
                 <Label htmlFor="cpfCnpj">CPF/CNPJ do Detentor</Label>
-                <Input id="cpfCnpj" {...register("cpfCnpj")} placeholder="000.000.000-00" />
-                {errors.cpfCnpj && <span className="text-sm text-red-500">{errors.cpfCnpj.message}</span>}
-            </div>
-
-            <div className="space-y-2">
-                <Label htmlFor="volumeExplorado">Volume Explorado (m³)</Label>
-                <Input type="number" step="0.01" id="volumeExplorado" {...register("volumeExplorado", { valueAsNumber: true })} placeholder="0.00" />
-                {errors.volumeExplorado && <span className="text-sm text-red-500">{errors.volumeExplorado.message}</span>}
-            </div>
-
-            <div className="space-y-2">
-                <Label htmlFor="volumeTotal">Volume Total (m³)</Label>
                 <Controller
                     control={control}
-                    name="volumeTotal"
+                    name="cpf_cnpj"
+                    render={({ field }) => (
+                        <CpfCnpjInput
+                            {...field}
+                        />
+                    )}
+                />
+                {errors.cpf_cnpj && <span className="text-sm text-red-500">{errors.cpf_cnpj.message}</span>}
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="validadeInicial">Validade Inicial</Label>
+                <Input type="date" id="validadeInicial" {...register("validade_inicial")} />
+                {errors.validade_inicial && <span className="text-sm text-red-500">{errors.validade_inicial.message}</span>}
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="validadeFinal">Validade Final</Label>
+                <Input type="date" id="validadeFinal" {...register("validade_final")} />
+                {errors.validade_final && <span className="text-sm text-red-500">{errors.validade_final.message}</span>}
+            </div>
+
+            <div className="space-y-2">
+                <Label htmlFor="volumeM3_Total">Volume Total (m³)</Label>
+                <Controller
+                    control={control}
+                    name="volumeM3_total"
                     render={({ field }) => (
                         <DecimalInput
                             {...field}
@@ -80,7 +107,7 @@ const AutexForm = () => {
                         />
                     )}
                 />
-                {errors.volumeTotal && <span className="text-sm text-red-500">{errors.volumeTotal.message}</span>}
+                {errors.volumeM3_total && <span className="text-sm text-red-500">{errors.volumeM3_total.message}</span>}
             </div>
 
             <div className="md:col-span-2">
