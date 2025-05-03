@@ -3,15 +3,15 @@ import { useQueryState } from '@/hooks/useSearchParams'
 import { Button } from "@/components/ui/button"
 import { ChevronsRight, ChevronsLeft, ChevronRight, ChevronLeft } from 'lucide-react';
 import { Label } from '@/components/ui/label';
+import { useTableQueryParams } from '@/hooks/useTableQueryParams';
 
 interface PaginationProps {
     pages: number
 }
 
 export function TablePagination({ pages, }: PaginationProps) {
-    const [page, setPage] = useQueryState('page', 1)
-    const [limit, setLimit] = useQueryState('limit', 10)
 
+    const { page, limit, setPagination } = useTableQueryParams()
     let currentPage = Number(page)
     let prevPage = currentPage <= 2 ? 1 : currentPage - 1
     let endPreviousPage = currentPage - 1;
@@ -29,7 +29,7 @@ export function TablePagination({ pages, }: PaginationProps) {
         nextPages.push(i);
     }
     const handlePage = (page: string) => {
-        setPage(parseInt(page))
+        setPagination(parseInt(page))
     }
     const handlePreviousPage = () => {
         if (currentPage <= 1) return

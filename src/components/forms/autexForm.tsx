@@ -27,7 +27,6 @@ const AutexForm = () => {
     const {
         register,
         handleSubmit,
-        watch,
         control,
         formState: { errors },
         reset
