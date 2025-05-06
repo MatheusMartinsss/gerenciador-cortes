@@ -23,7 +23,7 @@ const menuOptions = [
         childrens: [
             { name: 'autex-list', label: 'Listar Autex', path: '/autex', roles: ['user'] },
             { name: 'autex-create', label: 'Cadastrar Autex', path: '/autex/cadastrar', roles: ['user'] },
-            { name: 'sections', label: 'Árvores', path: '/sections', roles: ['user'] },
+            { name: 'arvores', label: 'Árvores', path: '/arvores', roles: ['user'] },
             { name: 'batchs', label: 'Cortes', path: '/batchs', roles: ['user'] },
         ]
     },

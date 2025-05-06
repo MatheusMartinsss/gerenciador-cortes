@@ -10,20 +10,21 @@ type DecimalInputProps = {
 } & Omit<InputHTMLAttributes<HTMLInputElement>, "value" | "onChange">
 
 
-const parseDecimalFromMasked = (value: string, divisor: number): number => {
+const parseDecimalFromMasked = (value: string, divisor: number, fractionDigits: number): number => {
     const raw = value
     const cleaned = raw.replace(/[\.\s\D]+/g, "").replace(/^0+/, "")
-    console.log(cleaned)
     const parsed = parseInt(cleaned || "0", 10)
     return parsed / divisor
 }
 
 const formatDecimalToPtBR = (value: number, digits: number): string => {
     if (typeof value !== "number" || isNaN(value)) return ""
+
     return value.toLocaleString("pt-BR", {
         minimumFractionDigits: digits,
         maximumFractionDigits: digits
     })
+
 }
 
 export const DecimalInput = forwardRef<HTMLInputElement, DecimalInputProps>(
@@ -40,7 +41,7 @@ export const DecimalInput = forwardRef<HTMLInputElement, DecimalInputProps>(
                             e.preventDefault()
                         }
                     }}
-                    onChange={(e) => onChange(parseDecimalFromMasked(e.target.value, dividirPor))}
+                    onChange={(e) => onChange(parseDecimalFromMasked(e.target.value, dividirPor, fractionDigits))}
                 />
                 {suffix && (
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm pointer-events-none">

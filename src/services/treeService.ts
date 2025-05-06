@@ -7,7 +7,7 @@ interface FindAllTreesFilter {
     limit?: number;
     orderBy?: string; // Adicionado opcionalmente
     noPagination?: boolean;
-    order?: 'ASC' | 'DESC' | '';
+    order?: 'asc' | 'desc' | '';
     number?: number;
     commonName?: string;
     specie_id?: string;

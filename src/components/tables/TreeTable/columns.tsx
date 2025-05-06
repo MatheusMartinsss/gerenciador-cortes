@@ -1,10 +1,10 @@
 "use client"
 
-import { maskToM3, maskToMeters } from "@/lib/masks"
+import { formatM3WithSuffix, maskToM3, maskToMeters } from "@/lib/masks"
 import { ColumnDef, SortingFn } from "@tanstack/react-table"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { Trash, Eye, MoreHorizontal, ArrowUpDown } from 'lucide-react';
+import { Trash, Eye, MoreHorizontal, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { useQueryState } from "@/hooks/useSearchParams"
 
 export type Tree = {
@@ -13,6 +13,7 @@ export type Tree = {
     commonName: string
     scientificName: string
     dap: number
+    autex?: any;
     meters: number
     volumeM3: number
     sVolumeM3: number
@@ -20,165 +21,189 @@ export type Tree = {
 
 export const columns: ColumnDef<Tree>[] = [
     {
-        accessorKey: 'number',
+        accessorKey: "number",
         header: ({ column }) => {
+            const isSorted = column.getIsSorted()
             return (
-                <Button
-                    variant="ghost"
-                    className="p-2 text-white"
-                    onClick={() => {
-                        column.toggleSorting(column.getIsSorted() === "asc")
-                    }}
+                <div
+                    onClick={() => column.toggleSorting(isSorted === "asc")}
+                    className="cursor-pointer select-none text-white flex items-center"
+                    role="columnheader"
+                    aria-sort={isSorted === "asc" ? "ascending" : isSorted === "desc" ? "descending" : "none"}
                 >
-                    Numero
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-
+                    Número
+                    {isSorted === "asc" ? (
+                        <ArrowUp className="ml-2 h-4 w-4" />
+                    ) : isSorted === "desc" ? (
+                        <ArrowDown className="ml-2 h-4 w-4" />
+                    ) : null}
+                </div>
             )
         },
-        cell: ({ row }) => {
-            return <div className="capitalize pr-8 pl-8">{row.getValue('number')}</div>
-        }
-    }, {
+        cell: ({ row }) => <div className="capitalize">{row.getValue("number")}</div>,
+    },
+    {
         accessorKey: "commonName",
         header: ({ column }) => {
+            const isSorted = column.getIsSorted()
             return (
-                <Button
-                    variant="ghost"
-                    className="p-2 text-white"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                <div
+                    onClick={() => column.toggleSorting(isSorted === "asc")}
+                    className="cursor-pointer select-none text-white flex items-center"
+                    role="columnheader"
+                    aria-sort={isSorted === "asc" ? "ascending" : isSorted === "desc" ? "descending" : "none"}
                 >
                     N. Popular
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
+                    {isSorted === "asc" ? <ArrowUp className="ml-2 h-4 w-4" /> : isSorted === "desc" ? <ArrowDown className="ml-2 h-4 w-4" /> : null}
+                </div>
             )
         },
-        cell: ({ row }) => {
-            return <div className="capitalize pr-2 pl-2 text-left">{row.getValue('commonName')}</div>
-        }
-
-    }, {
+        cell: ({ row }) => <div className="capitalize">{row.getValue("commonName")}</div>,
+    },
+    {
         accessorKey: "scientificName",
         header: ({ column }) => {
+            const isSorted = column.getIsSorted()
             return (
-                <Button
-                    variant="ghost"
-                    className="p-2 text-white"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                <div
+                    onClick={() => column.toggleSorting(isSorted === "asc")}
+                    className="cursor-pointer select-none text-white flex items-center"
+                    role="columnheader"
+                    aria-sort={isSorted === "asc" ? "ascending" : isSorted === "desc" ? "descending" : "none"}
                 >
-                    N. Cientifico
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
+                    N. Científico
+                    {isSorted === "asc" ? <ArrowUp className="ml-2 h-4 w-4" /> : isSorted === "desc" ? <ArrowDown className="ml-2 h-4 w-4" /> : null}
+                </div>
             )
         },
-        cell: ({ row }) => {
-            return <div className="capitalize pr-2 pl-2 text-left w-full">{row.getValue('scientificName')}</div>
-        }
-    }, {
+        cell: ({ row }) => <div className="capitalize">{row.getValue("scientificName")}</div>,
+    },
+    {
         accessorKey: "dap",
         header: ({ column }) => {
+            const isSorted = column.getIsSorted()
             return (
-                <Button
-                    variant="ghost"
-                    className="p-2 text-white"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                <div
+                    onClick={() => column.toggleSorting(isSorted === "asc")}
+                    className="cursor-pointer select-none text-white flex items-center"
+                    role="columnheader"
+                    aria-sort={isSorted === "asc" ? "ascending" : isSorted === "desc" ? "descending" : "none"}
                 >
                     DAP
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
+                    {isSorted === "asc" ? <ArrowUp className="ml-2 h-4 w-4" /> : isSorted === "desc" ? <ArrowDown className="ml-2 h-4 w-4" /> : null}
+                </div>
             )
         },
-        cell: ({ row }) => {
-            const value = maskToMeters(row.getValue('dap'))
-            return <div className="capitalize pr-4 pl-4">{value}</div>
-        }
-    }, {
-        accessorKey: 'meters',
+        cell: ({ row }) => <div>{maskToMeters(row.getValue("dap"))}</div>,
+    },
+    {
+        accessorKey: "meters",
         header: ({ column }) => {
+            const isSorted = column.getIsSorted()
             return (
-                <Button
-                    variant="ghost"
-                    className="p-2 text-white"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                <div
+                    onClick={() => column.toggleSorting(isSorted === "asc")}
+                    className="cursor-pointer select-none text-white flex items-center"
+                    role="columnheader"
+                    aria-sort={isSorted === "asc" ? "ascending" : isSorted === "desc" ? "descending" : "none"}
                 >
                     Altura
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
+                    {isSorted === "asc" ? <ArrowUp className="ml-2 h-4 w-4" /> : isSorted === "desc" ? <ArrowDown className="ml-2 h-4 w-4" /> : null}
+                </div>
             )
         },
-        cell: ({ row }) => {
-            const value = maskToMeters(row.getValue('meters'))
-            return <div className="capitalize pr-4 pl-4 ">{value}</div>
-        }
-    }, {
-        accessorKey: 'volumeM3',
+        cell: ({ row }) => <div>{maskToMeters(row.getValue("meters"))}</div>,
+    },
+    {
+        accessorKey: "volumeM3",
         header: ({ column }) => {
+            const isSorted = column.getIsSorted()
             return (
-                <Button
-                    variant="ghost"
-                    className="p-2 text-white"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                <div
+                    onClick={() => column.toggleSorting(isSorted === "asc")}
+                    className="cursor-pointer select-none text-white flex items-center"
+                    role="columnheader"
+                    aria-sort={isSorted === "asc" ? "ascending" : isSorted === "desc" ? "descending" : "none"}
                 >
-                    Exploravel
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
+                    Explorável
+                    {isSorted === "asc" ? <ArrowUp className="ml-2 h-4 w-4" /> : isSorted === "desc" ? <ArrowDown className="ml-2 h-4 w-4" /> : null}
+                </div>
             )
         },
-        cell: ({ row }) => {
-            const value = maskToM3(row.getValue('volumeM3'))
-            return <div className="capitalize pr-8 pl-8 ">{value}</div>
-        }
-    }, {
-        accessorKey: 'sVolumeM3',
+        cell: ({ row }) => <div>{formatM3WithSuffix(row.getValue("volumeM3"))}</div>,
+    },
+    {
+        accessorKey: "sVolumeM3",
         header: ({ column }) => {
+            const isSorted = column.getIsSorted()
             return (
-                <Button
-                    variant="ghost"
-                    className="p-2 text-white"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                <div
+                    onClick={() => column.toggleSorting(isSorted === "asc")}
+                    className="cursor-pointer select-none text-white flex items-center"
+                    role="columnheader"
+                    aria-sort={isSorted === "asc" ? "ascending" : isSorted === "desc" ? "descending" : "none"}
                 >
                     Explorado
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
+                    {isSorted === "asc" ? <ArrowUp className="ml-2 h-4 w-4" /> : isSorted === "desc" ? <ArrowDown className="ml-2 h-4 w-4" /> : null}
+                </div>
             )
         },
-        cell: ({ row }) => {
-            const value = maskToM3(row.getValue('sVolumeM3'))
-            return <div className="capitalize pr-8 pl-8">{value}</div>
-        }
+        cell: ({ row }) => <div>{formatM3WithSuffix(row.getValue("sVolumeM3"))}</div>,
     }, {
-        id: 'actions',
+        accessorFn: (row) => row.autex?.numero_autorizacao,
+        id: "autex_numero", // necessário porque não tem accessorKey
         header: ({ column }) => {
+            const isSorted = column.getIsSorted()
             return (
-                <div className="pr-4 pl-4 text-white">#</div>
+                <div
+                    onClick={() => column.toggleSorting(isSorted === "asc")}
+                    className="cursor-pointer select-none text-white flex items-center"
+                    role="columnheader"
+                    aria-sort={
+                        isSorted === "asc"
+                            ? "ascending"
+                            : isSorted === "desc"
+                                ? "descending"
+                                : "none"
+                    }
+                >
+                    Autex
+                    {isSorted === "asc" ? (
+                        <ArrowUp className="ml-2 h-4 w-4" />
+                    ) : isSorted === "desc" ? (
+                        <ArrowDown className="ml-2 h-4 w-4" />
+                    ) : null}
+                </div>
             )
         },
-        cell: ({ row }) => {
-            const treeId = row.original.id
-            return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
+        cell: ({ row }) => <div>{row.getValue("autex_numero")}</div>,
+    },
+    {
+        id: "actions",
+        header: () => <div className="text-white">#</div>,
+        cell: ({ row }) => (
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0">
+                        <span className="sr-only">Abrir menu</span>
+                        <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="flex flex-col">
+                    <DropdownMenuLabel>Opções</DropdownMenuLabel>
+                    <DropdownMenuItem>
+                        <ViewTreeButton treeId={row.original.id} />
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                        <Button size="sm" variant="ghost">
+                            <Trash className="w-3 h-3 mr-2" />
+                            Excluir
                         </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="flex flex-col">
-                        <DropdownMenuLabel>Opções</DropdownMenuLabel>
-                        <DropdownMenuItem>
-                            <ViewTreeButton treeId={treeId} />
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                            <Button size='sm' variant="ghost">
-                                <Trash className="w-3 h-3 mr-2" />
-                                Excluir
-                            </Button>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            )
-        }
-    }
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+        ),
+    },
 ]
 
 export const ViewTreeButton = ({ treeId }: { treeId: string }) => {

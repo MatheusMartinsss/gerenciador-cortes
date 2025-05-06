@@ -2,7 +2,6 @@
 
 import {
   ColumnDef,
-  SortingState,
   flexRender,
   getCoreRowModel,
   useReactTable,
@@ -17,8 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import React from "react"
-import { useQueryState } from "@/hooks/useSearchParams"
-import { SortOrder } from "@/domain"
+import { useTableQueryParams } from "@/hooks/useTableQueryParams"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -31,10 +29,7 @@ export function DataTable<TData, TValue>({
   data,
   isLoading = false,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [, setOrderBy] = useQueryState('orderBy', 'number')
-  const [, setSortOrder] = useQueryState<SortOrder>('order', 'ASC')
-
+  const { sorting, setSorting } = useTableQueryParams()
   const table = useReactTable({
     data,
     columns,
@@ -52,7 +47,6 @@ export function DataTable<TData, TValue>({
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
-                const isSortable = header.column.getCanSort()
                 const isSorted = header.column.getIsSorted()
                 return (
                   <TableHead
@@ -62,12 +56,7 @@ export function DataTable<TData, TValue>({
                       isSorted === 'asc' ? 'ascending'
                         : isSorted === 'desc' ? 'descending' : 'none'
                     }
-                    onClick={() => {
-                      if (isSortable) {
-                        setOrderBy(header.column.id)
-                        setSortOrder(isSorted === 'asc' ? 'DESC' : 'ASC')
-                      }
-                    }}
+                    onClick={header.column.getToggleSortingHandler()}
                     className="text-white font-medium cursor-pointer hover:bg-green-800 transition-colors"
                   >
                     {header.isPlaceholder
@@ -76,11 +65,7 @@ export function DataTable<TData, TValue>({
                         header.column.columnDef.header,
                         header.getContext()
                       )}
-                    {isSorted && (
-                      <span className="ml-1 text-xs">
-                        {isSorted === "asc" ? "▲" : "▼"}
-                      </span>
-                    )}
+
                   </TableHead>
                 )
               })}
@@ -109,8 +94,10 @@ export function DataTable<TData, TValue>({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={columns.length} className="py-20 text-center text-gray-500 text-sm">
-                Nenhum resultado encontrado.
+              <TableCell colSpan={columns.length} >
+                <div className="py-36 text-center  text-sm">
+                  Nenhum resultado encontrado.
+                </div>
               </TableCell>
             </TableRow>
           )}

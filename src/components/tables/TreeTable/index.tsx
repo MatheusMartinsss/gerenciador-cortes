@@ -17,28 +17,24 @@ import { TreeModal } from "@/components/modal/TreeModal"
 import { DataTable } from "./data-table"
 import { columns } from "./columns"
 import { useDebounce } from "@uidotdev/usehooks"
-
-type SortOrder = 'ASC' | 'DESC' | '';
-
+import { useTableQueryParams } from "@/hooks/useTableQueryParams";
+import { useRouter } from 'next/navigation'
 export const TreeTable = () => {
     const {
         setTree,
         selectedTrees,
-        handleSearchParam,
     } = useTree()
     const { setForm, isOpen } = useModal()
     const [searchText, setSearchText] = useState<string>('')
-    const textDebounce = useDebounce(searchText, 200)
-    const [page] = useQueryState<number>('page', 1)
-    const validFields = ['commonName', 'scientificName', 'createdAt', 'meters', 'sVolumeM3', 'volumeM3'];
-    const [orderBy] = useQueryState('orderBy', 'number', { type: 'enum', enum: validFields })
-    const [order] = useQueryState<SortOrder>('order', 'ASC')
+    const { order, orderBy, search, page } = useTableQueryParams()
+    const textDebounce = useDebounce(search, 200)
     const { data: response, isLoading, isError } = useQuery<FindAllTreesResponse>({
         queryKey: ['trees', page, orderBy, order, textDebounce],
         queryFn: async () => await findAllTrees({ page: Number(page), orderBy, order, searchTerm: textDebounce }),
         placeholderData: keepPreviousData
 
     })
+    const router = useRouter()
     useEffect(() => {
         if (!isOpen) {
             setTree(null)
@@ -78,13 +74,13 @@ export const TreeTable = () => {
     }
 
     return (
-        <div >
+        <div className="flex flex-col w-full h-full space-y-2">
             <div className='flex w-full flex-row space-x-2'>
                 <div>
                     <Button
                         variant='secondary'
                         onClick={() => {
-                            setForm('treesForm')
+                            router.push('/arvores/cadastrar')
                         }}
                     >
                         <TreePine className="mr-2 h-4 w-4" />
@@ -109,7 +105,7 @@ export const TreeTable = () => {
                 <div className='flex'>
                     <div className='flex w-max-sm items-center space-x-1'>
                         <Input value={searchText} onChange={(e) => handleSearch(e.target.value)} ></Input>
-                        <Button variant='outline' onClick={() => handleSearchParam(searchText)}> <Search className="mr-2 h-4 w-4" /></Button>
+
                     </div>
                 </div>
             </div>

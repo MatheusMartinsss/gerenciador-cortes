@@ -1,10 +1,11 @@
 export type FormFieldValues = {
+    autex_id: string;
     specie: {
-        id?: string | null
+        id: string | null
         commonName: string;
         scientificName: string
         trees: {
-            number: number;
+            number: string;
             dap: number;
             meters: number;
             range: number;

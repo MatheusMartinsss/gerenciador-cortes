@@ -2,7 +2,7 @@
 import { useModal } from "@/hooks/useModal"
 import { Dialog, DialogContent, DialogHeader } from "../ui/dialog"
 import { TreeForm } from "../tree/treeForm"
-import { TreesForm } from "../tree/TreesForm/treesForm"
+import { TreesForm } from "../forms/TreesForm/treesForm"
 import { SectionsForm } from "../section/sectionsForm"
 import { SpecieForm } from "../species/specieForm"
 import { useForm, FormProvider } from "react-hook-form";

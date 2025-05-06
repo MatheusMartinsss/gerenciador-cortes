@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Trash, Copy, CirclePlus } from 'lucide-react';
 import { maskToM3, maskToMeters, unMask } from "@/lib/masks";
+import { DecimalInput } from "@/components/ui/decimalinput";
 
 export default function NestedFieldArray({
     nestIndex,
@@ -34,7 +35,7 @@ export default function NestedFieldArray({
                     <div className="flex 2xl:space-x-8 space-x-4  justify-between " key={item.id} >
                         <div >
                             {isFirstIndex && (<Label>Plaqueta</Label>)}
-                            <Input {...register(`specie.${nestIndex}.trees.${k}.number`, { valueAsNumber: true })} />
+                            <Input {...register(`specie.${nestIndex}.trees.${k}.number`)} />
                         </div>
                         <div >
                             {isFirstIndex && <Label>DAP</Label>}
@@ -76,14 +77,13 @@ export default function NestedFieldArray({
                                 name={`specie.${nestIndex}.trees.${k}.volumeM3`}
                                 control={control}
                                 render={({ field }) => (
-                                    <Input
+                                    <DecimalInput
                                         {...field}
-                                        value={maskToM3(field.value)}
-                                        onChange={(e) => {
-                                            field.onChange(unMask(e.target.value))
-                                        }}
-                                    >
-                                    </Input>
+                                        dividirPor={1000}
+                                        fractionDigits={3}
+                                        suffix="m³"
+                                        placeholder="0,000"
+                                    />
                                 )}
                             />
                         </div>
@@ -113,7 +113,7 @@ export default function NestedFieldArray({
                                             range: 0,
                                             scientificName: '',
                                             meters: 0,
-                                            number: 0,
+                                            number: '',
                                             volumeM3: 0
                                         })
                                     }
