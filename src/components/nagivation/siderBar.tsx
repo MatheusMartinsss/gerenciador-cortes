@@ -23,8 +23,10 @@ const menuOptions = [
         childrens: [
             { name: 'autex-list', label: 'Listar Autex', path: '/autex', roles: ['user'] },
             { name: 'autex-create', label: 'Cadastrar Autex', path: '/autex/cadastrar', roles: ['user'] },
-            { name: 'arvores', label: 'Árvores', path: '/arvores', roles: ['user'] },
+            { name: 'arvores-list', label: 'Listar Árvores', path: '/arvores', roles: ['user'] },
+            { name: 'arvores-create', label: 'Cadastrar Árvores', path: '/arvores/cadastrar', roles: ['user'] },
             { name: 'batchs', label: 'Cortes', path: '/batchs', roles: ['user'] },
+            { name: 'corte-create', label: 'Lancar Corte', path: '/cortes/cadastrar', roles: ['user'] },
         ]
     },
     {
@@ -95,7 +97,7 @@ const Sidebar = ({ collapsed }: { collapsed: boolean }) => {
                                 </button>
                                 {isOpen && !collapsed && (
                                     <div
-                                        className={`ml-6 overflow-hidden flex flex-col transition-all duration-300 ease-in-out ${isOpen && !collapsed ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}
+                                        className={`ml-6 overflow-hidden flex flex-col transition-all duration-300 ease-in-out ${isOpen && !collapsed ? 'max-h-80 opacity-100' : 'max-h-0 opacity-0'}`}
                                     >
                                         {menu.childrens.map(child => (
                                             <Link key={child.name} href={child.path} className={subLinkClass(child.path)}>{child.label}</Link>

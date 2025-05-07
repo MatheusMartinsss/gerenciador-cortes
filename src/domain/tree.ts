@@ -14,7 +14,7 @@ export interface ICreateTree {
 
 export interface ITree {
     id: string
-    number: number;
+    number: string;
     commonName: string;
     specie_id: string;
     range: number

@@ -1,11 +1,10 @@
 import { useForm, useFieldArray, Controller } from 'react-hook-form'
 import FieldArray from "./FieldArray";
 import { useEffect, useRef, useState } from "react";
-import { Trash, Copy, CirclePlus, FileUp } from 'lucide-react';
+import { FileUp } from 'lucide-react';
 import { ICreateTree } from "@/domain/tree";
 import * as exceljs from 'exceljs'
 import { useModal } from '@/hooks/useModal';
-import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
 import { formatM3WithSuffix, normalizeString } from '@/lib/masks';
 import { Label } from '@/components/ui/label';
@@ -15,7 +14,6 @@ import { findAllAutex } from '@/services/autexService';
 import { Card } from '@/components/ui/card';
 import { LoaderOverlay } from '@/components/ui/loader-overlay';
 import { useCreateTrees } from '@/hooks/useCreateTreesMutation';
-import { useRouter } from 'next/navigation';
 import { z } from "zod"
 import { zodResolver } from '@hookform/resolvers/zod';
 const defaultValues: FormFieldValues = {
@@ -53,12 +51,10 @@ export const formSchema = z.object({
 export type FormFieldValues = z.infer<typeof formSchema>
 
 export const TreesForm = () => {
-    const router = useRouter()
     const [file, setFile] = useState<File | null>(null);
     const [fileName, setFileName] = useState<string>('');
     const inputFileRef = useRef<HTMLInputElement>(null);
     const { onClose } = useModal()
-    const { toast } = useToast()
     const { control,
         register,
         handleSubmit,

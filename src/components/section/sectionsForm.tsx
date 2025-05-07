@@ -53,7 +53,7 @@ export const SectionsForm = () => {
 
     useEffect(() => {
         if (selectedTrees) {
-            if (getValues('tree').length) {
+            if (getValues('tree')?.length) {
                 const currentValue = getValues('tree')
                 const newValue = selectedTrees.map((tree) => {
                     const alreadyExists = currentValue.find((x) => x.id == tree.id)
