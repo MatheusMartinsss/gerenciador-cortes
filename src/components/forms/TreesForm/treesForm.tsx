@@ -90,7 +90,6 @@ export const TreesForm = () => {
     })
     const formValue = watch('specie')
     const autexId = watch('autex_id')
-    console.log(errors)
     const handleImport = async () => {
         if (file) {
             const reader = new FileReader()
@@ -222,9 +221,7 @@ export const TreesForm = () => {
     return (
         <div className="flex flex-col space-y-1 w-full">
             <div className="grid-cols-1 gap-2 space-y-2">
-                {isPending &&
-                    <LoaderOverlay message='Cadastrando arvores...' />
-                }
+                {isPending && <LoaderOverlay message='Cadastrando arvores...' />}
                 <div className="space-y-2">
                     <label htmlFor="autex">Selecione uma Autex</label>
                     <Controller
@@ -237,13 +234,12 @@ export const TreesForm = () => {
                                     <SelectValue placeholder="Escolha uma opção" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {!isLoadingAutex &&
-                                        autexList.data.map((autex: any) => (
-                                            <SelectItem key={autex.id} value={autex.id}>
-                                                {autex.detentor_autorizacao} - {autex.numero_autorizacao} -{" "}
-                                                {formatM3WithSuffix(autex.volumeM3_total)}
-                                            </SelectItem>
-                                        ))}
+                                    {!isLoadingAutex && autexList.data.map((autex: any) => (
+                                        <SelectItem key={autex.id} value={autex.id}>
+                                            {autex.detentor_autorizacao} - {autex.numero_autorizacao} -{" "}
+                                            {formatM3WithSuffix(autex.volumeM3_total)}
+                                        </SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
                         )}

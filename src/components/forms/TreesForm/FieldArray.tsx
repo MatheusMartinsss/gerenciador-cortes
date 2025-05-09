@@ -58,7 +58,7 @@ export default function Fields({
             {fields.map((item, index) => {
                 const editMode = editIndex === index
                 return (
-                    <Card className="p-4 pt-8 rounded-2xl shadow-md mb-4 relative group">
+                    <Card key={index} className="p-4 pt-8 rounded-2xl shadow-md mb-4 relative group">
                         <div className="absolute top-0 right-2 z-10 flex space-x-2">
                             {/* Botão de editar/concluir */}
                             <Button
