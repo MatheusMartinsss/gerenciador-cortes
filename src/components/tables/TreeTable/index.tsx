@@ -19,14 +19,10 @@ import { columns } from "./columns"
 import { useDebounce } from "@uidotdev/usehooks"
 import { useTableQueryParams } from "@/hooks/useTableQueryParams";
 import { useRouter } from 'next/navigation'
+import { ITree } from "@/domain/tree";
 export const TreeTable = () => {
-    const {
-        setTree,
-        selectedTrees,
-    } = useTree()
-    const { setForm, isOpen } = useModal()
     const [searchText, setSearchText] = useState<string>('')
-    const { order, orderBy, search, page } = useTableQueryParams()
+    const { orderBy, order, search, setSearch, from, setFrom, setTo, to, dateField, setDateField, clearFilters, page } = useTableQueryParams()
     const textDebounce = useDebounce(search, 200)
     const { data: response, isLoading, isError } = useQuery<FindAllTreesResponse>({
         queryKey: ['trees', page, orderBy, order, textDebounce],
@@ -34,83 +30,76 @@ export const TreeTable = () => {
         placeholderData: keepPreviousData
 
     })
+    const [rowSelection, setRowSelection] = useState({});
+    const [selectedTrees, setSelectedTrees] = useState<ITree[]>([]);
+    console.log(rowSelection, selectedTrees)
     const router = useRouter()
-    useEffect(() => {
-        if (!isOpen) {
-            setTree(null)
-        }
-    }, [isOpen])
-    const handleSearch = (value: string) => {
-        setSearchText(value)
+    const onSelectionChange = (data: any) => {
+        console.log(data)
     }
-    const generateBatch = () => {
-        const workBook = new exceljs.Workbook()
-        const sheet = workBook.addWorksheet("tracar");
-        sheet.columns = [
-            {
-                header: "Nº Árvore",
-                key: 'id'
-            },
-        ]
-        if (selectedTrees.length > 0) {
-            selectedTrees.map((tree: any) => {
-                sheet.addRow({
-                    id: tree?.number,
-
-                })
-            })
-            workBook.csv.writeBuffer().then((data) => {
-                const blob = new Blob([data], {
-                    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                })
-                const url = window.URL.createObjectURL(blob);
-                const anchor = document.createElement("a");
-                anchor.href = url;
-                anchor.download = "download.csv";
-                anchor.click();
-                window.URL.revokeObjectURL(url);
-            })
-        }
-    }
-
     return (
         <div className="flex flex-col w-full h-full space-y-2">
-            <div className='flex w-full flex-row space-x-2'>
-                <div>
-                    <Button
-                        variant='secondary'
-                        onClick={() => {
-                            router.push('/arvores/cadastrar')
-                        }}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end bg-muted p-4 rounded-md border">
+                <div className="flex flex-col gap-1 col-span-4">
+                    <label htmlFor="search" className="text-sm font-medium text-muted-foreground">
+                        Buscar
+                    </label>
+                    <Input
+                        id="search"
+                        placeholder="Nome ou autorização"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                    />
+                </div>
+                <div className="flex flex-col gap-1">
+                    <label htmlFor="dateField" className="text-sm font-medium text-muted-foreground">
+                        Campo de data
+                    </label>
+                    <select
+                        id="dateField"
+                        className="border rounded px-2 py-2 text-sm"
+                        value={dateField}
+                        onChange={(e) => setDateField(e.target.value)}
                     >
-                        <TreePine className="mr-2 h-4 w-4" />
-                        Importar
-                    </Button>
+                        <option value="createdAt">Criado em</option>
+                    </select>
                 </div>
-                <div>
-                    <Button
-                        disabled={selectedTrees.length === 0}
-                        variant='secondary'
-                        onClick={() => {
-                            generateBatch()
-                        }}
-                    >
-                        <TreePine className="mr-2 h-4 w-4" />
-                        Cortar
-                    </Button>
+                <div className="flex flex-col gap-1">
+                    <label htmlFor="from" className="text-sm font-medium text-muted-foreground">
+                        Data de (início)
+                    </label>
+                    <Input
+                        type="date"
+                        id="from"
+                        value={from}
+                        onChange={(e) => setFrom(e.target.value)}
+                    />
                 </div>
-                <div>
-                    <CutTreeButton />
-                </div>
-                <div className='flex'>
-                    <div className='flex w-max-sm items-center space-x-1'>
-                        <Input value={searchText} onChange={(e) => handleSearch(e.target.value)} ></Input>
 
-                    </div>
+                <div className="flex flex-col gap-1">
+                    <label htmlFor="to" className="text-sm font-medium text-muted-foreground">
+                        Data até (fim)
+                    </label>
+                    <Input
+                        type="date"
+                        id="to"
+                        value={to}
+                        onChange={(e) => setTo(e.target.value)}
+                    />
                 </div>
+                <div className="flex flex-col gap-1">
+                    <Button variant='default' size='sm' onClick={clearFilters}>Limpar Filtros</Button>
+                </div>
+
+
             </div>
-
-            <DataTable columns={columns} data={response?.data || []} />
+            <DataTable
+                columns={columns}
+                data={response?.data || []}
+                rowSelection={rowSelection}
+                onRowSelectionChange={setRowSelection}
+                onSelectionDataChange={setSelectedTrees}
+            />
 
             <div className="bg-green-950 font-bold rounded-b-2xl p-2 flex w-full">
                 <TablePagination pages={response?.totalPages || 0} />

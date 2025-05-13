@@ -4,6 +4,8 @@ import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
+  OnChangeFn,
+  RowSelectionState,
   useReactTable,
 } from "@tanstack/react-table"
 
@@ -15,19 +17,26 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import React from "react"
+import React, { useEffect } from "react"
 import { useTableQueryParams } from "@/hooks/useTableQueryParams"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   isLoading?: boolean
+  onSelectionChange?: (selected: any[]) => void;
+  rowSelection: RowSelectionState;
+  onRowSelectionChange: OnChangeFn<RowSelectionState>;
+  onSelectionDataChange: (selected: any) => void;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   isLoading = false,
+  rowSelection,
+  onRowSelectionChange,
+  onSelectionDataChange,
 }: DataTableProps<TData, TValue>) {
   const { sorting, setSorting } = useTableQueryParams()
   const table = useReactTable({
@@ -36,9 +45,15 @@ export function DataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
     state: {
-      sorting
-    }
+      sorting,
+      rowSelection
+    },
+    onRowSelectionChange
   })
+
+  useEffect(() => {
+    onSelectionDataChange(table.getSelectedRowModel().rows.map(r => r.original));
+  }, [rowSelection]);
 
   return (
     <div className="rounded-md border bg-white overflow-x-auto min-h-[50vh]">

@@ -6,20 +6,32 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Button } from "@/components/ui/button"
 import { Trash, Eye, MoreHorizontal, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { useQueryState } from "@/hooks/useSearchParams"
+import { ITree } from "@/domain/tree"
+import { Checkbox } from "@/components/ui/checkbox"
 
-export type Tree = {
-    id: string
-    number: number
-    commonName: string
-    scientificName: string
-    dap: number
-    autex?: any;
-    meters: number
-    volumeM3: number
-    sVolumeM3: number
-}
 
-export const columns: ColumnDef<Tree>[] = [
+export const columns: ColumnDef<ITree>[] = [
+    {
+        id: 'select',
+        header: ({ table }) => (
+            <Checkbox
+                checked={table.getIsAllPageRowsSelected()}
+                onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
+                aria-label="Selecionar todas"
+            />
+        ),
+        cell: ({ row }) => (
+            <Checkbox
+                checked={row.getIsSelected()}
+                disabled={!row.getCanSelect()}
+                onCheckedChange={row.getToggleSelectedHandler()}
+                aria-label="Selecionar linha"
+            />
+        ),
+        enableSorting: false,
+        enableColumnFilter: false,
+        size: 5,
+    },
     {
         accessorKey: "number",
         header: ({ column }) => {
