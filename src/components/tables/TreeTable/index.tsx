@@ -1,25 +1,22 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useTree } from "@/hooks/useTree"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { TreePine, Search } from 'lucide-react';
-import { useModal } from "@/hooks/useModal"
 import { Eye } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { TablePagination } from "@/components/nagivation/pagination/pagination"
 import * as exceljs from 'exceljs'
-import { CutTreeButton } from "./CutTreeButton"
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import { findAllTrees, FindAllTreesResponse } from "@/services/treeService"
 import { useQueryState } from "@/hooks/useSearchParams"
-import { TreeModal } from "@/components/modal/TreeModal"
 import { DataTable } from "./data-table"
 import { columns } from "./columns"
 import { useDebounce } from "@uidotdev/usehooks"
 import { useTableQueryParams } from "@/hooks/useTableQueryParams";
 import { useRouter } from 'next/navigation'
 import { ITree } from "@/domain/tree";
+import { exportTreesToExcel } from "@/components/reports/exporTreesToExcel";
+import { exportTreesToCutCsv } from "@/components/reports/exportTreesToCutCsv";
 export const TreeTable = () => {
     const [searchText, setSearchText] = useState<string>('')
     const { orderBy, order, search, setSearch, from, setFrom, setTo, to, dateField, setDateField, clearFilters, page } = useTableQueryParams()
@@ -32,10 +29,39 @@ export const TreeTable = () => {
     })
     const [rowSelection, setRowSelection] = useState({});
     const [selectedTrees, setSelectedTrees] = useState<ITree[]>([]);
-    console.log(rowSelection, selectedTrees)
+    const clearSelecteds = () => {
+        setRowSelection({})
+        setSelectedTrees([])
+    }
     const router = useRouter()
-    const onSelectionChange = (data: any) => {
-        console.log(data)
+    const onSelectionDataChange = (newSelected: ITree[]) => {
+        setSelectedTrees((prevSelected) => {
+            const all = [...prevSelected];
+
+            newSelected.forEach(newItem => {
+                if (!all.some(tree => tree.id === newItem.id)) {
+                    all.push(newItem);
+                }
+            });
+            const currentPageIds = response?.data.map(tree => tree.id) || [];
+            const selectedIds = newSelected.map(tree => tree.id);
+
+            return all.filter(tree =>
+                selectedIds.includes(tree.id) || !currentPageIds.includes(tree.id)
+            );
+        });
+    };
+
+    const onRowSelectionChange = (updater: any) => {
+        setRowSelection(prev =>
+            typeof updater === "function" ? updater(prev) : updater
+        );
+    };
+    const generateReport = () => {
+        exportTreesToExcel(selectedTrees)
+    }
+    const generateTreeCut = () => {
+        exportTreesToCutCsv(selectedTrees)
     }
     return (
         <div className="flex flex-col w-full h-full space-y-2">
@@ -91,20 +117,34 @@ export const TreeTable = () => {
                     <Button variant='default' size='sm' onClick={clearFilters}>Limpar Filtros</Button>
                 </div>
 
-
             </div>
+
             <DataTable
                 columns={columns}
                 data={response?.data || []}
                 rowSelection={rowSelection}
-                onRowSelectionChange={setRowSelection}
-                onSelectionDataChange={setSelectedTrees}
+                onRowSelectionChange={onRowSelectionChange}
+                onSelectionDataChange={onSelectionDataChange}
             />
-
+            {selectedTrees.length > 0 && (
+                <div className="fixed bottom-0 right-0 bg-white border border-gray-200 shadow-md rounded-xl px-6 py-3 z-50 flex items-center justify-between animate-in slide-in-from-bottom-2">
+                    <span className="font-medium text-sm text-gray-700">
+                        {selectedTrees.length} árvore(s) selecionada(s)
+                    </span>
+                    <div className="flex gap-2">
+                        <Button variant="secondary" size="sm" onClick={() => clearSelecteds()}>
+                            Limpar
+                        </Button>
+                        <Button size='sm' onClick={() => generateTreeCut()}> Gerar Corte</Button>
+                        <Button size="sm" onClick={() => generateReport()}>
+                            Gerar Relatorio
+                        </Button>
+                    </div>
+                </div>
+            )}
             <div className="bg-green-950 font-bold rounded-b-2xl p-2 flex w-full">
                 <TablePagination pages={response?.totalPages || 0} />
             </div>
-            <TreeModal />
         </div>
     )
 }

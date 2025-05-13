@@ -39,7 +39,7 @@ export function DataTable<TData, TValue>({
   onSelectionDataChange,
 }: DataTableProps<TData, TValue>) {
   const { sorting, setSorting } = useTableQueryParams()
-  const table = useReactTable({
+  const table = useReactTable<TData>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
@@ -48,7 +48,8 @@ export function DataTable<TData, TValue>({
       sorting,
       rowSelection
     },
-    onRowSelectionChange
+    onRowSelectionChange,
+    getRowId: (row) => (row as any).id.toString(),
   })
 
   useEffect(() => {

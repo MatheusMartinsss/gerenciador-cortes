@@ -31,6 +31,12 @@ export const columns: ColumnDef<ITree>[] = [
         enableSorting: false,
         enableColumnFilter: false,
         size: 5,
+    }, {
+        accessorKey: "id",
+        header: ({}) => null,
+        cell: ({ row }) => null,
+        enableHiding: true,
+        meta: { hidden: true }
     },
     {
         accessorKey: "number",
