@@ -6,7 +6,7 @@ import { ITree } from "@/domain/tree"
 import { z } from 'zod'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Label } from "../ui/label"
-import { maskToM3, maskToMeters } from "@/lib/masks"
+import { formatVolumeM3, maskToM3, maskToMeters } from "@/lib/masks"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select"
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import { findAllTrees, FindAllTreesResponse } from "@/services/treeService"
@@ -146,11 +146,11 @@ export const SearchTree = ({ handleSelectedTree }: ISearchTreeProps) => {
                                         </div>
                                         <div className="flex flex-col space-x-1 xl:flex-row"  >
                                             <span className="font-bold">Exploravel</span>
-                                            <a>{maskToM3(item.volumeM3)}</a>
+                                            <a>{formatVolumeM3(item.volumeM3)}</a>
                                         </div>
                                         <div className="flex flex-col space-x-1 xl:flex-row "  >
                                             <span className="font-bold">Explorado</span>
-                                            <a>{maskToM3(item.sVolumeM3)}</a>
+                                            <a>{formatVolumeM3(item.sVolumeM3)}</a>
                                         </div>
                                     </div>
                                 </div>

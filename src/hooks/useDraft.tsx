@@ -1,7 +1,7 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { toast } from '@/components/ui/use-toast';
-import { createDraft } from '@/services/draftService';
+import { createDraft, deleteDraft } from '@/services/draftService';
 
 interface UseSaveDraftOptions {
     formType: string;
@@ -21,7 +21,7 @@ export function useSaveDraft<TFormData extends Record<string, any> = Record<stri
     errorMessage = 'Erro ao salvar rascunho',
 }: UseSaveDraftOptions) {
     return useMutation({
-        mutationFn: async (formData: TFormData) => await createDraft({formType: formType, formData, formHash, formVersion }),
+        mutationFn: async (formData: TFormData) => await createDraft({ formType: formType, formData, formHash, formVersion }),
         onSuccess: () => {
             toast({ description: successMessage });
             onSuccessCallback?.();
@@ -40,8 +40,23 @@ export function useGetDraft<TFormData = Record<string, any>>(formType: string) {
             const response = await api.get('/draft', {
                 params: { formType },
             });
-            return response.data.form_data ?? {}; // acessa diretamente o conteúdo salvo
+            return response.data.form_data ?? []; // acessa diretamente o conteúdo salvo
         },
-        staleTime: 1000 * 60 * 5, // 5 minutos
+
+    });
+}
+export function useDeleteDraft() {
+      const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (formType: string) => await deleteDraft(formType),
+
+        onSuccess: (_data, formType) => {
+            toast({
+                description: 'Formulario removido com sucesso!',
+                variant: 'destructive'
+            })
+            queryClient.invalidateQueries({ queryKey: ['draft', formType] });
+
+        }
     });
 }

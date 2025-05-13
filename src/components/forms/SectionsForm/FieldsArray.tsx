@@ -8,7 +8,7 @@ import {
     UseFormSetValue,
     UseFormWatch,
 } from "react-hook-form";
-import { FormFieldValues } from './index'
+import { BatchSchema } from './index'
 import { Label } from "@/components/ui/label";
 import { maskToM3 } from "@/lib/masks";
 import { SearchTree } from "@/components/SearchTree";
@@ -30,11 +30,11 @@ export default function FieldsArray({
     getValues,
     watch,
 }: {
-    control: Control<FormFieldValues>;
-    register: UseFormRegister<FormFieldValues>;
-    setValue: UseFormSetValue<FormFieldValues>;
-    getValues: UseFormGetValues<FormFieldValues>;
-    watch: UseFormWatch<FormFieldValues>
+    control: Control<BatchSchema>;
+    register: UseFormRegister<BatchSchema>;
+    setValue: UseFormSetValue<BatchSchema>;
+    getValues: UseFormGetValues<BatchSchema>;
+    watch: UseFormWatch<BatchSchema>
 }) {
     const { fields, append, remove } = useFieldArray({
         control,
@@ -59,7 +59,7 @@ export default function FieldsArray({
     const formSate = watch('tree')
     return (
         <div className="flex flex-col w-full space-y-4">
-            <div className="w-full">
+            <div className="w-full sticky top-10 bg-white">
                 <SearchTree handleSelectedTree={onSelectTree} />
             </div>
             {formSate.length == 0 || !formSate ? (
@@ -109,7 +109,7 @@ export default function FieldsArray({
                                             </AlertDialogContent>
                                         </AlertDialog>
                                     </div>
-                                    <Label className="font-bold"> N° {item.number} {item.scientificName} {item.commonName}</Label>
+                                    <Label className="font-bold"> N° {item.number} {item.scientificName} {item.commonName} {item.volumeM3}</Label>
                                     <div key={item.id} className="flex space-x-2 border-t-2 items-center w-full border-black border-l-2 border-l-black h-4 border-r-2 border-r-black">
                                         <div className="flex flex-col">
                                         </div>
@@ -130,9 +130,7 @@ export default function FieldsArray({
                             </Card>
                         );
                     })}
-                    <div className="w-full">
-                        <Button className="w-full" type="submit">Salvar</Button>
-                    </div>
+
                 </div>
             )}
         </div >

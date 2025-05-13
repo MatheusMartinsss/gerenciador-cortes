@@ -1,0 +1,26 @@
+import { BatchSchema } from "@/components/forms/SectionsForm";
+import { toast } from "@/components/ui/use-toast";
+import api from "@/lib/api";
+import { useMutation } from "@tanstack/react-query";
+
+interface UseSaveBatchOptions {
+    onSuccessCallback?: () => void;
+
+}
+
+export function useSaveBatch({ onSuccessCallback }: UseSaveBatchOptions) {
+    return useMutation({
+        mutationFn: async (body: BatchSchema) => {
+            const response = await api.post('/batch', body)
+            return response.data
+        },
+        onSuccess: () => {
+            toast({ description: 'Corte salvo com sucesso!' });
+            onSuccessCallback?.()
+        },
+        onError: (error) => {
+            console.error('Erro ao salvar rascunho:', error);
+            toast({ description: 'erro', variant: 'destructive' });
+        },
+    });
+}

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Control, Controller, useFieldArray, UseFormRegister, UseFormSetValue, UseFormWatch, useWatch } from "react-hook-form";
-import { FormFieldValues } from "./index";
+import { BatchSchema } from "./index";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -15,10 +15,10 @@ export default function NestedFieldArray({
     watch
 }: {
     nestIndex: number;
-    control: Control<FormFieldValues>;
-    register: UseFormRegister<FormFieldValues>;
-    watch: UseFormWatch<FormFieldValues>
-    setValue: UseFormSetValue<FormFieldValues>
+    control: Control<BatchSchema>;
+    register: UseFormRegister<BatchSchema>;
+    watch: UseFormWatch<BatchSchema>
+    setValue: UseFormSetValue<BatchSchema>
 }) {
     const { fields, remove, append, insert } = useFieldArray({
         control,
@@ -176,9 +176,9 @@ export default function NestedFieldArray({
 
 const SubTotal = ({ nestIndex, idx, control, setValue }: {
     nestIndex: number,
-    setValue: UseFormSetValue<FormFieldValues>,
+    setValue: UseFormSetValue<BatchSchema>,
     idx: number,
-    control: Control<FormFieldValues>
+    control: Control<BatchSchema>
 }) => {
     const watch = useWatch({
         control,

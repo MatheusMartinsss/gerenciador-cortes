@@ -1,6 +1,6 @@
 "use client"
 
-import { formatM3WithSuffix, maskToM3, maskToMeters } from "@/lib/masks"
+import { formatM3WithSuffix, formatVolumeM3, maskToM3, maskToMeters } from "@/lib/masks"
 import { ColumnDef, SortingFn } from "@tanstack/react-table"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
@@ -148,7 +148,7 @@ export const columns: ColumnDef<Tree>[] = [
                 </div>
             )
         },
-        cell: ({ row }) => <div>{formatM3WithSuffix(row.getValue("sVolumeM3"))}</div>,
+        cell: ({ row }) => <div>{formatVolumeM3(row.getValue("sVolumeM3"))}</div>,
     }, {
         accessorFn: (row) => row.autex?.numero_autorizacao,
         id: "autex_numero", // necessário porque não tem accessorKey

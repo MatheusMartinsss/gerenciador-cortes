@@ -1,14 +1,15 @@
 "use client"
-import { SearchTree } from "@/components/SearchTree";
-import { FormProvider, useFieldArray, useForm, useFormState } from "react-hook-form"
+import { FormProvider, useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from '@hookform/resolvers/zod';
 import FieldsArray from "./FieldsArray";
 import { Button } from "@/components/ui/button";
-import { useGetDraft, useSaveDraft } from "@/hooks/useDraft";
+import { useDeleteDraft, useGetDraft, useSaveDraft } from "@/hooks/useDraft";
 import { debounce } from 'lodash';
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import objectHash from 'object-hash';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { useSaveBatch } from "@/hooks/useBatch";
 
 export const sectionSchema = z.object({
     section: z.string().min(1, "Seccção é obrigatória"),
@@ -46,34 +47,40 @@ export const formSchema = z.object({
 })
 
 
-export type FormFieldValues = z.infer<typeof formSchema>
+export type BatchSchema = z.infer<typeof formSchema>
 
 const formType = "section_form"
-
+const defaultValues = {
+    tree: [],
+    formHash: '',
+    formVersion: 0
+}
 const SectionFormIndex = () => {
-    const methods = useForm<FormFieldValues>({
+    const methods = useForm<BatchSchema>({
         resolver: zodResolver(formSchema),
-        defaultValues: {
-            tree: [],
-            formHash: '',
-            formVersion: 0
-        },
+        defaultValues
 
     });
     const { data: draftData, isLoading } = useGetDraft(formType);
-    const { mutate: saveDraft } = useSaveDraft<FormFieldValues>({
+    const { mutate: saveDraft } = useSaveDraft<BatchSchema>({
         formType,
         successMessage: 'Rascunho salvo com sucesso!',
     });
+    const { mutate: deleteDraft } = useDeleteDraft()
+    const resetForm = () => {
+        methods.reset(defaultValues)
+        deleteDraft(formType)
+    }
+    const { mutate: saveBatch, isPending } = useSaveBatch({ onSuccessCallback: resetForm })
     const lastHash = useRef<string>('');
     const lastVersion = useRef<number>(0);
 
-    const generateDataHash = useCallback((data: FormFieldValues['tree']) => {
+    const generateDataHash = useCallback((data: BatchSchema['tree']) => {
         return objectHash.sha1(data);
     }, []);
 
     useEffect(() => {
-        if (draftData) {
+        if (draftData && draftData?.tree?.length > 0) {
             methods.reset({
                 ...draftData,
                 formHash: objectHash(draftData.tree),
@@ -86,10 +93,10 @@ const SectionFormIndex = () => {
 
     const treeValue = methods.watch('tree');
     const currentHash = useMemo(() => generateDataHash(treeValue), [treeValue]);
-
+    const hasData = methods.watch('tree').length > 0
     useEffect(() => {
         const debouncedSave = debounce((hash: string, version: number) => {
-            if (hash !== lastHash.current) {
+            if (hash !== lastHash.current && hasData) {
                 const payload = {
                     ...methods.getValues(),
                     formHash: hash,
@@ -107,8 +114,8 @@ const SectionFormIndex = () => {
         return () => debouncedSave.cancel();
     }, [currentHash]);
 
-    const onSubmit = (formData: FormFieldValues) => {
-        console.log(formData)
+    const onSubmit = async (formData: BatchSchema) => {
+        saveBatch(formData)
     }
     return (
         <div className="flex w-full ">
@@ -117,6 +124,39 @@ const SectionFormIndex = () => {
                     <div className="flex flex-col w-full space-y-2">
                         <FieldsArray {...methods} />
                     </div>
+                    {hasData && (
+                        <div className="w-full flex space-x-2">
+                            <AlertDialog >
+                                <AlertDialogTrigger asChild>
+                                    <Button
+                                        variant="destructive"
+                                        type="button"
+                                        title="Limpar formulario"
+
+                                    >
+                                        Limpar Formulario
+                                    </Button>
+                                </AlertDialogTrigger>
+
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Confirmar remoção</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            Deseja mesmo limpar o formulario?
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                        <AlertDialogAction
+                                            onClick={() => resetForm()}>
+                                            Confirmar
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                            <Button disabled={isPending} type="submit">Salvar</Button>
+                        </div>
+                    )}
                 </form>
             </FormProvider>
         </div>
