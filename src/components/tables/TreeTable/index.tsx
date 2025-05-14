@@ -191,17 +191,3 @@ export const TreeTable = () => {
     )
 }
 
-export const ViewTreeButton = ({ treeId }: { treeId: string }) => {
-    const [, setSelectedTreeId] = useQueryState('treeId', '')
-    const selectTree = (id: string) => {
-        setSelectedTreeId(id)
-    }
-    return (
-        <Button
-            variant='ghost'
-            onClick={() => selectTree(treeId)}>
-            <Eye className="h-3 w-3 mr-2" />
-            Detalhes
-        </Button>
-    )
-}
