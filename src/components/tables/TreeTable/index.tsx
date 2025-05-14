@@ -17,13 +17,24 @@ import { useRouter } from 'next/navigation'
 import { ITree } from "@/domain/tree";
 import { exportTreesToExcel } from "@/components/reports/exporTreesToExcel";
 import { exportTreesToCutCsv } from "@/components/reports/exportTreesToCutCsv";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { formatM3WithSuffix } from "@/lib/masks";
+import { findAllAutex } from "@/services/autexService";
 export const TreeTable = () => {
     const [searchText, setSearchText] = useState<string>('')
+    const [filterAutex, setFilterAutex] = useState<string>('')
     const { orderBy, order, search, setSearch, from, setFrom, setTo, to, dateField, setDateField, clearFilters, page } = useTableQueryParams()
     const textDebounce = useDebounce(search, 200)
-    const { data: response, isLoading, isError } = useQuery<FindAllTreesResponse>({
-        queryKey: ['trees', page, orderBy, order, textDebounce],
-        queryFn: async () => await findAllTrees({ page: Number(page), orderBy, order, searchTerm: textDebounce }),
+    const { data: response, } = useQuery<FindAllTreesResponse>({
+        queryKey: ['trees', page, orderBy, order, textDebounce, filterAutex],
+        queryFn: async () => await findAllTrees({ page: Number(page), orderBy, order, searchTerm: textDebounce, autex: filterAutex }),
+        placeholderData: keepPreviousData,
+
+
+    })
+    const { data: autexList, isLoading: isLoadingAutex, isError } = useQuery({
+        queryKey: ['autex',],
+        queryFn: async () => await findAllAutex({ page: 1, orderBy: '', order: '', noPagination: true }),
         placeholderData: keepPreviousData
 
     })
@@ -63,6 +74,10 @@ export const TreeTable = () => {
     const generateTreeCut = () => {
         exportTreesToCutCsv(selectedTrees)
     }
+    const onSelectAutex = (e: string) => {
+        setFilterAutex(e)
+    }
+
     return (
         <div className="flex flex-col w-full h-full space-y-2">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end bg-muted p-4 rounded-md border">
@@ -77,6 +92,31 @@ export const TreeTable = () => {
                         onChange={(e) => setSearch(e.target.value)}
                     />
                 </div>
+                <div className="col-span-auto">
+                    <label htmlFor="to" className="text-sm font-medium text-muted-foreground">
+                        Filtrar por autex
+                    </label>
+                    <div className="flex">
+                        <Select onValueChange={onSelectAutex} value={filterAutex}>
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Escolha uma opção" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {!isLoadingAutex && autexList.data.map((autex: any) => (
+                                    <SelectItem key={autex.id} value={autex.id}>
+                                        {autex.detentor_autorizacao} - {autex.numero_autorizacao} -{" "}
+                                        {formatM3WithSuffix(autex.volumeM3_total)}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        {filterAutex && (
+                            <Button variant="ghost" size="icon" onClick={() => setFilterAutex("")}>
+                                ✕
+                            </Button>
+                        )}
+                    </div>
+                </div>
                 <div className="flex flex-col gap-1">
                     <label htmlFor="dateField" className="text-sm font-medium text-muted-foreground">
                         Campo de data
@@ -90,6 +130,7 @@ export const TreeTable = () => {
                         <option value="createdAt">Criado em</option>
                     </select>
                 </div>
+
                 <div className="flex flex-col gap-1">
                     <label htmlFor="from" className="text-sm font-medium text-muted-foreground">
                         Data de (início)
@@ -113,6 +154,7 @@ export const TreeTable = () => {
                         onChange={(e) => setTo(e.target.value)}
                     />
                 </div>
+
                 <div className="flex flex-col gap-1">
                     <Button variant='default' size='sm' onClick={clearFilters}>Limpar Filtros</Button>
                 </div>
