@@ -6,10 +6,12 @@ import FieldsArray from "./FieldsArray";
 import { Button } from "@/components/ui/button";
 import { useDeleteDraft, useGetDraft, useSaveDraft } from "@/hooks/useDraft";
 import { debounce } from 'lodash';
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import objectHash from 'object-hash';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useSaveBatch } from "@/hooks/useBatch";
+import { ISection } from "@/domain/section";
+import { exportSectionsToCutCsv } from "@/components/reports/exportSectionsToCutCsv";
 
 export const sectionSchema = z.object({
     section: z.string().min(1, "Seccção é obrigatória"),
@@ -38,14 +40,12 @@ export const treeSchema = z.object({
     sectionsVolumeM3: z.number()
 })
 
-
 export const formSchema = z.object({
     tree: z.array(treeSchema).min(1, "Adicione ao menos uma espécie"),
     formHash: z.string(),
     formVersion: z.number()
 
 })
-
 
 export type BatchSchema = z.infer<typeof formSchema>
 
@@ -67,7 +67,9 @@ const SectionFormIndex = () => {
         successMessage: 'Rascunho salvo com sucesso!',
     });
     const { mutate: deleteDraft } = useDeleteDraft()
-    const resetForm = () => {
+    const [sectionsCreated, setSectionsCreated] = useState<ISection[]>([])
+    const resetForm = (data?: any) => {
+        setSectionsCreated(data)
         methods.reset(defaultValues)
         deleteDraft(formType)
     }
@@ -117,6 +119,13 @@ const SectionFormIndex = () => {
     const onSubmit = async (formData: BatchSchema) => {
         saveBatch(formData)
     }
+    const clearCreatedSections = () => {
+        setSectionsCreated([])
+    }
+    const generateSectionsCsv = () => {
+        exportSectionsToCutCsv(sectionsCreated)
+        clearCreatedSections()
+    }
     return (
         <div className="flex w-full ">
             <FormProvider {...methods}>
@@ -159,6 +168,24 @@ const SectionFormIndex = () => {
                     )}
                 </form>
             </FormProvider>
+            <AlertDialog open={sectionsCreated.length > 0} onOpenChange={clearCreatedSections} >
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Relatorio</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Deseja gerar o relatorio de abate?
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => clearCreatedSections()}>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={() => generateSectionsCsv()}>
+                            Confirmar
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
         </div>
     )
 }

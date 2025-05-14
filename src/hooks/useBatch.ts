@@ -4,7 +4,7 @@ import api from "@/lib/api";
 import { useMutation } from "@tanstack/react-query";
 
 interface UseSaveBatchOptions {
-    onSuccessCallback?: () => void;
+    onSuccessCallback?: (data: any) => void;
 
 }
 
@@ -14,9 +14,9 @@ export function useSaveBatch({ onSuccessCallback }: UseSaveBatchOptions) {
             const response = await api.post('/batch', body)
             return response.data
         },
-        onSuccess: () => {
+        onSuccess: (data) => {
             toast({ description: 'Corte salvo com sucesso!' });
-            onSuccessCallback?.()
+            onSuccessCallback?.(data)
         },
         onError: (error) => {
             console.error('Erro ao salvar rascunho:', error);
