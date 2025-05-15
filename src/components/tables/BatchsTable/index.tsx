@@ -11,13 +11,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { formatM3WithSuffix } from "@/lib/masks"
 import { findAllAutex } from "@/services/autexService"
 import { useState } from "react"
-import { useDebounce } from "@uidotdev/usehooks"
 
 
 export const BatchsTable = () => {
-    const { orderBy, order, search, setSearch, from, setFrom, setTo, to, dateField, setDateField, clearFilters, page } = useTableQueryParams()
+    const { orderBy, order,  from, setFrom, setTo, to, dateField, setDateField, clearFilters, page } = useTableQueryParams()
     const [filterAutex, setFilterAutex] = useState<string>('')
-    const textDebounce = useDebounce(search, 200)
 
     const { data: response, isLoading, isError } = useQuery<FindAllBatchResponse>({
         queryKey: ['batchs', page, orderBy, order],
