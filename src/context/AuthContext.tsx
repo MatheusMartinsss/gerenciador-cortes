@@ -2,6 +2,7 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { AlertProvider } from './AlertContex';
 
 type User = {
     id: string;
@@ -62,7 +63,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     return (
         <AuthContext.Provider value={{ user, isAuthenticated: !!user, logout, login }}>
-            {children}
+            <AlertProvider>
+                {children}
+            </AlertProvider>
         </AuthContext.Provider>
     );
 };

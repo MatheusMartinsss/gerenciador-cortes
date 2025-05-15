@@ -14,7 +14,7 @@ interface FindAllTreesFilter {
     createdAt?: Date;
     filterBy?: string
     searchTerm?: string | number | null
-    autex: string;
+    autex?: string;
 }
 
 export interface FindAllTreesResponse {

@@ -9,9 +9,15 @@ import { debounce } from 'lodash';
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import objectHash from 'object-hash';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { useSaveBatch } from "@/hooks/useBatch";
+import { useSaveBatch, useSaveBatchAsDraft } from "@/hooks/useBatch";
 import { ISection } from "@/domain/section";
 import { exportSectionsToCutCsv } from "@/components/reports/exportSectionsToCutCsv";
+import { findAllAutex } from "@/services/autexService";
+import { useQuery } from "@tanstack/react-query";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { formatM3WithSuffix } from "@/lib/masks";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAlert } from "@/context/AlertContex";
 
 export const sectionSchema = z.object({
     section: z.string().min(1, "Seccção é obrigatória"),
@@ -42,8 +48,11 @@ export const treeSchema = z.object({
 
 export const formSchema = z.object({
     tree: z.array(treeSchema).min(1, "Adicione ao menos uma espécie"),
+    autex_id: z.string().optional(),
+    description: z.string().default(''),
     formHash: z.string(),
-    formVersion: z.number()
+    formVersion: z.number(),
+    id: z.string().nullable().default(null)
 
 })
 
@@ -52,72 +61,78 @@ export type BatchSchema = z.infer<typeof formSchema>
 const formType = "section_form"
 const defaultValues = {
     tree: [],
-    formHash: '',
-    formVersion: 0
+    id: null,
+    description: ''
 }
-const SectionFormIndex = () => {
+const SectionFormIndex = ({ initialData }: { initialData: any }) => {
     const methods = useForm<BatchSchema>({
         resolver: zodResolver(formSchema),
         defaultValues
 
     });
-    const { data: draftData, isLoading } = useGetDraft(formType);
-    const { mutate: saveDraft } = useSaveDraft<BatchSchema>({
-        formType,
-        successMessage: 'Rascunho salvo com sucesso!',
-    });
+    const { showAlert, hideAlert } = useAlert()
+    const { data: autexList, isLoading: isLoadingAutex } = useQuery({
+        queryKey: ['autex',],
+        queryFn: async () => await findAllAutex({ page: 1, orderBy: '', order: '', noPagination: true }),
+    })
     const { mutate: deleteDraft } = useDeleteDraft()
     const [sectionsCreated, setSectionsCreated] = useState<ISection[]>([])
+    const { mutateAsync: saveBatchAsDraft, mutate: saveAsDraft, isPending: isPendingDraft } = useSaveBatchAsDraft({})
+    const updatedRef = useRef(false);
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const debouncedFn = useRef(
+        debounce(async (data: any) => {
+            if (!methods.getValues().id) {
+                updatedRef.current = true;
+                const response = await saveBatchAsDraft(methods.getValues());
+                methods.setValue('id', response.id);
+            } else if (!updatedRef.current && !isPendingDraft) {
+                updatedRef.current = true;
+                saveAsDraft(data);
+            }
+
+            // Libera novamente após 5 segundos
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            timeoutRef.current = setTimeout(() => {
+                updatedRef.current = false;
+            }, 5000);
+        }, 2000)
+    ).current;
+
     const resetForm = (data?: any) => {
         setSectionsCreated(data)
         methods.reset(defaultValues)
         deleteDraft(formType)
     }
     const { mutate: saveBatch, isPending } = useSaveBatch({ onSuccessCallback: resetForm })
-    const lastHash = useRef<string>('');
-    const lastVersion = useRef<number>(0);
 
-    const generateDataHash = useCallback((data: BatchSchema['tree']) => {
-        return objectHash.sha1(data);
+    useEffect(() => {
+        if (initialData) {
+            methods.reset({
+                ...initialData,
+            });
+        }
     }, []);
 
-    useEffect(() => {
-        if (draftData && draftData?.tree?.length > 0) {
-            methods.reset({
-                ...draftData,
-                formHash: objectHash(draftData.tree),
-                formVersion: draftData.formVersion || 0
-            });
-            lastHash.current = draftData.formHash || '';
-            lastVersion.current = draftData.formVersion || 0;
-        }
-    }, [draftData]);
-
     const treeValue = methods.watch('tree');
-    const currentHash = useMemo(() => generateDataHash(treeValue), [treeValue]);
     const hasData = methods.watch('tree').length > 0
+    const filterAutex = methods.watch('autex_id')
+    const formState = methods.watch()
     useEffect(() => {
-        const debouncedSave = debounce((hash: string, version: number) => {
-            if (hash !== lastHash.current && hasData) {
-                const payload = {
-                    ...methods.getValues(),
-                    formHash: hash,
-                    formVersion: version + 1
-                };
-                saveDraft(payload);
-                lastHash.current = hash;
-                lastVersion.current = payload.formVersion;
-                methods.setValue('formVersion', payload.formVersion);
-            }
-        }, 2000);
+        const hasId = !!formState.id;
+        const hasTree = formState.tree?.length > 0;
 
-        debouncedSave(currentHash, methods.getValues('formVersion'));
-
-        return () => debouncedSave.cancel();
-    }, [currentHash]);
+        if (!updatedRef.current && (hasId || hasTree) && !isPendingDraft) {
+            debouncedFn(formState);
+        }
+    }, [formState]);
 
     const onSubmit = async (formData: BatchSchema) => {
         saveBatch(formData)
+    }
+    const onSaveBatchAsDraft = () => {
+        saveBatchAsDraft(methods.getValues())
     }
     const clearCreatedSections = () => {
         setSectionsCreated([])
@@ -126,47 +141,98 @@ const SectionFormIndex = () => {
         exportSectionsToCutCsv(sectionsCreated)
         clearCreatedSections()
     }
+    const onSelectAutex = (e: string) => {
+        if (treeValue.length > 0) {
+            showAlert({
+                title: "Alerta",
+                description: 'Ao selecionar outra autex você ira perder os dados já digitados',
+                onCancel: () => {
+                    hideAlert()
+                },
+                onConfirm: () => {
+                    resetForm(defaultValues)
+                    methods.setValue('autex_id', e)
+                },
+                type: 'destructive'
+            })
+        } else {
+            methods.setValue('autex_id', e)
+        }
+    }
     return (
         <div className="flex w-full ">
             <FormProvider {...methods}>
-                <form onSubmit={methods.handleSubmit(onSubmit)} className="flex flex-col w-full space-y-2">
-                    <div className="flex flex-col w-full space-y-2">
-                        <FieldsArray {...methods} />
+                <div className="flex flex-col w-full space-y-2">
+                    <label>Selecione uma Autex</label>
+                    <div className="flex">
+                        <Select onValueChange={onSelectAutex} value={filterAutex}>
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Escolha uma opção" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {!isLoadingAutex && autexList.data.map((autex: any) => (
+                                    autex.id ? (
+                                        <SelectItem key={autex.id} value={autex.id}>
+                                            {autex.detentor_autorizacao} - {autex.numero_autorizacao} -{" "}
+                                            {formatM3WithSuffix(autex.volumeM3_total)}
+                                        </SelectItem>
+                                    ) : null
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        {filterAutex && (
+                            <Button variant="ghost" size="icon" onClick={() => methods.setValue('autex_id', '')}>
+                                ✕
+                            </Button>
+                        )}
                     </div>
-                    {hasData && (
-                        <div className="w-full flex space-x-2">
-                            <AlertDialog >
-                                <AlertDialogTrigger asChild>
-                                    <Button
-                                        variant="destructive"
-                                        type="button"
-                                        title="Limpar formulario"
+                    {filterAutex ? (
+                        <form onSubmit={methods.handleSubmit(onSubmit)} className="flex flex-col w-full space-y-2">
+                            <div className="flex flex-col w-full space-y-2">
+                                <FieldsArray {...methods} />
+                            </div>
+                            {hasData && (
+                                <div className="w-full flex space-x-2">
+                                    <AlertDialog >
+                                        <AlertDialogTrigger asChild>
+                                            <Button
+                                                variant="destructive"
+                                                type="button"
+                                                title="Limpar formulario"
 
-                                    >
-                                        Limpar Formulario
-                                    </Button>
-                                </AlertDialogTrigger>
+                                            >
+                                                Limpar Formulario
+                                            </Button>
+                                        </AlertDialogTrigger>
 
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>Confirmar remoção</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            Deseja mesmo limpar o formulario?
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                        <AlertDialogAction
-                                            onClick={() => resetForm()}>
-                                            Confirmar
-                                        </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
-                            <Button disabled={isPending} type="submit">Salvar</Button>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Confirmar remoção</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    Deseja mesmo limpar o formulario?
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                                <AlertDialogAction
+                                                    onClick={() => resetForm()}>
+                                                    Confirmar
+                                                </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
+                                    <Button disabled={isPendingDraft} onClick={onSaveBatchAsDraft} type="button">Salvar como rascunho</Button>
+                                    <Button disabled={isPending} type="submit">Salvar</Button>
+                                </div>
+                            )}
+                        </form>
+                    ) : (
+                        <div className="flex items-center space-x-4 w-full">
+                            <Skeleton className="h-[50vh] w-full" />
                         </div>
                     )}
-                </form>
+
+                </div>
             </FormProvider>
             <AlertDialog open={sectionsCreated.length > 0} onOpenChange={clearCreatedSections} >
                 <AlertDialogContent>

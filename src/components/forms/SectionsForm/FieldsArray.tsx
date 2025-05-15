@@ -57,10 +57,11 @@ export default function FieldsArray({
         });
     }
     const formSate = watch('tree')
+    const autex_id = watch('autex_id')
     return (
         <div className="flex flex-col w-full space-y-4">
             <div className="w-full  bg-white">
-                <SearchTree handleSelectedTree={onSelectTree} />
+                <SearchTree handleSelectedTree={onSelectTree} autex={autex_id} />
             </div>
             {formSate.length == 0 || !formSate ? (
                 <Card className="p-6 rounded-2xl shadow-md mb-4 flex items-center justify-center h-[30vh] text-center">

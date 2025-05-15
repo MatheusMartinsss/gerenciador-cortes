@@ -14,12 +14,13 @@ import { ChevronsRight, ChevronsLeft, ChevronRight, ChevronLeft } from 'lucide-r
 import { useDebounce } from '@uidotdev/usehooks'
 interface ISearchTreeProps {
     handleSelectedTree: (data: ITree) => void
+    autex?: string
 }
 const schema = z.object({
     searchInput: z.string(),
 
 })
-export const SearchTree = ({ handleSelectedTree }: ISearchTreeProps) => {
+export const SearchTree = ({ handleSelectedTree, autex }: ISearchTreeProps) => {
     const [showDropDown, setShowDropDown] = useState(false)
     const [page, setPage] = useState(1)
     const [filterBy, setFilterBy] = useState<string>('number')
@@ -27,8 +28,8 @@ export const SearchTree = ({ handleSelectedTree }: ISearchTreeProps) => {
     const [text, setText] = useState<string>('')
     const searchTerm = useDebounce(text, 200)
     const { data: response } = useQuery<FindAllTreesResponse>({
-        queryKey: ['trees', page, filterBy, searchTerm, filterDebounce],
-        queryFn: async () => await findAllTrees({ page: Number(page), filterBy, searchTerm }),
+        queryKey: ['trees', page, filterBy, searchTerm, filterDebounce, autex],
+        queryFn: async () => await findAllTrees({ page: Number(page), filterBy, searchTerm, autex }),
         placeholderData: keepPreviousData
 
     })

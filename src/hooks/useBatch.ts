@@ -24,6 +24,23 @@ export function useSaveBatch({ onSuccessCallback }: UseSaveBatchOptions) {
         },
     });
 }
+export function useSaveBatchAsDraft({ onSuccessCallback }: UseSaveBatchOptions) {
+    return useMutation({
+        mutationFn: async (body: BatchSchema) => {
+            const response = await api.post('/batch/draft', body)
+            console.log(response)
+            return response.data
+        },
+        onSuccess: (data) => {
+            toast({ description: 'Rascunho salvo com sucesso!' });
+            onSuccessCallback?.(data)
+        },
+        onError: (error) => {
+            console.error('Erro ao salvar rascunho:', error);
+            toast({ description: 'erro', variant: 'destructive' });
+        },
+    });
+}
 
 export function useGetBatch(batchId: string) {
     return useQuery({
