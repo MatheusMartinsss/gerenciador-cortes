@@ -17,8 +17,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import React from "react"
-import { useQueryState } from "@/hooks/useSearchParams"
-import { SortOrder } from "@/domain"
+import { useTableQueryParams } from "@/hooks/useTableQueryParams"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -29,9 +28,7 @@ export function DataTable<TData, TValue>({
     columns,
     data,
 }: DataTableProps<TData, TValue>) {
-    const [sorting, setSorting] = React.useState<SortingState>([])
-    const [, setOrderBy] = useQueryState('orderBy', 'number')
-    const [, setSortOrder] = useQueryState<SortOrder>('order', 'ASC')
+    const { setSorting, sorting } = useTableQueryParams()
     const table = useReactTable({
         data,
         columns,
@@ -42,24 +39,23 @@ export function DataTable<TData, TValue>({
         }
     })
     return (
-        <div className="rounded-md border">
-            <Table className="table-auto">
+        <div className="rounded-md border bg-white overflow-x-auto min-h-[50vh]">
+            <Table className="min-w-full table-auto">
                 <TableHeader className="bg-green-900">
                     {table.getHeaderGroups().map((headerGroup) => (
                         <TableRow key={headerGroup.id}>
                             {headerGroup.headers.map((header) => {
-                                const isSortable = header.column.getCanSort()
                                 const isSorted = header.column.getIsSorted()
                                 return (
-                                    <TableHead key={header.id}
-                                        onClick={() => {
-                                            if (isSortable) {
-                                                setOrderBy(header.column.id)
-                                            }
-                                            if (isSorted) {
-                                                setSortOrder(isSorted.toLocaleUpperCase() as SortOrder)
-                                            }
-                                        }}
+                                    <TableHead
+                                        key={header.id}
+                                        role="columnheader"
+                                        aria-sort={
+                                            isSorted === 'asc' ? 'ascending'
+                                                : isSorted === 'desc' ? 'descending' : 'none'
+                                        }
+                                        onClick={header.column.getToggleSortingHandler()}
+                                        className="text-white font-medium cursor-pointer hover:bg-green-800 transition-colors"
                                     >
                                         {header.isPlaceholder
                                             ? null
@@ -67,6 +63,7 @@ export function DataTable<TData, TValue>({
                                                 header.column.columnDef.header,
                                                 header.getContext()
                                             )}
+
                                     </TableHead>
                                 )
                             })}

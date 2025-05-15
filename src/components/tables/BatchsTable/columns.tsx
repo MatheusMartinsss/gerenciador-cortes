@@ -1,12 +1,12 @@
 "use client"
 
-import { dateMask, maskToM3, maskToMeters } from "@/lib/masks"
+import { dateMask, formatVolumeM3, maskToM3, maskToMeters } from "@/lib/masks"
 import { ColumnDef, SortingFn } from "@tanstack/react-table"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Button } from "../../ui/button"
 import { Trash, Eye, MoreHorizontal, ArrowUpDown } from 'lucide-react';
 import { useQueryState } from "@/hooks/useSearchParams"
-
+import { useRouter } from "next/navigation"
 export type Batch = {
     id: string
     number: number
@@ -50,7 +50,7 @@ export const columns: ColumnDef<Batch>[] = [
             )
         },
         cell: ({ row }) => {
-            const value = maskToM3(row.getValue('volumeM3'))
+            const value = formatVolumeM3(row.getValue('volumeM3'))
             return <div className="capitalize pr-8 pl-8 ">{value}</div>
         }
     }, {
@@ -80,7 +80,7 @@ export const columns: ColumnDef<Batch>[] = [
             )
         },
         cell: ({ row }) => {
-            const treeId = row.original.id
+            const batchId = row.original.id
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -92,7 +92,7 @@ export const columns: ColumnDef<Batch>[] = [
                     <DropdownMenuContent align="start" className="flex flex-col">
                         <DropdownMenuLabel>Opções</DropdownMenuLabel>
                         <DropdownMenuItem>
-                            <ViewTreeButton treeId={treeId} />
+                            <ViewButton batchId={batchId} />
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                             <Button size='sm' variant="ghost">
@@ -107,15 +107,12 @@ export const columns: ColumnDef<Batch>[] = [
     }
 ]
 
-export const ViewTreeButton = ({ treeId }: { treeId: string }) => {
-    const [, setSelectedTreeId] = useQueryState('treeId', '')
-    const selectTree = (id: string) => {
-        setSelectedTreeId(id)
-    }
+const ViewButton = ({ batchId }: { batchId: string }) => {
+    const router = useRouter()
     return (
         <Button
             variant='ghost'
-            onClick={() => selectTree(treeId)}>
+            onClick={() => router.push(`/cortes/editar/${batchId}`)}>
             <Eye className="h-3 w-3 mr-2" />
             Detalhes
         </Button>

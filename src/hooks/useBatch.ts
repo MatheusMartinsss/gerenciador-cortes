@@ -1,7 +1,7 @@
 import { BatchSchema } from "@/components/forms/SectionsForm";
 import { toast } from "@/components/ui/use-toast";
 import api from "@/lib/api";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 interface UseSaveBatchOptions {
     onSuccessCallback?: (data: any) => void;
@@ -23,4 +23,25 @@ export function useSaveBatch({ onSuccessCallback }: UseSaveBatchOptions) {
             toast({ description: 'erro', variant: 'destructive' });
         },
     });
+}
+
+export function useGetBatch(batchId: string) {
+    return useQuery({
+        queryKey: ['batch', batchId],
+        queryFn: async () => {
+            const response = await api.get(`/batch/${batchId}`)
+            return response.data
+        }
+    })
+}
+
+
+export function useGetBatchWithSections(batchId: string) {
+    return useQuery({
+        queryKey: ['batch', batchId],
+        queryFn: async () => {
+            const response = await api.get(`/batch/${batchId}/sections`)
+            return response.data
+        }
+    })
 }

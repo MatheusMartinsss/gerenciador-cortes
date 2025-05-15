@@ -7,7 +7,7 @@ interface FindAllBatchFilter {
     limit?: number;
     orderBy?: string; // Adicionado opcionalmente
     noPagination?: boolean;
-    order?: 'ASC' | 'DESC' | '';
+    order?: 'asc' | 'desc' | '';
     number?: number;
     createdAt?: Date;
     filterBy?: string

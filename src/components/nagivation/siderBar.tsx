@@ -25,7 +25,7 @@ const menuOptions = [
             { name: 'autex-create', label: 'Cadastrar Autex', path: '/autex/cadastrar', roles: ['user'] },
             { name: 'arvores-list', label: 'Listar Árvores', path: '/arvores', roles: ['user'] },
             { name: 'arvores-create', label: 'Cadastrar Árvores', path: '/arvores/cadastrar', roles: ['user'] },
-            { name: 'batchs', label: 'Cortes', path: '/batchs', roles: ['user'] },
+            { name: 'cortes', label: 'Cortes', path: '/cortes', roles: ['user'] },
             { name: 'corte-create', label: 'Lancar Corte', path: '/cortes/cadastrar', roles: ['user'] },
         ]
     },

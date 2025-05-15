@@ -10,7 +10,7 @@ import {
 } from "react-hook-form";
 import { BatchSchema } from './index'
 import { Label } from "@/components/ui/label";
-import { maskToM3 } from "@/lib/masks";
+import { dateMask, maskToM3 } from "@/lib/masks";
 import { SearchTree } from "@/components/SearchTree";
 import { ITree } from "@/domain/tree";
 import NestedFieldArray from "./NestedFieldArray";
@@ -40,36 +40,38 @@ export default function FieldsArray({
         control,
         name: "tree"
     });
-    const onSelectTree = (tree: ITree) => {
-        append({
-            ...tree, sectionsVolumeM3: 0, sections: [{
-                d1: 0,
-                d2: 0,
-                d3: 0,
-                d4: 0,
-                meters: 0,
-                plate: '',
-                specie_id: tree.specie_id,
-                section: '',
-                tree_id: tree.id,
-                volumeM3: 0
-            }]
-        });
-    }
-    const formSate = watch('tree')
+
+    const formState = watch()
     return (
         <div className="flex flex-col w-full space-y-4">
-            <div className="w-full  bg-white">
-                <SearchTree handleSelectedTree={onSelectTree} />
-            </div>
-            {formSate.length == 0 || !formSate ? (
+            {formState.tree.length == 0 || !formState.tree ? (
                 <Card className="p-6 rounded-2xl shadow-md mb-4 flex items-center justify-center h-[30vh] text-center">
                     <p className="text-lg font-medium text-gray-600">
                         Nenhuma árvore selecionada. Por favor, selecione pelo menos uma árvore para continuar.
                     </p>
                 </Card>
             ) : (
-                <div className="w-full flex flex-col" >
+                <div className="w-full flex flex-col space-y-2" >
+                    <div className="w-full flex  p-4 rounded-xl border bg-gray-100 shadow-sm space-x-4">
+                        <div className="flex flex-wrap gap-4 text-sm font-medium text-gray-700 justify-between w-full">
+                            <div>
+                                <span className="block text-gray-500">Número:</span>
+                                <span>{formState.number}</span>
+                            </div>
+                            <div>
+                                <span className="block text-gray-500">Descrição:</span>
+                                <span>{formState.description || '—'}</span>
+                            </div>
+                            <div>
+                                <span className="block text-gray-500">Volume M³:</span>
+                                <span>{maskToM3(formState.volumeM3)}</span>
+                            </div>
+                            <div>
+                                <span className="block text-gray-500">Data de Emissão:</span>
+                                <span>{dateMask(formState.createdAt)}</span>
+                            </div>
+                        </div>
+                    </div>
                     {fields.map((item, index) => {
                         return (
                             <Card className="p-4 pt-8 rounded-2xl shadow-md mb-4 relative group" key={index}>
