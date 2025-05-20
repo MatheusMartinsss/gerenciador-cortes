@@ -1,7 +1,7 @@
 import { useQueryState } from 'next-usequerystate'
 import { SortingState } from '@tanstack/react-table'
 
-export function useTableQueryParams(defaultOrderBy = 'createdAt', defaultOrder: 'asc' | 'desc' = 'asc', defaultLimit = 10) {
+export function useTableQueryParams(defaultOrderBy = '', defaultOrder: 'asc' | 'desc' | '' = '', defaultLimit = 10) {
     const [search, setSearch] = useQueryState('search', {
         defaultValue: '',
         parse: (v) => (v.trim().length == 0 ? null : v),
@@ -51,11 +51,14 @@ export function useTableQueryParams(defaultOrderBy = 'createdAt', defaultOrder: 
         clearOnDefault: true
     })
 
-    const [order, setOrder] = useQueryState<'asc' | 'desc'>('order', {
+    const [order, setOrder] = useQueryState<'asc' | 'desc' | ''>('order', {
         defaultValue: defaultOrder,
-        parse: (v) => (v === 'desc' ? 'desc' : 'asc'),
+        parse: (v): 'asc' | 'desc' | '' => {
+            if (v === 'asc' || v === 'desc') return v;
+            return '';
+        },
         serialize: (v) => v,
-        clearOnDefault: true
+        clearOnDefault: true,
     })
 
     const clearFilters = () => {

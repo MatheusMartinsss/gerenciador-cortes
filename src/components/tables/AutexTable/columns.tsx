@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, ArrowUp, ArrowDown } from "lucide-react";
+import { ColumnHeader } from "@/components/ui/columHeader";
 
 export type Autex = {
     id: string;
@@ -25,25 +26,7 @@ export const columns: ColumnDef<Autex>[] = [
         header: ({ column }) => {
             const isSorted = column.getIsSorted();
             return (
-                <div
-                    onClick={() => column.toggleSorting(isSorted === "asc")}
-                    className="cursor-pointer select-none text-white flex items-center"
-                    role="columnheader"
-                    aria-sort={
-                        isSorted === "asc"
-                            ? "ascending"
-                            : isSorted === "desc"
-                                ? "descending"
-                                : "none"
-                    }
-                >
-                    Autorização
-                    {isSorted === "asc" ? (
-                        <ArrowUp className="ml-2 h-4 w-4" />
-                    ) : isSorted === "desc" ? (
-                        <ArrowDown className="ml-2 h-4 w-4" />
-                    ) : null}
-                </div>
+                <ColumnHeader isSorted={isSorted} label="Autorizacao" toggleSorting={column.toggleSorting} align="left" />
             );
         },
         cell: ({ row }) => (
@@ -55,25 +38,8 @@ export const columns: ColumnDef<Autex>[] = [
         header: ({ column }) => {
             const isSorted = column.getIsSorted();
             return (
-                <div
-                    onClick={() => column.toggleSorting(isSorted === "asc")}
-                    className="cursor-pointer select-none text-white flex items-center"
-                    role="columnheader"
-                    aria-sort={
-                        isSorted === "asc"
-                            ? "ascending"
-                            : isSorted === "desc"
-                                ? "descending"
-                                : "none"
-                    }
-                >
-                    Detentor
-                    {isSorted === "asc" ? (
-                        <ArrowUp className="ml-2 h-4 w-4" />
-                    ) : isSorted === "desc" ? (
-                        <ArrowDown className="ml-2 h-4 w-4" />
-                    ) : null}
-                </div>
+                <ColumnHeader isSorted={isSorted} label="Detentor" toggleSorting={column.toggleSorting} align="left" />
+
             );
         },
         cell: ({ row }) => (
@@ -85,58 +51,23 @@ export const columns: ColumnDef<Autex>[] = [
         header: ({ column }) => {
             const isSorted = column.getIsSorted();
             return (
-                <div
-                    onClick={() => column.toggleSorting(isSorted === "asc")}
-                    className="cursor-pointer select-none text-white flex items-center"
-                    role="columnheader"
-                    aria-sort={
-                        isSorted === "asc"
-                            ? "ascending"
-                            : isSorted === "desc"
-                                ? "descending"
-                                : "none"
-                    }
-                >
-                    Vol. Total M³
-                    {isSorted === "asc" ? (
-                        <ArrowUp className="ml-2 h-4 w-4" />
-                    ) : isSorted === "desc" ? (
-                        <ArrowDown className="ml-2 h-4 w-4" />
-                    ) : null}
-                </div>
+                <ColumnHeader isSorted={isSorted} label="Vol. Total M3" toggleSorting={column.toggleSorting} align="center" />
+
             );
         },
         cell: ({ row }) => (
-            <div>{formatVolumeM3(row.getValue("volumeM3_total"))}</div>
+            <div className="capitalize text-center">{formatVolumeM3(row.getValue("volumeM3_total"))}</div>
         ),
-    },{
+    }, {
         accessorKey: "volumeM3_explorado",
         header: ({ column }) => {
             const isSorted = column.getIsSorted();
             return (
-                <div
-                    onClick={() => column.toggleSorting(isSorted === "asc")}
-                    className="cursor-pointer select-none text-white flex items-center"
-                    role="columnheader"
-                    aria-sort={
-                        isSorted === "asc"
-                            ? "ascending"
-                            : isSorted === "desc"
-                                ? "descending"
-                                : "none"
-                    }
-                >
-                    Vol. Explorado M³
-                    {isSorted === "asc" ? (
-                        <ArrowUp className="ml-2 h-4 w-4" />
-                    ) : isSorted === "desc" ? (
-                        <ArrowDown className="ml-2 h-4 w-4" />
-                    ) : null}
-                </div>
+                <ColumnHeader isSorted={isSorted} label="Vol. Total M3" toggleSorting={column.toggleSorting} align="center" />
             );
         },
         cell: ({ row }) => (
-            <div>{formatVolumeM3(row.getValue("volumeM3_explorado"))}</div>
+            <div className="capitalize text-center">{formatVolumeM3(row.getValue("volumeM3_explorado"))}</div>
         ),
     },
     {
@@ -144,29 +75,12 @@ export const columns: ColumnDef<Autex>[] = [
         header: ({ column }) => {
             const isSorted = column.getIsSorted();
             return (
-                <div
-                    onClick={() => column.toggleSorting(isSorted === "asc")}
-                    className="cursor-pointer select-none text-white flex items-center"
-                    role="columnheader"
-                    aria-sort={
-                        isSorted === "asc"
-                            ? "ascending"
-                            : isSorted === "desc"
-                                ? "descending"
-                                : "none"
-                    }
-                >
-                    Validade Inicial
-                    {isSorted === "asc" ? (
-                        <ArrowUp className="ml-2 h-4 w-4" />
-                    ) : isSorted === "desc" ? (
-                        <ArrowDown className="ml-2 h-4 w-4" />
-                    ) : null}
-                </div>
+                <ColumnHeader isSorted={isSorted} label="Validade Inicial" toggleSorting={column.toggleSorting} align="center" />
+
             );
         },
         cell: ({ row }) => (
-            <div>{dateMask(row.getValue("validade_inicial"))}</div>
+            <div className="capitalize text-center">{dateMask(row.getValue("validade_inicial"))}</div>
         ),
     },
     {

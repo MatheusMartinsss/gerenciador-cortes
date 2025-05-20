@@ -4,7 +4,7 @@ import { dateMask, formatVolumeM3, maskToM3, maskToMeters } from "@/lib/masks"
 import { ColumnDef, SortingFn } from "@tanstack/react-table"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Button } from "../../ui/button"
-import { Trash, Eye, MoreHorizontal, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Trash, Eye, MoreHorizontal, ArrowUpDown, ArrowUp, ArrowDown, Printer } from 'lucide-react';
 import { useQueryState } from "@/hooks/useSearchParams"
 import { useRouter } from "next/navigation"
 export type Batch = {
@@ -24,7 +24,7 @@ export const columns: ColumnDef<Batch>[] = [
             return (
                 <div
                     onClick={() => column.toggleSorting(isSorted === "asc")}
-                    className="cursor-pointer select-none text-white flex items-center"
+                    className="relative cursor-pointer select-none text-white flex items-center justify-center text-center"
                     role="columnheader"
                     aria-sort={
                         isSorted === "asc"
@@ -35,16 +35,20 @@ export const columns: ColumnDef<Batch>[] = [
                     }
                 >
                     Numero
-                    {isSorted === "asc" ? (
-                        <ArrowUp className="ml-2 h-4 w-4" />
-                    ) : isSorted === "desc" ? (
-                        <ArrowDown className="ml-2 h-4 w-4" />
-                    ) : null}
+                    {isSorted && (
+                        <span className="absolute right-0 pr-2">
+                            {isSorted === "asc" ? (
+                                <ArrowUp className="h-4 w-4" />
+                            ) : (
+                                <ArrowDown className="h-4 w-4" />
+                            )}
+                        </span>
+                    )}
                 </div>
             );
         },
         cell: ({ row }) => {
-            return <div className="capitalize">{row.getValue('number')}</div>
+            return <div className="capitalize text-center">{row.getValue('number')}</div>
         }
     }, {
         accessorKey: 'status',
@@ -53,7 +57,7 @@ export const columns: ColumnDef<Batch>[] = [
             return (
                 <div
                     onClick={() => column.toggleSorting(isSorted === "asc")}
-                    className="cursor-pointer select-none text-white flex items-center"
+                    className="relative cursor-pointer select-none text-white flex items-center justify-center text-center"
                     role="columnheader"
                     aria-sort={
                         isSorted === "asc"
@@ -64,21 +68,33 @@ export const columns: ColumnDef<Batch>[] = [
                     }
                 >
                     Status
-                    {isSorted === "asc" ? (
-                        <ArrowUp className="ml-2 h-4 w-4" />
-                    ) : isSorted === "desc" ? (
-                        <ArrowDown className="ml-2 h-4 w-4" />
-                    ) : null}
+                    {isSorted && (
+                        <span className="absolute right-0 pr-2">
+                            {isSorted === "asc" ? (
+                                <ArrowUp className="h-4 w-4" />
+                            ) : (
+                                <ArrowDown className="h-4 w-4" />
+                            )}
+                        </span>
+                    )}
                 </div>
             );
         },
         cell: ({ row }) => {
-            const value = row.getValue('status')
-            if (value == 'finalized') {
-                return <div className="capitalize rounded border w-fit px-2 py-0.5 text-sm border-green-600 text-green-700 bg-green-50">Finalizado</div>
-            }
-            return <div className="capitalize rounded border w-fit px-2 py-0.5 text-sm border-red-600 text-red-700 bg-red-50">Rascunho</div>
+            const value = row.getValue('status');
+            const statusClass = value === 'finalized'
+                ? 'border-green-600 text-green-700 bg-green-50'
+                : 'border-red-600 text-red-700 bg-red-50';
+
+            return (
+                <div className="w-full h-full flex justify-center items-center">
+                    <div className={`capitalize rounded border px-2 py-0.5 text-sm w-fit ${statusClass}`}>
+                        {value === 'finalized' ? 'Finalizado' : 'Rascunho'}
+                    </div>
+                </div>
+            );
         }
+
     },
     {
         accessorKey: 'volumeM3',
@@ -87,7 +103,7 @@ export const columns: ColumnDef<Batch>[] = [
             return (
                 <div
                     onClick={() => column.toggleSorting(isSorted === "asc")}
-                    className="cursor-pointer select-none text-white flex items-center"
+                    className="relative cursor-pointer select-none text-white flex items-center justify-center text-center"
                     role="columnheader"
                     aria-sort={
                         isSorted === "asc"
@@ -98,17 +114,21 @@ export const columns: ColumnDef<Batch>[] = [
                     }
                 >
                     Vol. M3
-                    {isSorted === "asc" ? (
-                        <ArrowUp className="ml-2 h-4 w-4" />
-                    ) : isSorted === "desc" ? (
-                        <ArrowDown className="ml-2 h-4 w-4" />
-                    ) : null}
+                    {isSorted && (
+                        <span className="absolute right-0 pr-2">
+                            {isSorted === "asc" ? (
+                                <ArrowUp className="h-4 w-4" />
+                            ) : (
+                                <ArrowDown className="h-4 w-4" />
+                            )}
+                        </span>
+                    )}
                 </div>
             );
         },
         cell: ({ row }) => {
             const value = formatVolumeM3(row.getValue('volumeM3'))
-            return <div className="capitalize">{value}</div>
+            return <div className="capitalize text-center">{value}</div>
         }
     }, {
         accessorKey: 'createdAt',
@@ -117,7 +137,7 @@ export const columns: ColumnDef<Batch>[] = [
             return (
                 <div
                     onClick={() => column.toggleSorting(isSorted === "asc")}
-                    className="cursor-pointer select-none text-white flex items-center"
+                    className="relative cursor-pointer select-none text-white flex items-center justify-center text-center"
                     role="columnheader"
                     aria-sort={
                         isSorted === "asc"
@@ -127,49 +147,38 @@ export const columns: ColumnDef<Batch>[] = [
                                 : "none"
                     }
                 >
-                    Dt. Emissão
-                    {isSorted === "asc" ? (
-                        <ArrowUp className="ml-2 h-4 w-4" />
-                    ) : isSorted === "desc" ? (
-                        <ArrowDown className="ml-2 h-4 w-4" />
-                    ) : null}
+                    <span className="mx-auto">Dt. Emissão</span>
+                    {isSorted && (
+                        <span className="absolute right-0 pr-2">
+                            {isSorted === "asc" ? (
+                                <ArrowUp className="h-4 w-4" />
+                            ) : (
+                                <ArrowDown className="h-4 w-4" />
+                            )}
+                        </span>
+                    )}
                 </div>
+
             );
         },
         cell: ({ row }) => {
-            return <div className="capitalize">{dateMask(row.getValue('createdAt'))}</div>
+            return <div className="capitalize text-center">{dateMask(row.getValue('createdAt'))}</div>
         }
     }, {
         id: 'actions',
-        header: ({ column }) => {
-            return (
-                <div className="capitalize">#</div>
-            )
-        },
+        header: () => <div className="text-center text-white">#</div>,
+        size: 30,        // largura base da coluna
+        maxSize: 40,     // largura máxima permitida
+        minSize: 30,     // opcional: garante que não estique demais
+        enableResizing: false, // impede redimensionamento se for suportado
         cell: ({ row }) => {
-            const batchId = row.original.id
+            const batchId = row.original.id;
             return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="flex flex-col">
-                        <DropdownMenuLabel>Opções</DropdownMenuLabel>
-                        <DropdownMenuItem>
-                            <ViewButton batchId={batchId} />
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                            <Button size='sm' variant="ghost">
-                                <Trash className="w-3 h-3 mr-2" />
-                                Excluir
-                            </Button>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            )
+                <div className="flex justify-center gap-1">
+                    <ViewButton batchId={batchId} />
+                    <GenerateCsv batchId={batchId} />
+                </div>
+            );
         }
     }
 ]
@@ -180,8 +189,16 @@ const ViewButton = ({ batchId }: { batchId: string }) => {
         <Button
             variant='ghost'
             onClick={() => router.push(`/cortes/editar/${batchId}`)}>
-            <Eye className="h-3 w-3 mr-2" />
-            Detalhes
+            <Eye className="h-4 w-4 mr-2" />
+        </Button>
+    )
+}
+const GenerateCsv = ({ batchId }: { batchId: string }) => {
+    return (
+        <Button
+            variant='ghost'
+        >
+            <Printer className="h-4 w-4 mr-2" />
         </Button>
     )
 }
