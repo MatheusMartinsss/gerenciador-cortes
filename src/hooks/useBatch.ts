@@ -59,6 +59,7 @@ export function useGetBatchWithSections(batchId: string) {
         queryFn: async () => {
             const response = await api.get(`/batch/${batchId}/sections`)
             return response.data
-        }
+        },
+        refetchOnWindowFocus: false
     })
 }

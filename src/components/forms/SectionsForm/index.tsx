@@ -4,10 +4,9 @@ import { z } from "zod"
 import { zodResolver } from '@hookform/resolvers/zod';
 import FieldsArray from "./FieldsArray";
 import { Button } from "@/components/ui/button";
-import { useDeleteDraft, useGetDraft, useSaveDraft } from "@/hooks/useDraft";
+import { useDeleteDraft } from "@/hooks/useDraft";
 import { debounce } from 'lodash';
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import objectHash from 'object-hash';
+import { useEffect, useRef, useState } from "react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useSaveBatch, useSaveBatchAsDraft } from "@/hooks/useBatch";
 import { ISection } from "@/domain/section";
@@ -50,8 +49,6 @@ export const formSchema = z.object({
     tree: z.array(treeSchema).min(1, "Adicione ao menos uma espécie"),
     autex_id: z.string().optional(),
     description: z.string().default(''),
-    formHash: z.string(),
-    formVersion: z.number(),
     id: z.string().nullable().default(null)
 
 })
@@ -67,7 +64,7 @@ const defaultValues = {
 const SectionFormIndex = ({ initialData }: { initialData: any }) => {
     const methods = useForm<BatchSchema>({
         resolver: zodResolver(formSchema),
-        defaultValues
+        defaultValues: initialData || defaultValues
 
     });
     const { showAlert, hideAlert } = useAlert()
@@ -75,11 +72,10 @@ const SectionFormIndex = ({ initialData }: { initialData: any }) => {
         queryKey: ['autex',],
         queryFn: async () => await findAllAutex({ page: 1, orderBy: '', order: '', noPagination: true }),
     })
-    const { mutate: deleteDraft } = useDeleteDraft()
-    const [sectionsCreated, setSectionsCreated] = useState<ISection[]>([])
     const { mutateAsync: saveBatchAsDraft, mutate: saveAsDraft, isPending: isPendingDraft } = useSaveBatchAsDraft({})
     const updatedRef = useRef(false);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const isInitialized = useRef(false);
 
     const debouncedFn = useRef(
         debounce(async (data: any) => {
@@ -101,20 +97,19 @@ const SectionFormIndex = ({ initialData }: { initialData: any }) => {
     ).current;
 
     const resetForm = (data?: any) => {
-        setSectionsCreated(data)
         methods.reset(defaultValues)
-        deleteDraft(formType)
+        showAlert({
+            title: 'Alerta',
+            description: 'Deseja gerar o relatorio dos cortes?',
+            onCancel: () => {
+                hideAlert()
+            },
+            onConfirm: () => {
+                generateSectionsCsv(data)
+            }
+        })
     }
     const { mutate: saveBatch, isPending } = useSaveBatch({ onSuccessCallback: resetForm })
-
-    useEffect(() => {
-        if (initialData) {
-            methods.reset({
-                ...initialData,
-            });
-        }
-    }, []);
-
     const treeValue = methods.watch('tree');
     const hasData = methods.watch('tree').length > 0
     const filterAutex = methods.watch('autex_id')
@@ -123,23 +118,27 @@ const SectionFormIndex = ({ initialData }: { initialData: any }) => {
         const hasId = !!formState.id;
         const hasTree = formState.tree?.length > 0;
 
+        if (!isInitialized.current || !methods.formState.isDirty) {
+            isInitialized.current = true;
+            return;
+        }
+
         if (!updatedRef.current && (hasId || hasTree) && !isPendingDraft) {
             debouncedFn(formState);
         }
     }, [formState]);
 
     const onSubmit = async (formData: BatchSchema) => {
+        debouncedFn.cancel();
+        updatedRef.current = true
         saveBatch(formData)
     }
     const onSaveBatchAsDraft = () => {
-        saveBatchAsDraft(methods.getValues())
+        debouncedFn(formState)
     }
-    const clearCreatedSections = () => {
-        setSectionsCreated([])
-    }
-    const generateSectionsCsv = () => {
-        exportSectionsToCutCsv(sectionsCreated)
-        clearCreatedSections()
+    const generateSectionsCsv = (data: any) => {
+        exportSectionsToCutCsv(data)
+        hideAlert()
     }
     const onSelectAutex = (e: string) => {
         if (treeValue.length > 0) {
@@ -234,24 +233,6 @@ const SectionFormIndex = ({ initialData }: { initialData: any }) => {
 
                 </div>
             </FormProvider>
-            <AlertDialog open={sectionsCreated.length > 0} onOpenChange={clearCreatedSections} >
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Relatorio</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Deseja gerar o relatorio de abate?
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => clearCreatedSections()}>Cancelar</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={() => generateSectionsCsv()}>
-                            Confirmar
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-
         </div>
     )
 }
